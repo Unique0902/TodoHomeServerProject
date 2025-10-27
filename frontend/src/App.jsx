@@ -16,6 +16,8 @@ import HabitAddView from './views/HabitAddView'; // 새 임포트
 import HabitDetailView from './views/HabitDetailView'; // 새 임포트
 import ProjectAddView from './views/ProjectAddView'; // 새 임포트
 import ProjectDetailView from './views/ProjectDetailView'; // 새 임포트
+import WishlistAddView from './views/WishlistAddView'; // 새 임포트
+import WishlistDetailView from './views/WishlistDetailView'; // 새 임포트
 
 function App() {
   return (
@@ -49,6 +51,9 @@ function App() {
             <Route path='/habits/:id/edit' element={<HabitAddView />} />{' '}
             {/* 수정은 AddView 재사용 예정 */}
             <Route path='/wishlists' element={<WishlistView />} />
+            <Route path='/wishlists/add' element={<WishlistAddView />} />
+            <Route path='/wishlists/:id' element={<WishlistDetailView />} />
+            <Route path='/wishlists/:id/edit' element={<WishlistAddView />} />
           </Routes>
         </main>
 
