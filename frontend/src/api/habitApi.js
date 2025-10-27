@@ -72,3 +72,34 @@ export const resetHabitCompletions = async (categoryId, date) => {
   });
   return response.data;
 };
+
+// 11. 습관 ID로 상세 조회
+export const getHabitById = async (id) => {
+  const response = await api.get(`/habits/${id}`);
+  return response.data;
+};
+
+// 12. 습관 삭제
+export const deleteHabit = async (id) => {
+  await api.delete(`/habits/${id}`);
+};
+
+// 13. 습관 카테고리 단일 조회 (상세 정보 표시용)
+export const getHabitCategoryById = async (id) => {
+  const response = await api.get(`/habit-categories/${id}`);
+  return response.data;
+};
+
+// 14. 습관 생성
+export const createHabit = async (habitData) => {
+  const response = await api.post('/habits', habitData);
+  return response.data;
+};
+
+// 15. 습관 수정
+export const updateHabit = async (id, habitData) => {
+  // Habit의 PATCH는 배열 수정과 일반 필드 수정이 모두 가능하도록 컨트롤러가 구현되어 있습니다.
+  // 여기서는 일반 필드만 수정하는 요청을 보냅니다.
+  const response = await api.patch(`/habits/${id}`, habitData);
+  return response.data;
+};

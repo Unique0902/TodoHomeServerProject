@@ -26,7 +26,20 @@ export const updateTodoStatus = async (id, isCompleted) => {
   return response.data;
 };
 
-// 4. 할일 삭제
+// 4. 할일 ID로 상세 조회
+export const getTodoById = async (id) => {
+  const response = await api.get(`/todos/${id}`);
+  return response.data;
+};
+
+// 5. 할일 수정 (PATCH)
+export const updateTodo = async (id, todoData) => {
+  const response = await api.patch(`/todos/${id}`, todoData);
+  return response.data;
+};
+
+// 6. 할일 삭제
 export const deleteTodo = async (id) => {
-  await api.delete(`/todos/${id}`);
+  const response = await api.delete(`/todos/${id}`);
+  return response.data;
 };

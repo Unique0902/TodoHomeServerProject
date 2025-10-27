@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // 👈 useNavigate 임포트
 
 // TodoItem 컴포넌트
 // todo: 할일 데이터 객체
 // onToggle: 완료 상태 토글 핸들러 함수
 const TodoItem = ({ todo, onToggle }) => {
+  const navigate = useNavigate(); // 👈 useNavigate 훅 사용
   // 시간 정보를 포맷하는 함수 (dueDate가 있으면 HH:MM, 없으면 '오늘')
   const formatTime = (dueDate) => {
     // 1. dueDate 필드가 아예 없거나 null일 경우
@@ -33,9 +35,19 @@ const TodoItem = ({ todo, onToggle }) => {
   // todo.dueDate를 사용하도록 수정
   const timeString = formatTime(todo.dueDate);
   const itemClasses = `todo-item ${todo.isCompleted ? 'completed' : ''}`;
-
+  // 상세 페이지 이동 핸들러
+  const handleDetailClick = (e) => {
+    // 이벤트 버블링 방지: 체크박스 클릭 이벤트가 상세 이동을 트리거하지 않도록 합니다.
+    if (
+      e.target.className.includes('todo-checkbox') ||
+      e.target.className.includes('checkbox-input')
+    ) {
+      return;
+    }
+    navigate(`/todos/${todo._id}`);
+  };
   return (
-    <div className={itemClasses}>
+    <div className={itemClasses} onClick={handleDetailClick}>
       {/* 체크박스 영역 */}
       <div className='todo-checkbox' onClick={() => onToggle(todo)}>
         <input

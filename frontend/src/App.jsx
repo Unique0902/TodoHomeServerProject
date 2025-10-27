@@ -10,6 +10,10 @@ import HabitsView from './views/HabitsView';
 import WishlistView from './views/WishlistView';
 import HabitCategorySelectView from './views/HabitCategorySelectView';
 import TodoAddView from './views/TodoAddView'; // 새 임포트
+import TodoDetailView from './views/TodoDetailView'; // 새 임포트
+import TodoEditView from './views/TodoEditView'; // 새 임포트
+import HabitAddView from './views/HabitAddView'; // 새 임포트
+import HabitDetailView from './views/HabitDetailView'; // 새 임포트
 
 function App() {
   return (
@@ -21,12 +25,20 @@ function App() {
             <Route path='/' element={<HomeView />} />
             <Route path='/todos' element={<TodosView />} />
             <Route path='/todos/add' element={<TodoAddView />} />
+            <Route path='/todos/:id' element={<TodoDetailView />} />{' '}
+            {/* 상세 페이지 */}
+            <Route path='/todos/:id/edit' element={<TodoEditView />} />{' '}
+            {/* 수정 페이지 */}
             <Route path='/projects' element={<ProjectsView />} />
             <Route path='/habits' element={<HabitsView />} />
             <Route
               path='/habit-categories'
               element={<HabitCategorySelectView />}
             />
+            <Route path='/habits/add' element={<HabitAddView />} />
+            <Route path='/habits/:id' element={<HabitDetailView />} />
+            <Route path='/habits/:id/edit' element={<HabitAddView />} />{' '}
+            {/* 수정은 AddView 재사용 예정 */}
             <Route path='/wishlists' element={<WishlistView />} />
           </Routes>
         </main>

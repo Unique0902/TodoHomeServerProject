@@ -1,0 +1,110 @@
+/* src/styles/TodoDetailView.css */
+
+.todo-detail-view {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 15px 5px 0;
+    color: #333;
+    font-weight: bold;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 상세 내용 섹션 */
+.detail-content {
+    padding: 10px 0;
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.info-group:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.value {
+    font-size: 18px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.value.description {
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+    min-height: 50px;
+}
+
+.value.status.completed {
+    color: #28a745; /* 초록색 */
+    font-weight: bold;
+}
+.value.status.active {
+    color: #dc3545; /* 빨간색 */
+}
+
+
+/* 하단 액션 버튼 섹션 */
+.action-bar {
+    position: fixed;
+    bottom: 80px; 
+    right: 30px;
+    display: flex;
+    flex-direction: column; /* 세로로 나열 */
+    gap: 15px;
+    z-index: 100;
+}
+
+.edit-button, .delete-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-button {
+    background-color: #ffc107; /* 노란색 계열 */
+}
+
+.delete-button {
+    background-color: #dc3545; /* 빨간색 계열 */
+}

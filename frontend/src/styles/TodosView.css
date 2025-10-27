@@ -141,3 +141,52 @@
     cursor: pointer;
     z-index: 100;
 }
+
+/* 습관 섹션 헤더 (TodosView.css의 하단에 추가) */
+.habit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ddd;
+}
+
+.category-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+}
+
+.category-edit-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.category-edit-button:hover {
+    color: #007bff;
+}
+
+/* 습관 추가 버튼 (AddButton) */
+.add-habit-button {
+    position: fixed;
+    bottom: 80px; 
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #28a745; /* 초록색 계열로 구분 */
+    color: white;
+    font-size: 30px;
+    line-height: 1;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 100;
+}
