@@ -9,6 +9,7 @@ import ProjectsView from './views/ProjectsView';
 import HabitsView from './views/HabitsView';
 import WishlistView from './views/WishlistView';
 import HabitCategorySelectView from './views/HabitCategorySelectView';
+import TodoAddView from './views/TodoAddView'; // 새 임포트
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Routes>
             <Route path='/' element={<HomeView />} />
             <Route path='/todos' element={<TodosView />} />
+            <Route path='/todos/add' element={<TodoAddView />} />
             <Route path='/projects' element={<ProjectsView />} />
             <Route path='/habits' element={<HabitsView />} />
             <Route

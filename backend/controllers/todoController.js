@@ -19,17 +19,19 @@ exports.createTodo = async (req, res) => {
 // 2. 할일 목록 조회 (GET /todos?date=...)
 exports.getAllTodos = async (req, res) => {
   try {
-    const { date } = req.query;
+    const { date } = req.query; // date는 "YYYY-MM-DD" 문자열
     let query = {};
 
-    // 날짜 필터링 로직 (쿼리 파라미터로 "YYYY-MM-DD" 형태의 날짜를 받아 필터링)
     if (date) {
-      // Mongoose Date 쿼리를 위한 날짜 범위 설정
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(startOfDay);
-      endOfDay.setDate(startOfDay.getDate() + 1); // 다음 날 0시
+      // [수정된 핵심 로직: UTC 기준 하루 범위 설정]
+      // 1. 해당 날짜의 00:00:00 UTC (그 날의 시작점)
+      const startOfDay = new Date(date + 'T00:00:00.000Z');
 
+      // 2. 다음 날짜의 00:00:00 UTC (그 날의 끝 지점)
+      const endOfDay = new Date(date + 'T00:00:00.000Z');
+      endOfDay.setDate(endOfDay.getDate() + 1);
+
+      // MongoDB 쿼리: startOfDay 이상, endOfDay 미만
       query.dueDate = { $gte: startOfDay, $lt: endOfDay };
     }
 
