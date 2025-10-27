@@ -63,3 +63,12 @@ export const toggleCategorySelection = async (id, action, date) => {
   const response = await api.patch(`/habit-categories/${id}`, { action, date });
   return response.data;
 };
+
+// 10. 습관 완료 기록 일괄 초기화 (카테고리 변경 시 사용)
+export const resetHabitCompletions = async (categoryId, date) => {
+  const response = await api.post('/habits/reset-completions', {
+    categoryId,
+    date,
+  });
+  return response.data;
+};

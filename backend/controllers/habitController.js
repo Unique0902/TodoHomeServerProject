@@ -7,11 +7,9 @@ exports.createHabit = async (req, res) => {
     res.status(201).json(habit);
   } catch (error) {
     if (error.name === 'ValidationError') {
-      return res
-        .status(400)
-        .json({
-          message: '필수 필드(title, habitCategoryId)가 누락되었습니다.',
-        });
+      return res.status(400).json({
+        message: '필수 필드(title, habitCategoryId)가 누락되었습니다.',
+      });
     }
     res.status(500).json({ message: '습관 생성 실패', error: error.message });
   }
@@ -126,5 +124,40 @@ exports.deleteHabit = async (req, res) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: '습관 삭제 실패', error: error.message });
+  }
+};
+
+// **새로운 커스텀 API: 습관 완료 날짜 일괄 초기화**
+// POST /api/v1/habits/reset-completions
+// Body: { categoryId: "habitCategoryId", date: "YYYY-MM-DD" }
+exports.resetCompletions = async (req, res) => {
+  try {
+    const { categoryId, date } = req.body;
+
+    if (!categoryId || !date) {
+      return res
+        .status(400)
+        .json({ message: 'categoryId와 date는 필수 필드입니다.' });
+    }
+
+    const dateToRemove = new Date(date);
+
+    // [핵심 로직]
+    // 1. habitCategoryId가 일치하는 모든 습관을 찾습니다.
+    // 2. 해당 습관들의 completedDates 배열에서 주어진 날짜(dateToRemove)를 제거합니다.
+    const result = await Habit.updateMany(
+      { habitCategoryId: categoryId },
+      { $pull: { completedDates: dateToRemove } }
+    );
+
+    // result.modifiedCount: 실제로 수정된 문서(습관)의 개수
+    res.status(200).json({
+      message: `${date} 날짜의 완료 기록이 ${result.modifiedCount}개 습관에서 초기화되었습니다.`,
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: '습관 완료 기록 초기화 실패', error: error.message });
   }
 };

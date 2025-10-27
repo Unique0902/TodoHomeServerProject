@@ -8,6 +8,9 @@ router
   .get(habitController.getAllHabits) // GET /api/v1/habits?categoryId=... (목록 조회 및 필터링)
   .post(habitController.createHabit); // POST /api/v1/habits (습관 생성)
 
+// **[새로운 커스텀 엔드포인트 추가]**
+router.post('/reset-completions', habitController.resetCompletions); // POST /api/v1/habits/reset-completions
+
 // /api/v1/habits/:id 경로에 대한 라우팅
 router
   .route('/:id')
