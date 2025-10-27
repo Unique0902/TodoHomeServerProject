@@ -14,6 +14,8 @@ import TodoDetailView from './views/TodoDetailView'; // 새 임포트
 import TodoEditView from './views/TodoEditView'; // 새 임포트
 import HabitAddView from './views/HabitAddView'; // 새 임포트
 import HabitDetailView from './views/HabitDetailView'; // 새 임포트
+import ProjectAddView from './views/ProjectAddView'; // 새 임포트
+import ProjectDetailView from './views/ProjectDetailView'; // 새 임포트
 
 function App() {
   return (
@@ -30,6 +32,13 @@ function App() {
             <Route path='/todos/:id/edit' element={<TodoEditView />} />{' '}
             {/* 수정 페이지 */}
             <Route path='/projects' element={<ProjectsView />} />
+            <Route path='/projects/add' element={<ProjectAddView />} />
+            <Route path='/projects/:id' element={<ProjectDetailView />} />
+            <Route
+              path='/projects/:id/edit'
+              element={<ProjectAddView />}
+            />{' '}
+            {/* 수정은 AddView 재사용 */}
             <Route path='/habits' element={<HabitsView />} />
             <Route
               path='/habit-categories'

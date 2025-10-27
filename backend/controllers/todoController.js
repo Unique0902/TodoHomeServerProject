@@ -16,25 +16,28 @@ exports.createTodo = async (req, res) => {
   }
 };
 
-// 2. 할일 목록 조회 (GET /todos?date=...)
+// 2. 할일 목록 조회 (GET /todos?date=...&projectId=...)
 exports.getAllTodos = async (req, res) => {
   try {
-    const { date } = req.query; // date는 "YYYY-MM-DD" 문자열
+    // --- 쿼리 파라미터에서 date와 projectId를 추출 ---
+    const { date, projectId } = req.query;
     let query = {};
 
+    // 1. 날짜 필터링 로직 (기존 로직 유지)
     if (date) {
-      // [수정된 핵심 로직: UTC 기준 하루 범위 설정]
-      // 1. 해당 날짜의 00:00:00 UTC (그 날의 시작점)
       const startOfDay = new Date(date + 'T00:00:00.000Z');
-
-      // 2. 다음 날짜의 00:00:00 UTC (그 날의 끝 지점)
       const endOfDay = new Date(date + 'T00:00:00.000Z');
       endOfDay.setDate(endOfDay.getDate() + 1);
 
-      // MongoDB 쿼리: startOfDay 이상, endOfDay 미만
       query.dueDate = { $gte: startOfDay, $lt: endOfDay };
     }
 
+    // 2. **[핵심 추가]** 프로젝트 ID 필터링 로직
+    if (projectId) {
+      query.projectId = projectId;
+    }
+
+    // --- 쿼리 실행 ---
     // 생성일 기준 내림차순 정렬
     const todos = await Todo.find(query).sort({ createdAt: -1 });
     res.status(200).json(todos);
@@ -48,7 +51,6 @@ exports.getAllTodos = async (req, res) => {
 // 3. 단일 할일 조회 (GET /todos/:id)
 exports.getTodo = async (req, res) => {
   try {
-    // ID 유효성 검사는 Mongoose가 자동으로 처리하지 못하는 경우 직접 확인 필요 (Optional)
     const todo = await Todo.findById(req.params.id);
     if (!todo) {
       return res.status(404).json({ message: '할일을 찾을 수 없습니다.' });
@@ -78,7 +80,7 @@ exports.updateTodoPartial = async (req, res) => {
   }
 };
 
-// 5. 할일 전체 수정 (PUT /todos/:id) - 전체 교체 로직 (PATCH와 유사)
+// 5. 할일 전체 수정 (PUT /todos/:id) - 전체 교체 로직
 exports.updateTodoFull = async (req, res) => {
   try {
     const todo = await Todo.findOneAndReplace(

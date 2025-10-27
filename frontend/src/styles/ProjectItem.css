@@ -1,0 +1,40 @@
+/* src/components/ProjectItem.css */
+
+.project-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.project-item:last-child {
+    border-bottom: none;
+}
+
+.project-checkbox {
+    padding-right: 15px;
+    line-height: 1; 
+}
+
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc; 
+    border-radius: 4px; 
+    cursor: pointer;
+    accent-color: #007bff;
+}
+
+.project-title {
+    flex-grow: 1; 
+    font-size: 16px;
+    color: #333;
+}
+
+/* 완료된 프로젝트 스타일 */
+.project-item.completed .project-title {
+    text-decoration: line-through; 
+    color: #999; 
+}

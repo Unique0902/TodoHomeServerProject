@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { createTodo } from '../api/todoApi';
 import '../styles/TodoAddView.css';
+import { useMemo } from 'react';
 
 // 오늘 날짜를 YYYY-MM-DD 형식의 문자열로 반환
 const getTodayDateString = () => {
@@ -14,14 +15,25 @@ const getTodayDateString = () => {
 
 const TodoAddView = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // 👈 쿼리 파라미터 훅 사용
 
-  // 폼 상태 관리
-  const [title, setTitle] = useState('');
+  // 쿼리 파라미터에서 projectId와 projectName 가져오기
+  const projectId = useMemo(
+    () => searchParams.get('projectId'),
+    [searchParams]
+  );
+  const projectName = useMemo(
+    () => searchParams.get('projectName'),
+    [searchParams]
+  );
+
+  // 폼 상태 관리 (기존 상태 유지)
+  const [title, setTitle] = useState(projectName ? `${projectName} - ` : ''); // 프로젝트 이름으로 제목 기본값 설정
+  // ... (나머지 상태 유지) ...
   const [description, setDescription] = useState('');
-  // 기한 활성화 상태 (와이어프레임의 '기한' 버튼 역할)
   const [isDueDateActive, setIsDueDateActive] = useState(false);
-  const [dueDate, setDueDate] = useState(getTodayDateString()); // 날짜 (YYYY-MM-DD)
-  const [time, setTime] = useState(''); // 시간 (HH:MM)
+  const [dueDate, setDueDate] = useState(getTodayDateString());
+  const [time, setTime] = useState('');
 
   // 저장 버튼 (체크 버튼) 핸들러
   const handleSave = async () => {
@@ -52,13 +64,22 @@ const TodoAddView = () => {
       title,
       description: description.trim(),
       dueDate: finalDueDate,
-      // isCompleted는 백엔드에서 기본값 false로 처리됨
+      projectId: projectId || null, // 👈 projectId가 있다면 추가
     };
 
     try {
       await createTodo(todoData);
       alert('할일이 성공적으로 추가되었습니다!');
-      navigate('/todos'); // 목록 페이지로 이동
+
+      // --- [핵심 수정: 이동 경로] ---
+      if (projectId) {
+        // 프로젝트 ID가 있다면, 해당 프로젝트 상세 페이지로 이동
+        navigate(`/projects/${projectId}`);
+      } else {
+        // 없다면, 일반 할일 목록 페이지로 이동
+        navigate('/todos');
+      }
+      // ---------------------------------
     } catch (error) {
       console.error('할일 추가 실패:', error);
       alert('할일 추가 중 오류가 발생했습니다.');
@@ -68,14 +89,12 @@ const TodoAddView = () => {
   return (
     <div className='todo-add-view'>
       <header className='header-bar'>
-        {/* 1. 뒤로가기 버튼 */}
+        {/* ... (뒤로가기, 제목, 저장 버튼 유지) ... */}
         <button className='back-button' onClick={() => navigate(-1)}>
           &lt;
         </button>
         <h1 className='title'>할일 추가</h1>
-        {/* 2. 저장(체크) 버튼 */}
         <button className='save-button' onClick={handleSave}>
-          {/* 와이어프레임의 V 체크 표시 (임시) */}
           <span role='img' aria-label='save'>
             ✔️
           </span>

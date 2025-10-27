@@ -43,3 +43,12 @@ export const deleteTodo = async (id) => {
   const response = await api.delete(`/todos/${id}`);
   return response.data;
 };
+
+// 7. 프로젝트 ID로 할일 목록 조회 (추가)
+export const getTodosByProjectId = async (projectId) => {
+  // 백엔드에는 아직 이 필터링 기능이 없지만, 쿼리 파라미터로 처리한다고 가정합니다.
+  const response = await api.get('/todos', {
+    params: { projectId },
+  });
+  return response.data;
+};
