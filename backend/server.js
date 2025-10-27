@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./db/connect');
 const cors = require('cors');
+const morgan = require('morgan');
 
 // --- 1. 모든 라우트 파일 임포트 ---
 const todoRoutes = require('./routes/todoRoutes');
@@ -16,6 +17,7 @@ const port = process.env.PORT || 5000;
 // --- 2. 미들웨어 설정 ---
 app.use(cors()); // 프론트엔드 연결 허용
 app.use(express.json()); // JSON 요청 본문 파싱
+app.use(morgan('tiny')); // 'tiny'는 간결한 로그 포맷을 의미
 
 // --- 3. 라우팅 설정 (모든 리소스 등록) ---
 // 기본 URL: /api/v1
