@@ -39,5 +39,10 @@ const start = async () => {
     process.exit(1);
   }
 };
+// 개발 서버 실행 시에만 start() 호출
+if (require.main === module) {
+  start();
+}
 
-start();
+// 테스트를 위해 Express 앱 인스턴스를 export
+module.exports = app;
