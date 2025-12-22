@@ -1,0 +1,55 @@
+/* src/styles/WishlistView.css */
+
+.wishlists-view {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.main-title {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.completed-section .section-title {
+    margin-top: 40px;
+}
+
+.completed-label {
+    color: #888;
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+/* 위시리스트 추가 버튼 */
+.add-wishlist-button {
+    position: fixed;
+    bottom: 80px; 
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #ffc107; /* 노란색 계열 */
+    color: white;
+    font-size: 30px;
+    line-height: 1;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 100;
+}

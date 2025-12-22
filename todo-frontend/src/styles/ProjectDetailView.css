@@ -1,0 +1,142 @@
+/* src/styles/ProjectDetailView.css */
+
+.project-detail-view {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    /* 하단 버튼을 위해 공간 확보 */
+    padding-bottom: 120px; 
+}
+
+/* 상단 헤더 스타일 재정의 */
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 요소들을 양 끝으로 분리 */
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 15px 5px 0;
+    color: #333;
+    font-weight: bold;
+}
+
+.title {
+    /* 제목이 뒤로가기 버튼과 액션 그룹 사이를 유연하게 채우도록 */
+    flex-grow: 1; 
+    text-align: center;
+    padding: 0 10px;
+    font-size: 24px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 우측 상단 관리 버튼 그룹 */
+.top-action-group {
+    display: flex;
+    gap: 10px; /* 수정 버튼과 삭제 버튼 사이 간격 */
+}
+
+/* 상단 아이콘 버튼 공통 스타일 */
+.edit-button-icon, .delete-button-icon {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.edit-button-icon {
+    color: #ffc107; /* 노란색 (수정) */
+}
+
+.delete-button-icon {
+    color: #dc3545; /* 빨간색 (삭제) */
+}
+
+
+/* --- 상세 정보 섹션 --- */
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.value {
+    font-size: 18px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.value.description {
+    white-space: pre-wrap;
+    min-height: 50px;
+}
+
+/* --- 하위 할일 목록 스타일 --- */
+
+.todo-list-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+.completed-sub-title {
+    font-size: 16px;
+    color: #888;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.empty-message.small {
+    padding: 10px;
+    font-size: 14px;
+    color: #999;
+}
+
+/* --- 하단 액션 버튼 (할일 추가 버튼) --- */
+
+.project-action-bar-bottom {
+    position: fixed;
+    bottom: 80px; 
+    right: 30px; /* 우측 하단 고정 */
+    left: auto;
+    display: flex;
+    flex-direction: row; 
+    z-index: 100;
+}
+
+.add-todo-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #007bff; /* Todo의 기본 파란색 */
+    color: white;
+    font-size: 30px;
+    line-height: 1;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}

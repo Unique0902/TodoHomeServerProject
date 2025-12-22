@@ -1,0 +1,174 @@
+/* src/styles/HomeView.css */
+
+/* 기본 레이아웃 */
+.home-view {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff; /* 배경색 다시 확인 */
+    min-height: 100%; /* 콘텐츠가 적어도 전체 높이를 차지하도록 */
+}
+
+/* 상단 헤더 */
+.header-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-top: 10px;
+}
+
+.main-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: #1a1a1a; 
+    margin-bottom: 5px;
+}
+
+.date-info {
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    gap: 8px;
+}
+
+/* 섹션 타이틀 (할일, 습관, 완료) */
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 25px; /* 섹션 간격 */
+    margin-bottom: 10px;
+    color: #333;
+    /* 와이어프레임의 수평선을 CSS로 구현 */
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+    width: 100%; /* 너비를 꽉 채우도록 */
+}
+
+/* 할일 아이템 공통 스타일 */
+.todo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-checkbox {
+    padding-right: 15px; /* 체크박스와 제목 사이 여백 */
+    line-height: 1; 
+}
+
+/* 체크박스 스타일링 */
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc; /* 와이어프레임처럼 테두리 강조 */
+    border-radius: 4px; /* 약간의 둥근 모서리 */
+    cursor: pointer;
+    accent-color: #007bff;
+}
+
+.todo-title {
+    flex-grow: 1; 
+    margin-right: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.todo-time {
+    font-size: 14px;
+    color: #999; 
+    font-style: italic;
+    min-width: 60px; /* 시간 필드가 흔들리지 않도록 최소 너비 지정 */
+    text-align: right;
+}
+
+/* 완료된 할일 (Completed) 스타일 */
+.todo-item.completed .todo-title {
+    text-decoration: line-through; 
+    color: #999; 
+}
+
+.completed-label {
+    color: #888;
+    margin-top: 40px; 
+}
+
+.todo-list.completed-list .todo-item {
+    border-bottom: 1px dashed #f0f0f0; /* 완료 목록도 구분선 유지 */
+    padding-left: 5px; 
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+/* ... 기존 Todo 섹션 및 공통 스타일 ... */
+
+/* 습관 섹션 헤더 (카테고리 정보와 버튼) */
+.habit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px 0;
+    border-bottom: 1px dashed #ddd;
+}
+
+.habit-category-info {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+}
+
+.category-edit-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.category-edit-button:hover {
+    color: #007bff;
+}
+
+/* 습관 아이템 스타일 (HabitItem.css에 넣을 수도 있지만 일단 통합) */
+.habit-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.habit-item.completed .habit-title {
+    /* 습관은 완료되어도 줄이 그어지지 않음 (요청 사항) */
+    color: #444; 
+}
+
+.habit-title {
+    flex-grow: 1;
+    margin: 0 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.habit-meta {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+}

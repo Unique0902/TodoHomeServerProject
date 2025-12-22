@@ -1,0 +1,40 @@
+/* src/components/WishlistItem.css */
+
+.wishlist-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.wishlist-item:last-child {
+    border-bottom: none;
+}
+
+.wishlist-checkbox {
+    padding-right: 15px;
+    line-height: 1; 
+}
+
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc; 
+    border-radius: 4px; 
+    cursor: pointer;
+    accent-color: #ffc107; /* 위시리스트 고유 색상 (노란색 계열) */
+}
+
+.wishlist-title {
+    flex-grow: 1; 
+    font-size: 16px;
+    color: #333;
+}
+
+/* 완료된 위시리스트 스타일 */
+.wishlist-item.completed .wishlist-title {
+    text-decoration: line-through; 
+    color: #999; 
+}
