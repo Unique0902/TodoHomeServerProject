@@ -1,0 +1,26 @@
+name: Deploy to Home Server
+
+on:
+  push:
+    branches: [main] # 메인 브랜치에 푸시될 때 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: todo.mooktodomanager.shop
+          username: mook
+          password: ${{ secrets.SSH_PASSWORD }} # GitHub Secrets에 등록한 비번
+          port: 2222
+          script: |
+            cd ~/docker/TodoHomeServerProject
+            # 1. 최신 코드 가져오기 (package.json 포함)
+            git pull origin main
+
+            # 2. 부모 폴더에 있는 docker-compose.yml 실행 (경로 주의)
+            # 만약 docker-compose.yml이 TodoHomeServerProject 안에 있다면 그냥 실행
+            cd ..
+            docker compose up -d --build todo_frontend todo_backend
