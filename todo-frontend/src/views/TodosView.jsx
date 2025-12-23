@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTodos, updateTodoStatus } from '../api/todoApi';
+import {
+  getTodos,
+  updateTodoStatus,
+  getTodosWithoutDate,
+} from '../api/todoApi';
 import TodoItem from '../components/TodoItem';
 import {
   getStartOfWeek,
@@ -15,7 +19,9 @@ const dayLabels = ['일', '월', '화', '수', '목', '금', '토'];
 const TodosView = () => {
   const navigate = useNavigate();
   const [todos, setTodos] = useState([]);
+  const [todosWithoutDate, setTodosWithoutDate] = useState([]); // 수행일 없는 할일
   const [loading, setLoading] = useState(false);
+  const [loadingWithoutDate, setLoadingWithoutDate] = useState(false);
 
   // 현재 주의 시작 날짜 (Date 객체)
   const [currentWeekStart, setCurrentWeekStart] = useState(getStartOfWeek());
@@ -56,10 +62,25 @@ const TodosView = () => {
     }
   }, [selectedDate]);
 
+  // 수행일 없는 할일 로딩
+  const fetchTodosWithoutDate = useCallback(async () => {
+    setLoadingWithoutDate(true);
+    try {
+      const data = await getTodosWithoutDate();
+      setTodosWithoutDate(data);
+    } catch (err) {
+      console.error('수행일 없는 Todo 로드 실패:', err);
+      setTodosWithoutDate([]);
+    } finally {
+      setLoadingWithoutDate(false);
+    }
+  }, []);
+
   const handleToggle = async (todo) => {
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
-      fetchTodos(); // 목록 갱신
+      fetchTodos(); // 날짜별 목록 갱신
+      fetchTodosWithoutDate(); // 수행일 없는 목록 갱신
     } catch (error) {
       alert('상태 업데이트에 실패했습니다.');
     }
@@ -69,11 +90,17 @@ const TodosView = () => {
     // 주가 바뀔 때, 선택된 날짜가 그 주에 포함되도록 조정 (선택된 날짜를 유지하거나 주의 첫날로 변경 가능)
     // 여기서는 선택된 날짜를 유지하며 그 날짜의 데이터만 불러옵니다.
     fetchTodos();
-  }, [currentWeekStart, selectedDate, fetchTodos]);
+    fetchTodosWithoutDate();
+  }, [currentWeekStart, selectedDate, fetchTodos, fetchTodosWithoutDate]);
 
   // 할일 목록 분리
   const activeTodos = todos.filter((todo) => !todo.isCompleted);
   const completedTodos = todos.filter((todo) => todo.isCompleted);
+
+  // 수행일 없는 할일 목록 (완료되지 않은 것만)
+  const activeTodosWithoutDate = todosWithoutDate.filter(
+    (todo) => !todo.isCompleted
+  );
 
   return (
     <div className='todos-view'>
@@ -116,7 +143,19 @@ const TodosView = () => {
         </div>
       </div>
 
-      {/* 2. 할일 목록 섹션 */}
+      {/* 2. 해야할리스트 섹션 (수행일이 없는 할일) */}
+      {activeTodosWithoutDate.length > 0 && (
+        <section className='todo-list-section'>
+          <h2 className='section-title'>해야할리스트</h2>
+          <div className='todo-list active-list'>
+            {activeTodosWithoutDate.map((todo) => (
+              <TodoItem key={todo._id} todo={todo} onToggle={handleToggle} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. 할일 목록 섹션 (선택된 날짜의 할일) */}
       <section className='todo-list-section'>
         <h2 className='section-title'>할일</h2>
 
@@ -132,7 +171,7 @@ const TodosView = () => {
         </div>
       </section>
 
-      {/* 3. 완료 목록 섹션 */}
+      {/* 4. 완료 목록 섹션 */}
       <section className='completed-section'>
         <h2 className='section-title completed-label'>완료</h2>
         <div className='todo-list completed-list'>
@@ -142,7 +181,7 @@ const TodosView = () => {
         </div>
       </section>
 
-      {/* 4. 할일 추가 버튼 */}
+      {/* 5. 할일 추가 버튼 */}
       <button
         className='add-todo-button'
         onClick={() => navigate('/todos/add')} // 할일 추가 페이지로 이동

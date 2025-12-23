@@ -16,15 +16,23 @@ exports.createTodo = async (req, res) => {
   }
 };
 
-// 2. 할일 목록 조회 (GET /todos?date=...&projectId=...)
+// 2. 할일 목록 조회 (GET /todos?date=...&projectId=...&noDueDate=true)
 exports.getAllTodos = async (req, res) => {
   try {
-    // --- 쿼리 파라미터에서 date와 projectId를 추출 ---
-    const { date, projectId } = req.query;
+    // --- 쿼리 파라미터에서 date, projectId, noDueDate를 추출 ---
+    const { date, projectId, noDueDate } = req.query;
     let query = {};
 
-    // 1. 날짜 필터링 로직 (기존 로직 유지)
-    if (date) {
+    // 1. 수행일이 없는 할일 조회 (noDueDate 파라미터가 우선순위)
+    if (noDueDate === 'true') {
+      // 필드가 없거나 null인 경우 모두 포함
+      query.$or = [
+        { dueDate: { $exists: false } },
+        { dueDate: null }
+      ];
+    }
+    // 2. 날짜 필터링 로직 (date와 noDueDate가 동시에 오지 않는다고 가정)
+    else if (date) {
       const startOfDay = new Date(date + 'T00:00:00.000Z');
       const endOfDay = new Date(date + 'T00:00:00.000Z');
       endOfDay.setDate(endOfDay.getDate() + 1);
@@ -32,7 +40,7 @@ exports.getAllTodos = async (req, res) => {
       query.dueDate = { $gte: startOfDay, $lt: endOfDay };
     }
 
-    // 2. **[핵심 추가]** 프로젝트 ID 필터링 로직
+    // 3. 프로젝트 ID 필터링 로직
     if (projectId) {
       query.projectId = projectId;
     }

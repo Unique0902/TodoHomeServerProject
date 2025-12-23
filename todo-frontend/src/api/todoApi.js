@@ -52,3 +52,16 @@ export const getTodosByProjectId = async (projectId) => {
   });
   return response.data;
 };
+
+// 8. 수행일이 지정되지 않은 할일 목록 조회
+export const getTodosWithoutDate = async () => {
+  try {
+    const response = await api.get('/todos', {
+      params: { noDueDate: 'true' },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('수행일 없는 할일 조회 실패:', error);
+    throw error;
+  }
+};
