@@ -1,4 +1,5 @@
 const HabitCategory = require('../models/HabitCategory');
+const Habit = require('../models/Habit');
 
 // 1. 카테고리 생성 (POST /habit-categories)
 exports.createHabitCategory = async (req, res) => {
@@ -116,11 +117,20 @@ exports.updateHabitCategoryFull = async (req, res) => {
 // 6. 카테고리 삭제 (DELETE /habit-categories/:id)
 exports.deleteHabitCategory = async (req, res) => {
   try {
-    const category = await HabitCategory.findByIdAndDelete(req.params.id);
+    const category = await HabitCategory.findById(req.params.id);
 
     if (!category) {
       return res.status(404).json({ message: '카테고리를 찾을 수 없습니다.' });
     }
+
+    // 해당 카테고리에 속한 모든 습관 삭제
+    const deleteHabitsResult = await Habit.deleteMany({
+      habitCategoryId: req.params.id,
+    });
+
+    // 카테고리 삭제
+    await HabitCategory.findByIdAndDelete(req.params.id);
+
     // 204 No Content 응답 (삭제 성공)
     res.status(204).send();
   } catch (error) {

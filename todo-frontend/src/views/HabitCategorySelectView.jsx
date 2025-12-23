@@ -8,6 +8,7 @@ import {
   // 🌟 사용자님의 habitApi.js에 맞춰 'toggleCategorySelection'으로 임포트합니다.
   toggleCategorySelection,
   resetHabitCompletions,
+  deleteHabitCategory,
 } from '../api/habitApi';
 
 // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오는 헬퍼 함수
@@ -86,6 +87,27 @@ const HabitCategorySelectView = () => {
           console.error(err);
         });
     }
+  };
+
+  // 카테고리 삭제 핸들러 (휴지통 버튼)
+  const handleDelete = (category) => {
+    if (
+      !window.confirm(
+        `"${category.title}" 카테고리를 삭제하시겠습니까?\n이 카테고리에 속한 모든 습관도 함께 삭제됩니다.`
+      )
+    ) {
+      return;
+    }
+
+    deleteHabitCategory(category._id)
+      .then(() => {
+        alert('카테고리가 성공적으로 삭제되었습니다.');
+        return fetchCategories();
+      })
+      .catch((err) => {
+        alert('카테고리 삭제에 실패했습니다.');
+        console.error(err);
+      });
   };
 
   // --- 1. 카테고리 선택 로직 ---
@@ -189,9 +211,23 @@ const HabitCategorySelectView = () => {
                 {/* 연필 수정 버튼 */}
                 <button
                   className='edit-button'
-                  onClick={() => handleEdit(category)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(category);
+                  }}
                 >
                   ✏️
+                </button>
+
+                {/* 휴지통 삭제 버튼 */}
+                <button
+                  className='delete-button'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(category);
+                  }}
+                >
+                  🗑️
                 </button>
               </li>
             ))

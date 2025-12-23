@@ -59,6 +59,27 @@
     font-size: 18px;
     padding: 5px;
     color: #999;
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+
+.edit-button:hover {
+    color: #007bff;
+}
+
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    color: #999;
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+
+.delete-button:hover {
+    color: #dc3545;
 }
 
 /* 플러스 추가 버튼 (와이어프레임 하단 우측) */
