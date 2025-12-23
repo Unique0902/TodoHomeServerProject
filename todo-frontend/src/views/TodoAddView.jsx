@@ -45,18 +45,16 @@ const TodoAddView = () => {
     // 1. dueDate 필드 구성
     let finalDueDate = null;
     if (isDueDateActive) {
-      // --- [핵심 수정 부분] ---
-      // 2025-10-27T10:00과 같은 문자열을 생성하여 로컬 시간으로 Date 객체를 만듭니다.
-      const dateTimeString = `${dueDate}T${time || '00:00'}`;
-      finalDueDate = new Date(dateTimeString);
-
-      // 중요: 만약 Node.js에서 이 로컬 시간을 UTC로 저장할 경우,
-      // KST 시간인 finalDueDate를 DB에 저장할 때 Mongoose가 자동으로 UTC로 변환하여 저장합니다.
-      // 예를 들어, KST 20시 00분 -> UTC 11시 00분으로 저장됨. (이게 정상)
-
-      // 시간 정보가 없을 경우 (time이 빈 문자열일 경우)
-      if (!time) {
-        finalDueDate.setHours(0, 0, 0, 0); // 해당 날짜 0시 KST로 설정
+      if (time) {
+        // 시간이 있는 경우: 로컬 시간으로 Date 객체 생성
+        // 예: 2025-01-15T14:30 -> 로컬 시간(KST) 기준
+        const dateTimeString = `${dueDate}T${time}`;
+        finalDueDate = new Date(dateTimeString);
+      } else {
+        // 시간이 없는 경우: UTC 기준으로 해당 날짜의 00:00:00으로 저장
+        // 이렇게 하면 백엔드의 날짜 필터링과 정확히 일치합니다
+        // 예: 2025-01-15 -> 2025-01-15T00:00:00.000Z (UTC)
+        finalDueDate = new Date(dueDate + 'T00:00:00.000Z');
       }
     }
 

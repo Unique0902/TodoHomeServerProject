@@ -13,10 +13,14 @@ const TodoItem = ({ todo, onToggle }) => {
 
     try {
       const date = new Date(dueDate);
-
-      // 2. dueDate는 있으나 시간 정보가 00:00:00인 경우 (TodoAddView에서 시간 없이 날짜만 저장했을 경우)
-      // KST 기준 9시간 차이가 발생하므로, 로컬 시간으로 변환 후 시간이 0인지 체크합니다.
-      if (date.getHours() === 0 && date.getMinutes() === 0) {
+      
+      // UTC로 저장된 날짜만 있는 경우 확인 (UTC 00:00:00)
+      // 날짜 문자열이 있는 경우에만 체크
+      const dueDateStr = typeof dueDate === 'string' ? dueDate : date.toISOString();
+      const isUTCOnly = dueDateStr.endsWith('Z') && dueDateStr.includes('T00:00:00');
+      
+      if (isUTCOnly) {
+        // 날짜만 있는 경우 "오늘"로 표시
         return '오늘';
       }
 

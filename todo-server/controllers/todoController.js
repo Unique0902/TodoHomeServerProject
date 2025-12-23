@@ -33,6 +33,8 @@ exports.getAllTodos = async (req, res) => {
     }
     // 2. 날짜 필터링 로직 (date와 noDueDate가 동시에 오지 않는다고 가정)
     else if (date) {
+      // 해당 날짜의 시작(00:00:00 UTC)부터 다음 날 시작 전까지
+      // 프론트엔드에서 날짜만 선택한 경우 UTC 00:00:00으로 저장되므로 이 범위에 포함됨
       const startOfDay = new Date(date + 'T00:00:00.000Z');
       const endOfDay = new Date(date + 'T00:00:00.000Z');
       endOfDay.setDate(endOfDay.getDate() + 1);

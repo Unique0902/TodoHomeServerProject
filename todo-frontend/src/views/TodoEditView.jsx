@@ -8,19 +8,28 @@ const formatToLocalISO = (dateString) => {
   if (!dateString) return { date: '', time: '' };
   const date = new Date(dateString);
 
-  // UTC 시간을 KST 로컬 시간으로 변환 (KST = UTC + 9)
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  // UTC로 저장된 날짜만 있는 경우 확인 (UTC 00:00:00)
+  // 예: 2025-01-15T00:00:00.000Z
+  const isUTCOnly = dateString.endsWith('Z') && 
+                    dateString.includes('T00:00:00');
 
-  const datePart = localDate.toISOString().substring(0, 10);
-  const timePart = localDate.toISOString().substring(11, 16);
-
-  // 시간 정보가 00:00이면 시간이 없다고 간주하고 timePart를 비웁니다.
-  // 이는 TodoAddView에서 시간 없이 날짜만 저장했을 때의 형태를 복구하기 위함입니다.
-  if (timePart === '00:00') {
+  if (isUTCOnly) {
+    // UTC 날짜만 있는 경우: 날짜 부분만 추출 (YYYY-MM-DD)
+    const datePart = dateString.substring(0, 10);
     return { date: datePart, time: '' };
   }
 
-  return { date: datePart, time: timePart };
+  // 시간이 있는 경우: 로컬 시간으로 변환하여 표시
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return {
+    date: `${year}-${month}-${day}`,
+    time: `${hours}:${minutes}`
+  };
 };
 
 const TodoEditView = () => {
@@ -70,13 +79,14 @@ const TodoEditView = () => {
 
     let finalDueDate = null;
     if (isDueDateActive) {
-      // 로컬 시간 기준으로 Date 객체 생성 (TodoAddView와 동일)
-      const dateTimeString = `${dueDate}T${time || '00:00'}`;
-      finalDueDate = new Date(dateTimeString);
-
-      // 시간 정보가 없을 경우 (time이 빈 문자열일 경우)
-      if (!time) {
-        finalDueDate.setHours(0, 0, 0, 0);
+      if (time) {
+        // 시간이 있는 경우: 로컬 시간으로 Date 객체 생성
+        const dateTimeString = `${dueDate}T${time}`;
+        finalDueDate = new Date(dateTimeString);
+      } else {
+        // 시간이 없는 경우: UTC 기준으로 해당 날짜의 00:00:00으로 저장
+        // TodoAddView와 동일한 로직 적용
+        finalDueDate = new Date(dueDate + 'T00:00:00.000Z');
       }
     }
 
