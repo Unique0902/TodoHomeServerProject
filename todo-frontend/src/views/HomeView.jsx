@@ -178,7 +178,7 @@ const HomeView = () => {
               key={habit._id}
               habit={habit}
               todayString={todayString}
-              onToggle={handleHabitToggle}
+              onToggle={(h) => handleHabitToggle(h, isHabitCompletedToday(h))}
               isCompletedToday={isHabitCompletedToday(habit)}
             />
           ))}
