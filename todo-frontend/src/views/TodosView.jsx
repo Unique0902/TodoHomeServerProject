@@ -143,19 +143,7 @@ const TodosView = () => {
         </div>
       </div>
 
-      {/* 2. 해야할리스트 섹션 (수행일이 없는 할일) */}
-      {activeTodosWithoutDate.length > 0 && (
-        <section className='todo-list-section'>
-          <h2 className='section-title'>해야할리스트</h2>
-          <div className='todo-list active-list'>
-            {activeTodosWithoutDate.map((todo) => (
-              <TodoItem key={todo._id} todo={todo} onToggle={handleToggle} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 3. 할일 목록 섹션 (선택된 날짜의 할일) */}
+      {/* 2. 할일 목록 섹션 (선택된 날짜의 할일) */}
       <section className='todo-list-section'>
         <h2 className='section-title'>할일</h2>
 
@@ -170,6 +158,18 @@ const TodosView = () => {
           ))}
         </div>
       </section>
+
+      {/* 3. 해야할리스트 섹션 (수행일이 없는 할일) */}
+      {activeTodosWithoutDate.length > 0 && (
+        <section className='todo-list-section'>
+          <h2 className='section-title'>해야할리스트</h2>
+          <div className='todo-list active-list'>
+            {activeTodosWithoutDate.map((todo) => (
+              <TodoItem key={todo._id} todo={todo} onToggle={handleToggle} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 4. 완료 목록 섹션 */}
       <section className='completed-section'>
