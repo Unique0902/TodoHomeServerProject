@@ -148,7 +148,7 @@ const HomeView = () => {
 
       {/* 습관 (Habit) 섹션 */}
       <section className='habit-section'>
-        <h2 className='section-title'>습관 안녕하세요 테스트하러왔어요</h2>
+        <h2 className='section-title'>습관</h2>
         <div className='habit-header'>
           <div className='habit-category-info'>
             {/* 와이어프레임의 '평일' 텍스트에 해당하는 부분 */}
