@@ -54,12 +54,12 @@ const ProjectAddView = () => {
         // 수정 API 호출
         await updateProject(id, projectData);
         alert('프로젝트가 성공적으로 수정되었습니다!');
-        navigate(`/projects/${id}`); // 상세 페이지로 이동
+        navigate(`/projects/${id}`, { replace: true }); // 상세 페이지로 이동 (히스토리에서 EditView 제거)
       } else {
         // 생성 API 호출
         await createProject(projectData);
         alert('프로젝트가 성공적으로 추가되었습니다!');
-        navigate('/projects'); // 목록 페이지로 이동
+        navigate('/projects', { replace: true }); // 목록 페이지로 이동 (히스토리에서 AddView 제거)
       }
     } catch (error) {
       console.error(

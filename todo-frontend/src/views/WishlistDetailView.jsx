@@ -65,7 +65,7 @@ const WishlistDetailView = () => {
       {/* 스타일 재활용 */}
       <header className='header-bar'>
         {/* 뒤로가기 버튼 */}
-        <button className='back-button' onClick={() => navigate(-1)}>
+        <button className='back-button' onClick={() => navigate('/wishlists')}>
           &lt;
         </button>
         <h1 className='title'>{wishlist.title}</h1>

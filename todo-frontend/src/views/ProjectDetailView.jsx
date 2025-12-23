@@ -84,7 +84,7 @@ const ProjectDetailView = () => {
     <div className='project-detail-view'>
       <header className='header-bar detail-header'>
         {/* 1. 뒤로가기 버튼 */}
-        <button className='back-button' onClick={() => navigate(-1)}>
+        <button className='back-button' onClick={() => navigate('/projects')}>
           &lt;
         </button>
         {/* 2. 프로젝트 제목 */}

@@ -54,12 +54,12 @@ const WishlistAddView = () => {
         // 수정 API 호출
         await updateWishlist(id, wishlistData);
         alert('위시리스트가 성공적으로 수정되었습니다!');
-        navigate(`/wishlists/${id}`); // 상세 페이지로 이동
+        navigate(`/wishlists/${id}`, { replace: true }); // 상세 페이지로 이동 (히스토리에서 EditView 제거)
       } else {
         // 생성 API 호출
         const newWishlist = await createWishlist(wishlistData);
         alert('위시리스트가 성공적으로 추가되었습니다!');
-        navigate(`/wishlists/${newWishlist._id}`); // 상세 페이지로 이동
+        navigate(`/wishlists/${newWishlist._id}`, { replace: true }); // 상세 페이지로 이동 (히스토리에서 AddView 제거)
       }
     } catch (error) {
       console.error(

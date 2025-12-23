@@ -99,7 +99,7 @@ const TodoEditView = () => {
     try {
       await updateTodo(id, todoData); // 👈 수정 API 호출
       alert('할일이 성공적으로 수정되었습니다!');
-      navigate(`/todos/${id}`); // 상세 페이지로 이동
+      navigate(`/todos/${id}`, { replace: true }); // 상세 페이지로 이동 (히스토리에서 EditView 제거)
     } catch (error) {
       console.error('할일 수정 실패:', error);
       alert('할일 수정 중 오류가 발생했습니다.');

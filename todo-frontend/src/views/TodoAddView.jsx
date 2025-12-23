@@ -72,10 +72,10 @@ const TodoAddView = () => {
       // --- [핵심 수정: 이동 경로] ---
       if (projectId) {
         // 프로젝트 ID가 있다면, 해당 프로젝트 상세 페이지로 이동
-        navigate(`/projects/${projectId}`);
+        navigate(`/projects/${projectId}`, { replace: true });
       } else {
         // 없다면, 일반 할일 목록 페이지로 이동
-        navigate('/todos');
+        navigate('/todos', { replace: true });
       }
       // ---------------------------------
     } catch (error) {
