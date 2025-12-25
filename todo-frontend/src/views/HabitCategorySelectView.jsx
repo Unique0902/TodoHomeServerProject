@@ -161,6 +161,8 @@ const HabitCategorySelectView = () => {
       alert(
         `"${categoryTitle}"이(가) ${selectedDate}의 습관 카테고리로 설정되었습니다.`
       );
+      // 카테고리 선택 후 이전 페이지로 이동
+      navigate(-1);
     } catch (error) {
       console.error('새 카테고리 선택 실패:', error);
       alert('새 카테고리 설정 중 오류가 발생했습니다.');
