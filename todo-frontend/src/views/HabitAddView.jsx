@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getAllHabitCategories,
   getHabitById,
@@ -11,6 +11,7 @@ import '../styles/TodoAddView.css'; // 스타일 재사용
 const HabitAddView = () => {
   const { id } = useParams(); // URL에서 ID를 가져옴 (수정 모드 시 사용)
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // 상태 관리
   const [title, setTitle] = useState('');
@@ -20,6 +21,9 @@ const HabitAddView = () => {
   const [loading, setLoading] = useState(true);
 
   const isEditMode = !!id; // ID가 있으면 수정 모드
+  
+  // URL 쿼리 파라미터에서 카테고리 ID 가져오기
+  const categoryIdFromUrl = useMemo(() => searchParams.get('categoryId'), [searchParams]);
 
   // 1. 카테고리 목록 로드 및 수정 데이터 불러오기
   const fetchInitialData = useCallback(async () => {
@@ -29,8 +33,20 @@ const HabitAddView = () => {
       setCategories(categoryList);
 
       if (categoryList.length > 0 && !isEditMode) {
-        // 추가 모드일 경우, 기본 카테고리를 첫 번째 항목으로 설정
-        setSelectedCategoryId(categoryList[0]._id);
+        // 추가 모드일 경우
+        if (categoryIdFromUrl) {
+          // URL에서 전달받은 카테고리 ID가 있고, 해당 카테고리가 존재하면 그 카테고리 선택
+          const categoryExists = categoryList.find(cat => cat._id === categoryIdFromUrl);
+          if (categoryExists) {
+            setSelectedCategoryId(categoryIdFromUrl);
+          } else {
+            // 전달받은 카테고리가 존재하지 않으면 첫 번째 항목 선택
+            setSelectedCategoryId(categoryList[0]._id);
+          }
+        } else {
+          // URL에서 카테고리 ID가 없으면 첫 번째 항목 선택
+          setSelectedCategoryId(categoryList[0]._id);
+        }
       }
 
       if (isEditMode) {
@@ -47,7 +63,7 @@ const HabitAddView = () => {
     } finally {
       setLoading(false);
     }
-  }, [id, isEditMode, navigate]);
+  }, [id, isEditMode, navigate, categoryIdFromUrl]);
 
   useEffect(() => {
     fetchInitialData();

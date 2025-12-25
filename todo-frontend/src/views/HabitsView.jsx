@@ -204,7 +204,13 @@ const HabitsView = () => {
       {/* 4. 습관 추가 버튼 */}
       <button
         className='add-habit-button'
-        onClick={() => navigate('/habits/add')}
+        onClick={() => {
+          // 선택된 카테고리가 있으면 쿼리 파라미터로 전달
+          const url = selectedCategory
+            ? `/habits/add?categoryId=${selectedCategory._id}`
+            : '/habits/add';
+          navigate(url);
+        }}
       >
         +
       </button>
