@@ -2,13 +2,19 @@
 
 .app-container {
     height: 100vh;
+    height: 100dvh; /* 동적 뷰포트 높이 (모바일 주소창 고려) */
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* 컨테이너 자체는 스크롤 불가 */
+    position: relative;
 }
 .content {
-    flex-grow: 1;
-    overflow-y: auto; /* 내용이 길어지면 스크롤 가능하도록 */
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
     padding-bottom: 70px; /* 네비게이션 바 높이(60px) + 여유 공간(10px) */
+    min-height: 0; /* flex 아이템이 올바르게 축소되도록 */
 }
 
 /* iOS Safari의 safe area 고려 (홈 인디케이터 영역) */
@@ -53,3 +59,4 @@
     line-height: 1;
     margin-bottom: 2px;
 }
+

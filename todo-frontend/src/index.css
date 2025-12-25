@@ -1,6 +1,9 @@
 /* 전역 스타일 초기화 및 기본 배경색 설정 */
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* body 스크롤 방지 */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -13,7 +16,9 @@ body {
 /* 앱 컨테이너의 크기를 뷰포트에 맞추고 배경색 지정 */
 #root, .app-container {
   height: 100vh;
+  height: 100dvh; /* 동적 뷰포트 높이 (모바일 주소창 고려) */
   background-color: #ffffff;
+  overflow: hidden; /* 루트 컨테이너 스크롤 방지 */
 }
 
 code {
