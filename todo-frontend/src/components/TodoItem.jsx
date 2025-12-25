@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'; // 👈 useNavigate 임포트
 // TodoItem 컴포넌트
 // todo: 할일 데이터 객체
 // onToggle: 완료 상태 토글 핸들러 함수
-const TodoItem = ({ todo, onToggle }) => {
+// projectMap: 프로젝트 ID를 키로 하는 프로젝트 정보 Map (선택사항)
+const TodoItem = ({ todo, onToggle, projectMap }) => {
   const navigate = useNavigate(); // 👈 useNavigate 훅 사용
   // 시간 정보를 포맷하는 함수 (dueDate가 있으면 날짜/시간, 없으면 '기한없음')
   const formatTime = (dueDate) => {
@@ -78,6 +79,9 @@ const TodoItem = ({ todo, onToggle }) => {
   // todo.dueDate를 사용하도록 수정
   const timeString = formatTime(todo.dueDate);
   const itemClasses = `todo-item ${todo.isCompleted ? 'completed' : ''}`;
+  
+  // 프로젝트 정보 가져오기
+  const project = todo.projectId && projectMap ? projectMap.get(todo.projectId) : null;
   // 상세 페이지 이동 핸들러
   const handleDetailClick = (e) => {
     // 이벤트 버블링 방지: 체크박스 클릭 이벤트가 상세 이동을 트리거하지 않도록 합니다.
@@ -101,8 +105,13 @@ const TodoItem = ({ todo, onToggle }) => {
         />
       </div>
 
-      {/* 할일 제목 영역 */}
-      <div className='todo-title'>{todo.title}</div>
+      {/* 할일 제목 및 프로젝트명 영역 */}
+      <div className='todo-title-section'>
+        <div className='todo-title'>{todo.title}</div>
+        {project && (
+          <div className='todo-project-name'>{project.title}</div>
+        )}
+      </div>
 
       {/* 마감 시한 정보 영역 */}
       <div className='todo-time'>{timeString}</div>

@@ -75,6 +75,11 @@
     color: #dc3545; /* 빨간색 */
 }
 
+.value.project-name {
+    color: #007bff; /* 파란색 */
+    font-weight: 500;
+}
+
 
 /* 하단 액션 버튼 섹션 */
 .action-bar {

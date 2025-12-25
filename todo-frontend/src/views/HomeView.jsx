@@ -6,6 +6,7 @@ import {
   getTodayHabitCategory,
   toggleHabitCompletion,
 } from '../api/habitApi'; // Habit API 임포트
+import { getProjects } from '../api/projectApi';
 import TodoItem from '../components/TodoItem';
 import HabitItem from '../components/HabitItem';
 import '../styles/HomeView.css';
@@ -23,6 +24,7 @@ const HomeView = () => {
   const navigate = useNavigate(); // 페이지 이동 훅
   const [todos, setTodos] = useState([]);
   const [habits, setHabits] = useState([]);
+  const [projects, setProjects] = useState([]); // 프로젝트 목록
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [todayCategory, setTodayCategory] = useState(null); // 오늘 선택된 습관 카테고리
@@ -37,6 +39,10 @@ const HomeView = () => {
       // 1. TODO 데이터 로드
       const todoData = await getTodos(todayString);
       setTodos(todoData);
+
+      // 1-1. 프로젝트 목록 로드
+      const projectData = await getProjects();
+      setProjects(projectData);
 
       // 2. Habit Category 데이터 로드 (클라이언트 로직이 복잡하므로 임시 처리)
       const allCategories = await getTodayHabitCategory();
@@ -109,6 +115,9 @@ const HomeView = () => {
   const activeTodos = todos.filter((todo) => !todo.isCompleted);
   const completedTodos = todos.filter((todo) => todo.isCompleted);
 
+  // 프로젝트 Map 생성 (ID를 키로 사용)
+  const projectMap = new Map(projects.map((project) => [project._id, project]));
+
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
 
@@ -141,7 +150,12 @@ const HomeView = () => {
             <p className='empty-message'>오늘 할일이 없습니다!</p>
           )}
           {activeTodos.map((todo) => (
-            <TodoItem key={todo._id} todo={todo} onToggle={handleTodoToggle} />
+            <TodoItem
+              key={todo._id}
+              todo={todo}
+              onToggle={handleTodoToggle}
+              projectMap={projectMap}
+            />
           ))}
         </div>
       </section>
@@ -192,7 +206,12 @@ const HomeView = () => {
         </h2>
         <div className='todo-list completed-list'>
           {completedTodos.map((todo) => (
-            <TodoItem key={todo._id} todo={todo} onToggle={handleTodoToggle} />
+            <TodoItem
+              key={todo._id}
+              todo={todo}
+              onToggle={handleTodoToggle}
+              projectMap={projectMap}
+            />
           ))}
         </div>
       </section>

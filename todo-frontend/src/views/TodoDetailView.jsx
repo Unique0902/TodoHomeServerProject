@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getTodoById, deleteTodo } from '../api/todoApi';
+import { getProjectById } from '../api/projectApi';
 import '../styles/TodoDetailView.css';
 
 const TodoDetailView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [todo, setTodo] = useState(null);
+  const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -45,6 +47,17 @@ const TodoDetailView = () => {
     try {
       const data = await getTodoById(id);
       setTodo(data);
+
+      // 프로젝트 정보가 있으면 프로젝트 정보도 로드
+      if (data.projectId) {
+        try {
+          const projectData = await getProjectById(data.projectId);
+          setProject(projectData);
+        } catch (projectErr) {
+          console.error('프로젝트 정보 로드 실패:', projectErr);
+          // 프로젝트 정보 로드 실패해도 할일 정보는 표시
+        }
+      }
     } catch (err) {
       setError('할일 정보를 불러오지 못했습니다.');
     } finally {
@@ -89,6 +102,13 @@ const TodoDetailView = () => {
           <span className='label'>설명</span>
           <p className='value description'>{todo.description || '설명 없음'}</p>
         </div>
+
+        {project && (
+          <div className='info-group'>
+            <span className='label'>프로젝트</span>
+            <span className='value project-name'>{project.title}</span>
+          </div>
+        )}
 
         <div className='info-group'>
           <span className='label'>완료 상태</span>

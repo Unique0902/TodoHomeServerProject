@@ -104,6 +104,67 @@
 }
 
 
+/* 할일 아이템 공통 스타일 (HomeView.css와 동일하게 유지) */
+.todo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-checkbox {
+    padding-right: 15px;
+    line-height: 1;
+}
+
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    accent-color: #007bff;
+}
+
+.todo-title-section {
+    flex-grow: 1;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.todo-title {
+    font-size: 16px;
+    color: #333;
+}
+
+.todo-project-name {
+    font-size: 12px;
+    color: #007bff;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.todo-time {
+    font-size: 14px;
+    color: #999;
+    font-style: italic;
+    min-width: 60px;
+    text-align: right;
+}
+
+.todo-item.completed .todo-title {
+    text-decoration: line-through;
+    color: #999;
+}
+
 /* 할일 목록 섹션 (HomeView.css와 유사하게 스타일링) */
 .section-title {
     font-size: 20px;

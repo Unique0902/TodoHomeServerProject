@@ -5,6 +5,7 @@ import {
   updateTodoStatus,
   getTodosWithoutDate,
 } from '../api/todoApi';
+import { getProjects } from '../api/projectApi';
 import TodoItem from '../components/TodoItem';
 import {
   getStartOfWeek,
@@ -20,6 +21,7 @@ const TodosView = () => {
   const navigate = useNavigate();
   const [todos, setTodos] = useState([]);
   const [todosWithoutDate, setTodosWithoutDate] = useState([]); // 수행일 없는 할일
+  const [projects, setProjects] = useState([]); // 프로젝트 목록
   const [loading, setLoading] = useState(false);
   const [loadingWithoutDate, setLoadingWithoutDate] = useState(false);
 
@@ -76,6 +78,17 @@ const TodosView = () => {
     }
   }, []);
 
+  // 프로젝트 목록 로딩
+  const fetchProjects = useCallback(async () => {
+    try {
+      const data = await getProjects();
+      setProjects(data);
+    } catch (err) {
+      console.error('프로젝트 로드 실패:', err);
+      setProjects([]);
+    }
+  }, []);
+
   const handleToggle = async (todo) => {
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
@@ -91,7 +104,14 @@ const TodosView = () => {
     // 여기서는 선택된 날짜를 유지하며 그 날짜의 데이터만 불러옵니다.
     fetchTodos();
     fetchTodosWithoutDate();
-  }, [currentWeekStart, selectedDate, fetchTodos, fetchTodosWithoutDate]);
+    fetchProjects();
+  }, [
+    currentWeekStart,
+    selectedDate,
+    fetchTodos,
+    fetchTodosWithoutDate,
+    fetchProjects,
+  ]);
 
   // 할일 목록 분리
   const activeTodos = todos.filter((todo) => !todo.isCompleted);
@@ -101,6 +121,9 @@ const TodosView = () => {
   const activeTodosWithoutDate = todosWithoutDate.filter(
     (todo) => !todo.isCompleted
   );
+
+  // 프로젝트 Map 생성 (ID를 키로 사용)
+  const projectMap = new Map(projects.map((project) => [project._id, project]));
 
   return (
     <div className='todos-view'>
@@ -154,7 +177,12 @@ const TodosView = () => {
             <p className='empty-message'>선택된 날짜에 할일이 없습니다!</p>
           )}
           {activeTodos.map((todo) => (
-            <TodoItem key={todo._id} todo={todo} onToggle={handleToggle} />
+            <TodoItem
+              key={todo._id}
+              todo={todo}
+              onToggle={handleToggle}
+              projectMap={projectMap}
+            />
           ))}
         </div>
       </section>
@@ -165,7 +193,12 @@ const TodosView = () => {
           <h2 className='section-title'>해야할리스트</h2>
           <div className='todo-list active-list'>
             {activeTodosWithoutDate.map((todo) => (
-              <TodoItem key={todo._id} todo={todo} onToggle={handleToggle} />
+              <TodoItem
+                key={todo._id}
+                todo={todo}
+                onToggle={handleToggle}
+                projectMap={projectMap}
+              />
             ))}
           </div>
         </section>
@@ -176,7 +209,12 @@ const TodosView = () => {
         <h2 className='section-title completed-label'>완료</h2>
         <div className='todo-list completed-list'>
           {completedTodos.map((todo) => (
-            <TodoItem key={todo._id} todo={todo} onToggle={handleToggle} />
+            <TodoItem
+              key={todo._id}
+              todo={todo}
+              onToggle={handleToggle}
+              projectMap={projectMap}
+            />
           ))}
         </div>
       </section>

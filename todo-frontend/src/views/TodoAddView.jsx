@@ -27,8 +27,8 @@ const TodoAddView = () => {
     [searchParams]
   );
 
-  // 폼 상태 관리 (기존 상태 유지)
-  const [title, setTitle] = useState(projectName ? `${projectName} - ` : ''); // 프로젝트 이름으로 제목 기본값 설정
+  // 폼 상태 관리
+  const [title, setTitle] = useState(''); // 프로젝트명을 제목에 붙이지 않음
   // ... (나머지 상태 유지) ...
   const [description, setDescription] = useState('');
   const [isDueDateActive, setIsDueDateActive] = useState(false);

@@ -75,6 +75,9 @@ const ProjectDetailView = () => {
   const activeTodos = todos.filter((todo) => !todo.isCompleted);
   const completedTodos = todos.filter((todo) => todo.isCompleted);
 
+  // 프로젝트 Map 생성 (현재 프로젝트만 포함, 다른 프로젝트와 연결된 할일이 있을 수 있으므로)
+  const projectMap = project ? new Map([[project._id, project]]) : new Map();
+
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
   if (!project)
@@ -151,6 +154,7 @@ const ProjectDetailView = () => {
                 key={todo._id}
                 todo={todo}
                 onToggle={handleTodoToggle}
+                projectMap={projectMap}
                 // 프로젝트 상세 뷰에서는 할일 상세로 바로 이동하지 않도록 클릭 이벤트 막음
                 onClick={(e) => e.stopPropagation()}
               />
@@ -164,6 +168,7 @@ const ProjectDetailView = () => {
                 key={todo._id}
                 todo={todo}
                 onToggle={handleTodoToggle}
+                projectMap={projectMap}
                 onClick={(e) => e.stopPropagation()}
               />
             ))}
