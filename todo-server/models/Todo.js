@@ -9,6 +9,8 @@ const TodoSchema = new mongoose.Schema(
     dueDate: { type: Date, required: false },
     // 연결된 프로젝트 ID (참조용 String)
     projectId: { type: String, required: false },
+    // 완료된 날짜 (기한이 없는 할일의 경우 완료 날짜 저장)
+    completedDate: { type: Date, required: false },
   },
   { timestamps: true }
 ); // createdAt, updatedAt 자동 관리

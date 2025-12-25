@@ -76,8 +76,27 @@ const TodoItem = ({ todo, onToggle, projectMap }) => {
     }
   };
 
-  // todo.dueDate를 사용하도록 수정
-  const timeString = formatTime(todo.dueDate);
+  // 할일 시간 표시 함수 (기한이 없는 완료된 할일의 경우 완료 날짜 표시)
+  const getTimeString = () => {
+    if (!todo.dueDate && todo.isCompleted && todo.completedDate) {
+      // 기한이 없고 완료되었으며 completedDate가 있는 경우: 완료 날짜 표시
+      try {
+        const completedDate = new Date(todo.completedDate);
+        return completedDate.toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      } catch (e) {
+        console.error('완료 날짜 포맷 오류:', e);
+        return '완료됨';
+      }
+    }
+    // 기한이 있는 경우 또는 기한이 없는 미완료 할일: 기존 로직 사용
+    return formatTime(todo.dueDate);
+  };
+
+  const timeString = getTimeString();
   const itemClasses = `todo-item ${todo.isCompleted ? 'completed' : ''}`;
   
   // 프로젝트 정보 가져오기

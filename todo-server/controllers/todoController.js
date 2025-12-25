@@ -74,15 +74,41 @@ exports.getTodo = async (req, res) => {
 // 4. 할일 부분 수정 (PATCH /todos/:id) - isCompleted 토글, title 변경 등
 exports.updateTodoPartial = async (req, res) => {
   try {
-    const todo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
-      new: true, // 업데이트된 문서 반환
-      runValidators: true, // 스키마 유효성 검사 실행
-    });
-
+    const todo = await Todo.findById(req.params.id);
     if (!todo) {
       return res.status(404).json({ message: '할일을 찾을 수 없습니다.' });
     }
-    res.status(200).json(todo);
+
+    // isCompleted가 변경되고, 기한이 없는 할일인 경우 completedDate 처리
+    if (req.body.hasOwnProperty('isCompleted')) {
+      const updateData = { ...req.body };
+      
+      // 기한이 없는 할일(dueDate가 없거나 null)인 경우
+      if (!todo.dueDate) {
+        if (req.body.isCompleted === true) {
+          // 완료로 변경: 현재 날짜를 completedDate에 저장
+          updateData.completedDate = new Date();
+        } else if (req.body.isCompleted === false) {
+          // 미완료로 변경: completedDate를 null로 설정
+          updateData.completedDate = null;
+        }
+      }
+      
+      const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, updateData, {
+        new: true,
+        runValidators: true,
+      });
+      
+      res.status(200).json(updatedTodo);
+    } else {
+      // isCompleted가 변경되지 않은 경우 일반 업데이트
+      const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+      
+      res.status(200).json(updatedTodo);
+    }
   } catch (error) {
     res
       .status(400)
