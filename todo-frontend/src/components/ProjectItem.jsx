@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ProjectItem.css'; // 스타일 파일 임포트 (아래에 정의)
 
-const ProjectItem = ({ project, onToggle }) => {
+const ProjectItem = ({ project, onToggle, todoStats }) => {
   const navigate = useNavigate();
 
   // 상세 페이지 이동 핸들러
@@ -32,8 +32,15 @@ const ProjectItem = ({ project, onToggle }) => {
         />
       </div>
 
-      {/* 프로젝트 제목 영역 */}
-      <div className='project-title'>{project.title}</div>
+      {/* 프로젝트 제목 및 통계 영역 */}
+      <div className='project-content'>
+        <div className='project-title'>{project.title}</div>
+        {todoStats && todoStats.totalCount > 0 && (
+          <div className='project-todo-stats'>
+            할일 {todoStats.completedCount}/{todoStats.totalCount}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

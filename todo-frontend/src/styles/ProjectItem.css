@@ -27,10 +27,21 @@
     accent-color: #007bff;
 }
 
+.project-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .project-title {
-    flex-grow: 1; 
     font-size: 16px;
     color: #333;
+}
+
+.project-todo-stats {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
 }
 
 /* 완료된 프로젝트 스타일 */
