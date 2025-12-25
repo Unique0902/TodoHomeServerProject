@@ -8,7 +8,7 @@
 
 .header-bar {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 30px;
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
@@ -28,9 +28,14 @@
     font-size: 24px;
     font-weight: 700;
     flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
     white-space: normal;
     word-wrap: break-word;
+    overflow-wrap: break-word;
     line-height: 1.4;
+    margin: 0;
+    padding: 0;
 }
 
 /* 상세 내용 섹션 */
