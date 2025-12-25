@@ -90,7 +90,7 @@ const TodoDetailView = () => {
     <div className='todo-detail-view'>
       <header className='header-bar'>
         {/* 뒤로가기 버튼 */}
-        <button className='back-button' onClick={() => navigate('/todos')}>
+        <button className='back-button' onClick={() => navigate(-1)}>
           &lt;
         </button>
         {/* 할일 제목 */}
