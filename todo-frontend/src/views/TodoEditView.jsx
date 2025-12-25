@@ -99,7 +99,8 @@ const TodoEditView = () => {
     try {
       await updateTodo(id, todoData); // 👈 수정 API 호출
       alert('할일이 성공적으로 수정되었습니다!');
-      navigate(`/todos/${id}`, { replace: true }); // 상세 페이지로 이동 (히스토리에서 EditView 제거)
+      // 수정 페이지와 원래 상세 페이지를 모두 건너뛰고 그 이전 페이지로 이동
+      navigate(-2); // 프로젝트 상세 페이지나 할일 목록 페이지로 이동
     } catch (error) {
       console.error('할일 수정 실패:', error);
       alert('할일 수정 중 오류가 발생했습니다.');
