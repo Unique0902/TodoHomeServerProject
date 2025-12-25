@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import '../styles/HabitCategorySelectView.css';
 import {
   getAllHabitCategories,
@@ -22,9 +22,13 @@ const getTodayDateString = () => {
 
 const HabitCategorySelectView = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(getTodayDateString());
+
+  // URL 쿼리 파라미터에서 날짜를 가져오고, 없으면 오늘 날짜 사용
+  const initialDate = searchParams.get('date') || getTodayDateString();
+  const [selectedDate, setSelectedDate] = useState(initialDate);
 
   // 카테고리 목록 불러오기
   const fetchCategories = async () => {

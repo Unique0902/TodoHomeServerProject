@@ -109,9 +109,9 @@ const HabitsView = () => {
     );
   };
 
-  // 연필 버튼 클릭 시 카테고리 선택 뷰로 이동
+  // 연필 버튼 클릭 시 카테고리 선택 뷰로 이동 (선택된 날짜 전달)
   const handleCategoryEditClick = () => {
-    navigate('/habit-categories');
+    navigate(`/habit-categories?date=${selectedDate}`);
   };
 
   if (loading) return <div className='loading-state'>로딩 중...</div>;
