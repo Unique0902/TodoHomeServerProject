@@ -12,6 +12,8 @@
     margin-bottom: 30px;
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .back-button {
@@ -22,6 +24,7 @@
     padding: 5px 15px 5px 0;
     color: #333;
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 .title {
@@ -30,9 +33,13 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 0;
-    white-space: normal;
+    width: 100%;
+    max-width: none;
+    white-space: normal !important;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    overflow: visible !important;
+    text-overflow: clip !important;
     line-height: 1.4;
     margin: 0;
     padding: 0;
