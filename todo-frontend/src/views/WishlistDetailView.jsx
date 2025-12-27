@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getWishlistById, deleteWishlist } from '../api/wishlistApi';
-import '../styles/TodoDetailView.css'; // 상세 뷰 스타일 재활용
+import { createProject } from '../api/projectApi';
+import '../styles/TodoDetailView.css'; // 상세 뷰 스타일 재사용
 
 const WishlistDetailView = () => {
   const { id } = useParams();
@@ -54,6 +55,34 @@ const WishlistDetailView = () => {
     }
   };
 
+  // 프로젝트로 변환 핸들러
+  const handleConvertToProject = async () => {
+    if (
+      window.confirm(
+        `위시리스트 "${wishlist.title}"을 프로젝트로 변환하시겠습니까? 변환 후 위시리스트는 삭제됩니다.`
+      )
+    ) {
+      try {
+        // 1. 위시리스트의 제목과 설명으로 프로젝트 생성
+        const projectData = {
+          title: wishlist.title,
+          description: wishlist.description || '',
+        };
+        const newProject = await createProject(projectData);
+
+        // 2. 위시리스트 삭제
+        await deleteWishlist(id);
+
+        alert('프로젝트로 변환되었습니다.');
+        // 3. 생성된 프로젝트 상세 페이지로 이동
+        navigate(`/projects/${newProject._id}`, { replace: true });
+      } catch (err) {
+        console.error('프로젝트 변환 실패:', err);
+        alert('프로젝트 변환에 실패했습니다.');
+      }
+    }
+  };
+
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
   if (!wishlist)
@@ -96,7 +125,7 @@ const WishlistDetailView = () => {
           </span>
         </div>
       </main>
-      {/* 하단 버튼 섹션 (연필, 쓰레기통) */}
+      {/* 하단 버튼 섹션 (연필, 프로젝트 변환, 쓰레기통) */}
       <footer className='action-bar'>
         {/* 수정 버튼 */}
         <button
@@ -105,6 +134,16 @@ const WishlistDetailView = () => {
         >
           <span role='img' aria-label='edit'>
             ✏️
+          </span>
+        </button>
+        {/* 프로젝트로 변환 버튼 */}
+        <button
+          className='convert-button'
+          onClick={handleConvertToProject}
+          title='프로젝트로 변환'
+        >
+          <span role='img' aria-label='convert'>
+            💡
           </span>
         </button>
         {/* 삭제 버튼 */}

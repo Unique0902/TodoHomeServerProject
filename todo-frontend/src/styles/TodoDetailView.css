@@ -104,7 +104,7 @@
     z-index: 100;
 }
 
-.edit-button, .delete-button {
+.edit-button, .delete-button, .convert-button {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -120,6 +120,10 @@
 
 .edit-button {
     background-color: #ffc107; /* 노란색 계열 */
+}
+
+.convert-button {
+    background-color: #007bff; /* 파란색 계열 */
 }
 
 .delete-button {
