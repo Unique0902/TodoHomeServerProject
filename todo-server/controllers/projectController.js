@@ -20,17 +20,27 @@ exports.createProject = async (req, res) => {
 // 2. 프로젝트 목록 조회 (GET /projects)
 exports.getAllProjects = async (req, res) => {
   try {
-    // 쿼리 파라미터로 완료 상태 필터링을 추가할 수 있습니다 (선택 사항)
-    const { isCompleted } = req.query;
+    // 쿼리 파라미터로 상태 필터링 (선택 사항)
+    const { status } = req.query;
     let query = {};
 
-    if (isCompleted !== undefined) {
-      // "true" 또는 "false" 문자열을 Boolean 값으로 변환
-      query.isCompleted = isCompleted === 'true';
+    if (status) {
+      query.status = status;
     }
 
     const projects = await Project.find(query).sort({ createdAt: -1 });
-    res.status(200).json(projects);
+    
+    // 기존 데이터 마이그레이션: isCompleted가 있고 status가 없으면 status로 변환
+    for (const project of projects) {
+      if (!project.status && project.isCompleted !== undefined) {
+        project.status = project.isCompleted ? 'completed' : 'active';
+        await project.save();
+      }
+    }
+    
+    // 다시 조회하여 업데이트된 데이터 반환
+    const updatedProjects = await Project.find(query || {}).sort({ createdAt: -1 });
+    res.status(200).json(updatedProjects);
   } catch (error) {
     res
       .status(500)
@@ -45,6 +55,13 @@ exports.getProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
     }
+    
+    // 기존 데이터 마이그레이션: isCompleted가 있고 status가 없으면 status로 변환
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+      await project.save();
+    }
+    
     res.status(200).json(project);
   } catch (error) {
     res
@@ -56,14 +73,26 @@ exports.getProject = async (req, res) => {
 // 4. 프로젝트 부분 수정 (PATCH /projects/:id)
 exports.updateProjectPartial = async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
-      new: true, // 업데이트된 문서 반환
-      runValidators: true, // 스키마 유효성 검사 실행
-    });
-
+    const project = await Project.findById(req.params.id);
     if (!project) {
       return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
     }
+    
+    // 기존 데이터 마이그레이션: isCompleted가 있고 status가 없으면 status로 변환
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+    
+    // 요청 본문에서 isCompleted가 있으면 status로 변환
+    const updateData = { ...req.body };
+    if (updateData.hasOwnProperty('isCompleted') && !updateData.status) {
+      updateData.status = updateData.isCompleted ? 'completed' : 'active';
+      delete updateData.isCompleted; // isCompleted 필드 제거
+    }
+    
+    Object.assign(project, updateData);
+    await project.save();
+    
     res.status(200).json(project);
   } catch (error) {
     res

@@ -17,16 +17,20 @@ const ProjectItem = ({ project, onToggle, todoStats }) => {
     navigate(`/projects/${project._id}`); // 상세 페이지로 이동
   };
 
+  // status가 없거나 isCompleted가 있는 경우(기존 데이터) 호환성 처리
+  const projectStatus = project.status || (project.isCompleted ? 'completed' : 'active');
+  const isCompleted = projectStatus === 'completed';
+
   return (
     <div
-      className={`project-item ${project.isCompleted ? 'completed' : ''}`}
+      className={`project-item ${projectStatus === 'completed' ? 'completed' : projectStatus === 'paused' ? 'paused' : projectStatus === 'wish' ? 'wish' : ''}`}
       onClick={handleDetailClick}
     >
       {/* 체크박스 영역 */}
       <div className='project-checkbox' onClick={() => onToggle(project)}>
         <input
           type='checkbox'
-          checked={project.isCompleted}
+          checked={isCompleted}
           readOnly
           className='checkbox-input'
         />

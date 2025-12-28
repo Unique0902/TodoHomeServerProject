@@ -134,10 +134,22 @@ const ProjectDetailView = () => {
           <span className='label'>상태</span>
           <span
             className={`value status ${
-              project.isCompleted ? 'completed' : 'active'
+              (project.status || (project.isCompleted ? 'completed' : 'active')) === 'completed'
+                ? 'completed'
+                : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'paused'
+                ? 'paused'
+                : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'wish'
+                ? 'wish'
+                : 'active'
             }`}
           >
-            {project.isCompleted ? '✅ 완료된 프로젝트' : '🔲 진행 중'}
+            {(project.status || (project.isCompleted ? 'completed' : 'active')) === 'completed'
+              ? '✅ 완료'
+              : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'paused'
+              ? '⏸️ 정지됨'
+              : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'wish'
+              ? '💡 위시'
+              : '🔲 진행중'}
           </span>
         </div>
 

@@ -18,9 +18,9 @@ export const createProject = async (projectData) => {
   return response.data;
 };
 
-// 4. 프로젝트 완료 상태 토글 및 부분 수정
-export const updateProjectStatus = async (id, isCompleted) => {
-  const response = await api.patch(`/projects/${id}`, { isCompleted });
+// 4. 프로젝트 상태 업데이트 및 부분 수정
+export const updateProjectStatus = async (id, status) => {
+  const response = await api.patch(`/projects/${id}`, { status });
   return response.data;
 };
 

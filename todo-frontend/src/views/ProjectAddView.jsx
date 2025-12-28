@@ -14,6 +14,7 @@ const ProjectAddView = () => {
   // 폼 상태 관리
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('active'); // 기본값: 진행중
   const [loading, setLoading] = useState(true);
 
   const isEditMode = !!id;
@@ -25,6 +26,14 @@ const ProjectAddView = () => {
         const data = await getProjectById(id);
         setTitle(data.title);
         setDescription(data.description || '');
+        // status가 있으면 사용, 없으면 기존 isCompleted를 기반으로 변환
+        if (data.status) {
+          setStatus(data.status);
+        } else if (data.isCompleted) {
+          setStatus('completed');
+        } else {
+          setStatus('active');
+        }
       } catch (err) {
         alert('수정할 프로젝트를 불러오지 못했습니다.');
         navigate('/projects');
@@ -47,6 +56,7 @@ const ProjectAddView = () => {
     const projectData = {
       title: title.trim(),
       description: description.trim(),
+      status: status,
     };
 
     try {
@@ -104,7 +114,22 @@ const ProjectAddView = () => {
           />
         </div>
 
-        {/* 2. 설명 입력 */}
+        {/* 2. 상태 선택 */}
+        <div className='input-group'>
+          <label>상태</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className='select-input'
+          >
+            <option value='active'>진행중</option>
+            <option value='paused'>정지됨</option>
+            <option value='wish'>위시</option>
+            <option value='completed'>완료</option>
+          </select>
+        </div>
+
+        {/* 3. 설명 입력 */}
         <div className='input-group'>
           <label>설명</label>
           <textarea

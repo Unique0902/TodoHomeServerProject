@@ -92,6 +92,23 @@
     min-height: 50px;
 }
 
+.value.status.completed {
+    color: #28a745; /* 초록색 (완료) */
+    font-weight: bold;
+}
+
+.value.status.active {
+    color: #333; /* 기본 색상 (진행중) */
+}
+
+.value.status.paused {
+    color: #ff9800; /* 오렌지색 (정지됨) */
+}
+
+.value.status.wish {
+    color: #9c27b0; /* 보라색 (위시) */
+}
+
 /* --- 하위 할일 목록 스타일 --- */
 
 .todo-list-title {

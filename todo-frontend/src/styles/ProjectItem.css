@@ -49,3 +49,13 @@
     text-decoration: line-through; 
     color: #999; 
 }
+
+/* 정지된 프로젝트 스타일 */
+.project-item.paused .project-title {
+    color: #ff9800; /* 오렌지색 */
+}
+
+/* 위시 프로젝트 스타일 */
+.project-item.wish .project-title {
+    color: #9c27b0; /* 보라색 */
+}

@@ -51,10 +51,24 @@ const ProjectsView = () => {
     return { totalCount, completedCount };
   };
 
-  // 완료 상태 토글 핸들러
+  // 상태 변경 핸들러 (체크박스 클릭 시 토글)
   const handleToggle = async (project) => {
     try {
-      await updateProjectStatus(project._id, !project.isCompleted);
+      // status가 없으면 isCompleted 기반으로 변환
+      const currentStatus = project.status || (project.isCompleted ? 'completed' : 'active');
+      
+      // 체크박스 토글: completed ↔ active (다른 상태는 그대로 유지)
+      let newStatus;
+      if (currentStatus === 'completed') {
+        newStatus = 'active';
+      } else if (currentStatus === 'active') {
+        newStatus = 'completed';
+      } else {
+        // paused나 wish 상태는 active로 변경
+        newStatus = 'active';
+      }
+      
+      await updateProjectStatus(project._id, newStatus);
       fetchProjects(); // 목록 갱신
       fetchAllTodos(); // 할일 통계 갱신
     } catch (error) {
@@ -62,9 +76,17 @@ const ProjectsView = () => {
     }
   };
 
-  // 프로젝트 목록 분리
-  const activeProjects = projects.filter((p) => !p.isCompleted);
-  const completedProjects = projects.filter((p) => p.isCompleted);
+  // 프로젝트 목록을 상태별로 분리 (기존 isCompleted도 호환성 처리)
+  const activeProjects = projects.filter((p) => {
+    const status = p.status || (p.isCompleted ? 'completed' : 'active');
+    return status === 'active';
+  });
+  const pausedProjects = projects.filter((p) => p.status === 'paused');
+  const completedProjects = projects.filter((p) => {
+    const status = p.status || (p.isCompleted ? 'completed' : 'active');
+    return status === 'completed';
+  });
+  const wishProjects = projects.filter((p) => p.status === 'wish');
 
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
@@ -73,10 +95,9 @@ const ProjectsView = () => {
     <div className='projects-view'>
       <h1 className='main-title'>프로젝트</h1>
 
-      {/* 1. 미완료 프로젝트 목록 */}
+      {/* 1. 진행중 프로젝트 목록 */}
       <section className='project-list-section'>
-        <h2 className='section-title'>프로젝트</h2>
-
+        <h2 className='section-title'>진행중</h2>
         <div className='project-list active-list'>
           {activeProjects.length === 0 && (
             <p className='empty-message'>진행 중인 프로젝트가 없습니다.</p>
@@ -95,10 +116,53 @@ const ProjectsView = () => {
         </div>
       </section>
 
-      {/* 2. 완료 프로젝트 목록 */}
+      {/* 2. 정지됨 프로젝트 목록 */}
+      {pausedProjects.length > 0 && (
+        <section className='project-list-section'>
+          <h2 className='section-title'>정지됨</h2>
+          <div className='project-list'>
+            {pausedProjects.map((project) => {
+              const stats = getProjectTodoStats(project._id);
+              return (
+                <ProjectItem
+                  key={project._id}
+                  project={project}
+                  onToggle={handleToggle}
+                  todoStats={stats}
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* 3. 위시 프로젝트 목록 */}
+      {wishProjects.length > 0 && (
+        <section className='project-list-section'>
+          <h2 className='section-title'>위시</h2>
+          <div className='project-list'>
+            {wishProjects.map((project) => {
+              const stats = getProjectTodoStats(project._id);
+              return (
+                <ProjectItem
+                  key={project._id}
+                  project={project}
+                  onToggle={handleToggle}
+                  todoStats={stats}
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* 4. 완료 프로젝트 목록 */}
       <section className='completed-section'>
         <h2 className='section-title completed-label'>완료</h2>
         <div className='project-list completed-list'>
+          {completedProjects.length === 0 && (
+            <p className='empty-message'>완료된 프로젝트가 없습니다.</p>
+          )}
           {completedProjects.map((project) => {
             const stats = getProjectTodoStats(project._id);
             return (
