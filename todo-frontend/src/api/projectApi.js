@@ -34,3 +34,21 @@ export const updateProject = async (id, projectData) => {
   const response = await api.patch(`/projects/${id}`, projectData);
   return response.data;
 };
+
+// 7. 프로젝트에 준비물 추가
+export const addProjectItem = async (projectId, itemData) => {
+  const response = await api.post(`/projects/${projectId}/items`, itemData);
+  return response.data;
+};
+
+// 8. 프로젝트 준비물 수정
+export const updateProjectItem = async (projectId, itemId, itemData) => {
+  const response = await api.patch(`/projects/${projectId}/items/${itemId}`, itemData);
+  return response.data;
+};
+
+// 9. 프로젝트 준비물 삭제
+export const deleteProjectItem = async (projectId, itemId) => {
+  const response = await api.delete(`/projects/${projectId}/items/${itemId}`);
+  return response.data;
+};

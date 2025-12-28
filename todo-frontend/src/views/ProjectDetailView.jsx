@@ -1,6 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProjectById, deleteProject } from '../api/projectApi';
+import {
+  getProjectById,
+  deleteProject,
+  addProjectItem,
+  updateProjectItem,
+  deleteProjectItem,
+} from '../api/projectApi';
 import { getTodosByProjectId, updateTodoStatus } from '../api/todoApi';
 import TodoItem from '../components/TodoItem';
 import '../styles/TodoDetailView.css'; // 상세 뷰 스타일 재활용
@@ -13,6 +19,9 @@ const ProjectDetailView = () => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showItemForm, setShowItemForm] = useState(false); // 준비물 추가 폼 표시 여부
+  const [newItemName, setNewItemName] = useState(''); // 새 준비물 이름
+  const [newItemPrice, setNewItemPrice] = useState(''); // 새 준비물 가격
 
   // 날짜 포맷팅 헬퍼
   const formatDate = (dateString) => {
@@ -77,6 +86,65 @@ const ProjectDetailView = () => {
 
   // 프로젝트 Map 생성 (현재 프로젝트만 포함, 다른 프로젝트와 연결된 할일이 있을 수 있으므로)
   const projectMap = project ? new Map([[project._id, project]]) : new Map();
+
+  // 예산 계산
+  const budgetStats = useMemo(() => {
+    if (!project || !project.items) return { totalBudget: 0, remainingBudget: 0 };
+    
+    const itemsWithPrice = project.items.filter((item) => item.price !== null && item.price !== undefined);
+    const totalBudget = itemsWithPrice.reduce((sum, item) => sum + (item.price || 0), 0);
+    
+    const unpurchasedItemsWithPrice = itemsWithPrice.filter((item) => !item.isPurchased);
+    const remainingBudget = unpurchasedItemsWithPrice.reduce((sum, item) => sum + (item.price || 0), 0);
+    
+    return { totalBudget, remainingBudget };
+  }, [project]);
+
+  // 준비물 추가 핸들러
+  const handleAddItem = async (e) => {
+    e.preventDefault();
+    if (!newItemName.trim()) {
+      alert('준비물 이름을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await addProjectItem(id, {
+        name: newItemName.trim(),
+        price: newItemPrice ? parseFloat(newItemPrice) : null,
+      });
+      setNewItemName('');
+      setNewItemPrice('');
+      setShowItemForm(false);
+      fetchProjectData(); // 프로젝트 데이터 갱신
+    } catch (error) {
+      alert('준비물 추가에 실패했습니다.');
+    }
+  };
+
+  // 준비물 구매 여부 토글
+  const handleItemToggle = async (item) => {
+    try {
+      await updateProjectItem(id, item._id, {
+        isPurchased: !item.isPurchased,
+      });
+      fetchProjectData(); // 프로젝트 데이터 갱신
+    } catch (error) {
+      alert('구매 여부 업데이트에 실패했습니다.');
+    }
+  };
+
+  // 준비물 삭제 핸들러
+  const handleDeleteItem = async (itemId, itemName) => {
+    if (window.confirm(`"${itemName}" 준비물을 삭제하시겠습니까?`)) {
+      try {
+        await deleteProjectItem(id, itemId);
+        fetchProjectData(); // 프로젝트 데이터 갱신
+      } catch (error) {
+        alert('준비물 삭제에 실패했습니다.');
+      }
+    }
+  };
 
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
@@ -152,6 +220,112 @@ const ProjectDetailView = () => {
               : '🔲 진행중'}
           </span>
         </div>
+
+        {/* --- 준비물 섹션 --- */}
+        <h2 className='todo-list-title'>준비물</h2>
+        <section className='project-items-section'>
+          {/* 예산 정보 */}
+          <div className='budget-info'>
+            <div className='budget-item'>
+              <span className='budget-label'>총 필요한 예산:</span>
+              <span className='budget-value'>
+                {budgetStats.totalBudget.toLocaleString()}원
+              </span>
+            </div>
+            <div className='budget-item'>
+              <span className='budget-label'>추가로 필요한 예산:</span>
+              <span className='budget-value remaining'>
+                {budgetStats.remainingBudget.toLocaleString()}원
+              </span>
+            </div>
+          </div>
+
+          {/* 준비물 리스트 */}
+          <div className='project-items-list'>
+            {(!project.items || project.items.length === 0) ? (
+              <p className='empty-message small'>준비물이 없습니다.</p>
+            ) : (
+              project.items.map((item) => (
+                <div
+                  key={item._id}
+                  className={`project-item-row ${item.isPurchased ? 'purchased' : ''}`}
+                >
+                  <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
+                    <input
+                      type='checkbox'
+                      checked={item.isPurchased}
+                      readOnly
+                      className='checkbox-input'
+                    />
+                  </div>
+                  <div className='item-content'>
+                    <div className='item-name'>{item.name}</div>
+                    {item.price !== null && item.price !== undefined && (
+                      <div className='item-price'>{item.price.toLocaleString()}원</div>
+                    )}
+                  </div>
+                  <button
+                    className='item-delete-button'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteItem(item._id, item.name);
+                    }}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* 준비물 추가 폼 */}
+          {showItemForm ? (
+            <form onSubmit={handleAddItem} className='item-add-form'>
+              <div className='form-row'>
+                <input
+                  type='text'
+                  placeholder='준비물 이름'
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  className='item-name-input'
+                  autoFocus
+                />
+                <input
+                  type='number'
+                  placeholder='가격 (선택)'
+                  value={newItemPrice}
+                  onChange={(e) => setNewItemPrice(e.target.value)}
+                  className='item-price-input'
+                  min='0'
+                  step='1'
+                />
+              </div>
+              <div className='form-actions'>
+                <button type='submit' className='item-add-confirm-button'>
+                  추가
+                </button>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setShowItemForm(false);
+                    setNewItemName('');
+                    setNewItemPrice('');
+                  }}
+                  className='item-add-cancel-button'
+                >
+                  취소
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              className='add-item-button'
+              onClick={() => setShowItemForm(true)}
+            >
+              + 준비물 추가
+            </button>
+          )}
+        </section>
 
         {/* --- 하위 할일 목록 섹션 --- */}
         <h2 className='todo-list-title'>할일 List</h2>

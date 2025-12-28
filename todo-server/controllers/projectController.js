@@ -141,3 +141,93 @@ exports.deleteProject = async (req, res) => {
       .json({ message: '프로젝트 삭제 실패', error: error.message });
   }
 };
+
+// 7. 프로젝트에 준비물 추가 (POST /projects/:id/items)
+exports.addProjectItem = async (req, res) => {
+  try {
+    const { name, price } = req.body;
+    
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: '준비물 이름은 필수입니다.' });
+    }
+
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    // 기존 데이터 마이그레이션
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+
+    project.items.push({
+      name: name.trim(),
+      isPurchased: false,
+      price: price ? parseFloat(price) : null,
+    });
+
+    await project.save();
+    res.status(201).json(project);
+  } catch (error) {
+    res.status(400).json({ message: '준비물 추가 실패', error: error.message });
+  }
+};
+
+// 8. 프로젝트 준비물 수정 (구매 여부, 이름, 가격) (PATCH /projects/:id/items/:itemId)
+exports.updateProjectItem = async (req, res) => {
+  try {
+    const { name, isPurchased, price } = req.body;
+    const project = await Project.findById(req.params.id);
+    
+    if (!project) {
+      return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const item = project.items.id(req.params.itemId);
+    if (!item) {
+      return res.status(404).json({ message: '준비물을 찾을 수 없습니다.' });
+    }
+
+    // 기존 데이터 마이그레이션
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+
+    if (name !== undefined) item.name = name.trim();
+    if (isPurchased !== undefined) item.isPurchased = isPurchased;
+    if (price !== undefined) item.price = price ? parseFloat(price) : null;
+
+    await project.save();
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(400).json({ message: '준비물 수정 실패', error: error.message });
+  }
+};
+
+// 9. 프로젝트 준비물 삭제 (DELETE /projects/:id/items/:itemId)
+exports.deleteProjectItem = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    
+    if (!project) {
+      return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const item = project.items.id(req.params.itemId);
+    if (!item) {
+      return res.status(404).json({ message: '준비물을 찾을 수 없습니다.' });
+    }
+
+    // 기존 데이터 마이그레이션
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+
+    item.deleteOne();
+    await project.save();
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(400).json({ message: '준비물 삭제 실패', error: error.message });
+  }
+};
