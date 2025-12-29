@@ -51,23 +51,27 @@ const AccountBookView = () => {
     fetchProjects();
   }, [fetchAccountBook, fetchProjects]);
 
-  // 사고 싶은 것에 필요한 총 예산 계산
+  // 사고 싶은 것에 필요한 총 예산 계산 (미구매 항목만)
   const wishItemsBudget = useMemo(() => {
     if (!accountBook || !accountBook.wishItems) return 0;
-    return accountBook.wishItems.reduce((sum, item) => sum + (item.price || 0), 0);
+    return accountBook.wishItems
+      .filter((item) => !item.isPurchased)
+      .reduce((sum, item) => sum + (item.price || 0), 0);
   }, [accountBook]);
 
-  // 프로젝트에 필요한 총 예산 계산
+  // 프로젝트에 추가로 필요한 총 예산 계산 (미구매 준비물만)
   const projectsBudget = useMemo(() => {
     if (!projects || projects.length === 0) return 0;
     return projects.reduce((total, project) => {
       if (!project.items || project.items.length === 0) return total;
-      const projectBudget = project.items.reduce((sum, item) => {
-        if (item.price !== null && item.price !== undefined) {
-          return sum + (item.price || 0);
-        }
-        return sum;
-      }, 0);
+      const projectBudget = project.items
+        .filter((item) => !item.isPurchased) // 미구매 항목만 필터링
+        .reduce((sum, item) => {
+          if (item.price !== null && item.price !== undefined) {
+            return sum + (item.price || 0);
+          }
+          return sum;
+        }, 0);
       return total + projectBudget;
     }, 0);
   }, [projects]);
@@ -77,17 +81,20 @@ const AccountBookView = () => {
     return wishItemsBudget + projectsBudget;
   }, [wishItemsBudget, projectsBudget]);
 
-  // 예산이 0원보다 큰 프로젝트만 필터링
+  // 미구매 준비물 예산이 0원보다 큰 프로젝트만 필터링
   const projectsWithBudget = useMemo(() => {
     return projects.filter((project) => {
       if (!project.items || project.items.length === 0) return false;
-      const projectBudget = project.items.reduce((sum, item) => {
-        if (item.price !== null && item.price !== undefined) {
-          return sum + (item.price || 0);
-        }
-        return sum;
-      }, 0);
-      return projectBudget > 0;
+      // 미구매 항목만 계산
+      const remainingBudget = project.items
+        .filter((item) => !item.isPurchased)
+        .reduce((sum, item) => {
+          if (item.price !== null && item.price !== undefined) {
+            return sum + (item.price || 0);
+          }
+          return sum;
+        }, 0);
+      return remainingBudget > 0;
     });
   }, [projects]);
 
@@ -246,7 +253,7 @@ const AccountBookView = () => {
               <div className='budget-value'>{wishItemsBudget.toLocaleString()}원</div>
             </div>
             <div className='budget-row'>
-              <div className='budget-label'>프로젝트에 필요한 총 예산</div>
+              <div className='budget-label'>프로젝트에 추가로 필요한 총 예산</div>
               <div className='budget-value'>{projectsBudget.toLocaleString()}원</div>
             </div>
             <div className='budget-row total'>
@@ -389,12 +396,22 @@ const AccountBookView = () => {
               return sum;
             }, 0);
 
+            // 프로젝트의 미구매 예산 계산
+            const remainingProjectBudget = project.items
+              .filter((item) => !item.isPurchased)
+              .reduce((sum, item) => {
+                if (item.price !== null && item.price !== undefined) {
+                  return sum + (item.price || 0);
+                }
+                return sum;
+              }, 0);
+
             return (
               <div key={project._id} className='project-items-block'>
                 <div className='project-items-header'>
                   <h3 className='project-items-title'>{project.title}</h3>
                   <div className='project-items-budget'>
-                    총 예산: {projectBudget.toLocaleString()}원
+                    추가 예산: {remainingProjectBudget.toLocaleString()}원
                   </div>
                 </div>
                 <div className='project-items-list'>
