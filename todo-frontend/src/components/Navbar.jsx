@@ -10,6 +10,7 @@ const icons = {
   Projects: '💡',
   Habits: '🔗', // 임시로 습관을 나타내는 아이콘
   Wishlist: '🤍',
+  AccountBook: '💰',
 };
 
 const Navbar = () => {
@@ -20,6 +21,7 @@ const Navbar = () => {
     { name: '프로젝트', path: '/projects', icon: icons.Projects },
     { name: '습관', path: '/habits', icon: icons.Habits },
     { name: '위시리스트', path: '/wishlists', icon: icons.Wishlist },
+    { name: '가계부', path: '/accountbook', icon: icons.AccountBook },
   ];
 
   return (

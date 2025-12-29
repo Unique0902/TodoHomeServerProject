@@ -10,6 +10,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const habitCategoryRoutes = require('./routes/habitCategoryRoutes');
 const habitRoutes = require('./routes/habitRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const accountBookRoutes = require('./routes/accountBookRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -26,6 +27,7 @@ app.use('/api/v1/projects', projectRoutes);
 app.use('/api/v1/habit-categories', habitCategoryRoutes);
 app.use('/api/v1/habits', habitRoutes);
 app.use('/api/v1/wishlists', wishlistRoutes);
+app.use('/api/v1/accountbook', accountBookRoutes);
 
 // --- 4. DB 연결 및 서버 시작 ---
 const start = async () => {
