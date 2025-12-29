@@ -6,10 +6,12 @@ import {
   updateWishItem,
   deleteWishItem,
 } from '../api/accountBookApi';
+import { getProjects, updateProjectItem } from '../api/projectApi';
 import '../styles/AccountBookView.css';
 
 const AccountBookView = () => {
   const [accountBook, setAccountBook] = useState(null);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showItemForm, setShowItemForm] = useState(false);
@@ -33,15 +35,73 @@ const AccountBookView = () => {
     }
   }, []);
 
+  // 프로젝트 목록 로드
+  const fetchProjects = useCallback(async () => {
+    try {
+      const data = await getProjects();
+      setProjects(data);
+    } catch (err) {
+      console.error('프로젝트 로드 실패:', err);
+      setProjects([]);
+    }
+  }, []);
+
   useEffect(() => {
     fetchAccountBook();
-  }, [fetchAccountBook]);
+    fetchProjects();
+  }, [fetchAccountBook, fetchProjects]);
 
-  // 총 필요한 예산 계산
-  const totalBudget = useMemo(() => {
+  // 사고 싶은 것에 필요한 총 예산 계산
+  const wishItemsBudget = useMemo(() => {
     if (!accountBook || !accountBook.wishItems) return 0;
     return accountBook.wishItems.reduce((sum, item) => sum + (item.price || 0), 0);
   }, [accountBook]);
+
+  // 프로젝트에 필요한 총 예산 계산
+  const projectsBudget = useMemo(() => {
+    if (!projects || projects.length === 0) return 0;
+    return projects.reduce((total, project) => {
+      if (!project.items || project.items.length === 0) return total;
+      const projectBudget = project.items.reduce((sum, item) => {
+        if (item.price !== null && item.price !== undefined) {
+          return sum + (item.price || 0);
+        }
+        return sum;
+      }, 0);
+      return total + projectBudget;
+    }, 0);
+  }, [projects]);
+
+  // 총 필요한 예산 (사고 싶은 것 + 프로젝트)
+  const totalBudget = useMemo(() => {
+    return wishItemsBudget + projectsBudget;
+  }, [wishItemsBudget, projectsBudget]);
+
+  // 예산이 0원보다 큰 프로젝트만 필터링
+  const projectsWithBudget = useMemo(() => {
+    return projects.filter((project) => {
+      if (!project.items || project.items.length === 0) return false;
+      const projectBudget = project.items.reduce((sum, item) => {
+        if (item.price !== null && item.price !== undefined) {
+          return sum + (item.price || 0);
+        }
+        return sum;
+      }, 0);
+      return projectBudget > 0;
+    });
+  }, [projects]);
+
+  // 프로젝트 준비물 토글 핸들러
+  const handleProjectItemToggle = async (projectId, item) => {
+    try {
+      await updateProjectItem(projectId, item._id, {
+        isPurchased: !item.isPurchased,
+      });
+      fetchProjects(); // 프로젝트 목록 갱신
+    } catch (error) {
+      alert('구매 여부 업데이트에 실패했습니다.');
+    }
+  };
 
   // 총 재산 수정 핸들러
   const handleUpdateAsset = async (e) => {
@@ -181,8 +241,18 @@ const AccountBookView = () => {
       {totalBudget > 0 && (
         <section className='budget-section'>
           <div className='budget-info'>
-            <div className='budget-label'>총 필요한 예산</div>
-            <div className='budget-value'>{totalBudget.toLocaleString()}원</div>
+            <div className='budget-row'>
+              <div className='budget-label'>사고 싶은 것에 필요한 총 예산</div>
+              <div className='budget-value'>{wishItemsBudget.toLocaleString()}원</div>
+            </div>
+            <div className='budget-row'>
+              <div className='budget-label'>프로젝트에 필요한 총 예산</div>
+              <div className='budget-value'>{projectsBudget.toLocaleString()}원</div>
+            </div>
+            <div className='budget-row total'>
+              <div className='budget-label'>총 필요한 예산</div>
+              <div className='budget-value'>{totalBudget.toLocaleString()}원</div>
+            </div>
           </div>
         </section>
       )}
@@ -303,6 +373,63 @@ const AccountBookView = () => {
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* 프로젝트 준비물 섹션 */}
+      {projectsWithBudget.length > 0 && (
+        <section className='projects-items-section'>
+          <h2 className='section-title'>프로젝트 준비물</h2>
+          {projectsWithBudget.map((project) => {
+            // 프로젝트 예산 계산
+            const projectBudget = project.items.reduce((sum, item) => {
+              if (item.price !== null && item.price !== undefined) {
+                return sum + (item.price || 0);
+              }
+              return sum;
+            }, 0);
+
+            return (
+              <div key={project._id} className='project-items-block'>
+                <div className='project-items-header'>
+                  <h3 className='project-items-title'>{project.title}</h3>
+                  <div className='project-items-budget'>
+                    총 예산: {projectBudget.toLocaleString()}원
+                  </div>
+                </div>
+                <div className='project-items-list'>
+                  {project.items
+                    .filter((item) => item.price !== null && item.price !== undefined)
+                    .map((item) => (
+                      <div
+                        key={item._id}
+                        className={`project-item-row ${item.isPurchased ? 'purchased' : ''}`}
+                      >
+                        <div
+                          className='item-checkbox'
+                          onClick={() => handleProjectItemToggle(project._id, item)}
+                        >
+                          <input
+                            type='checkbox'
+                            checked={item.isPurchased}
+                            readOnly
+                            className='checkbox-input'
+                          />
+                        </div>
+                        <div className='item-content'>
+                          <div className='item-name'>{item.name}</div>
+                          {item.price !== null && item.price !== undefined && (
+                            <div className='item-price'>
+                              {item.price.toLocaleString()}원
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            );
+          })}
         </section>
       )}
     </div>

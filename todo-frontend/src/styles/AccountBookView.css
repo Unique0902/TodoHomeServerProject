@@ -119,8 +119,21 @@
 
 .budget-info {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.budget-row {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 5px 0;
+}
+
+.budget-row.total {
+    border-top: 2px solid #856404;
+    margin-top: 5px;
+    padding-top: 10px;
 }
 
 .budget-label {
@@ -133,6 +146,12 @@
     font-size: 18px;
     font-weight: bold;
     color: #856404;
+}
+
+.budget-row.total .budget-label,
+.budget-row.total .budget-value {
+    font-size: 16px;
+    font-weight: 700;
 }
 
 /* 사고 싶은 것 섹션 */
@@ -299,5 +318,63 @@
     border-radius: 4px;
     cursor: pointer;
     accent-color: #007bff;
+}
+
+/* 프로젝트 준비물 섹션 */
+.projects-items-section {
+    margin-top: 30px;
+}
+
+.project-items-block {
+    margin-bottom: 25px;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.project-items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.project-items-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.project-items-budget {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.project-items-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-item-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #ddd;
+}
+
+.project-item-row:last-child {
+    border-bottom: none;
+}
+
+.project-item-row.purchased {
+    opacity: 0.6;
+}
+
+.project-item-row.purchased .item-name {
+    text-decoration: line-through;
 }
 
