@@ -16,7 +16,8 @@ const ProjectsView = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getProjects();
+      // 최상위 프로젝트만 조회 (하위 프로젝트 제외)
+      const data = await getProjects({ topLevelOnly: true });
       setProjects(data);
     } catch (err) {
       console.error('프로젝트 로드 실패:', err);

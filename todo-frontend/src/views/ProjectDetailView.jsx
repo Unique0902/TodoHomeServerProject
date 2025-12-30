@@ -6,6 +6,7 @@ import {
   addProjectItem,
   updateProjectItem,
   deleteProjectItem,
+  getProjects,
 } from '../api/projectApi';
 import { getTodosByProjectId, updateTodoStatus } from '../api/todoApi';
 import { getHabitsByProjectId } from '../api/habitApi';
@@ -19,6 +20,7 @@ const ProjectDetailView = () => {
   const [project, setProject] = useState(null);
   const [todos, setTodos] = useState([]);
   const [habits, setHabits] = useState([]); // 프로젝트 관련 습관
+  const [subProjects, setSubProjects] = useState([]); // 하위 프로젝트 목록
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showItemForm, setShowItemForm] = useState(false); // 준비물 추가 폼 표시 여부
@@ -51,6 +53,10 @@ const ProjectDetailView = () => {
       // 프로젝트 관련 습관 로드
       const habitData = await getHabitsByProjectId(id);
       setHabits(habitData);
+
+      // 하위 프로젝트 로드
+      const subProjectsData = await getProjects({ parentProjectId: id });
+      setSubProjects(subProjectsData);
     } catch (err) {
       setError('프로젝트 정보를 불러오지 못했습니다.');
     } finally {
@@ -227,6 +233,32 @@ const ProjectDetailView = () => {
               : '🔲 진행중'}
           </span>
         </div>
+
+        {/* --- 하위 프로젝트 섹션 --- */}
+        {subProjects.length > 0 && (
+          <>
+            <h2 className='todo-list-title'>하위 프로젝트</h2>
+            <section className='project-habits-section'>
+              <div className='project-habits-list'>
+                {subProjects.map((subProject) => (
+                  <div
+                    key={subProject._id}
+                    className='project-habit-item'
+                    onClick={() => navigate(`/projects/${subProject._id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className='habit-title'>{subProject.title}</div>
+                    {subProject.description && (
+                      <div className='habit-description'>
+                        {subProject.description}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
 
         {/* --- 습관 섹션 --- */}
         {habits.length > 0 && (
@@ -411,6 +443,15 @@ const ProjectDetailView = () => {
                 }}
               >
                 습관 추가
+              </button>
+              <button
+                className='add-menu-item'
+                onClick={() => {
+                  setShowAddMenu(false);
+                  navigate(`/projects/add?parentProjectId=${id}`);
+                }}
+              >
+                프로젝트 추가
               </button>
               <button
                 className='add-menu-cancel'

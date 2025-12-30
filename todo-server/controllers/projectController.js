@@ -20,12 +20,24 @@ exports.createProject = async (req, res) => {
 // 2. 프로젝트 목록 조회 (GET /projects)
 exports.getAllProjects = async (req, res) => {
   try {
-    // 쿼리 파라미터로 상태 필터링 (선택 사항)
-    const { status } = req.query;
+    // 쿼리 파라미터로 상태 필터링 및 하위 프로젝트 필터링 (선택 사항)
+    const { status, parentProjectId, topLevelOnly } = req.query;
     let query = {};
 
     if (status) {
       query.status = status;
+    }
+
+    // parentProjectId가 지정되면 해당 상위 프로젝트의 하위 프로젝트만 조회
+    if (parentProjectId) {
+      query.parentProjectId = parentProjectId;
+    } else if (topLevelOnly === 'true') {
+      // topLevelOnly가 true면 최상위 프로젝트만 조회 (parentProjectId가 없거나 null인 것들)
+      query.$or = [
+        { parentProjectId: { $exists: false } },
+        { parentProjectId: null },
+        { parentProjectId: '' },
+      ];
     }
 
     const projects = await Project.find(query).sort({ createdAt: -1 });
@@ -39,7 +51,7 @@ exports.getAllProjects = async (req, res) => {
     }
     
     // 다시 조회하여 업데이트된 데이터 반환
-    const updatedProjects = await Project.find(query || {}).sort({ createdAt: -1 });
+    const updatedProjects = await Project.find(query).sort({ createdAt: -1 });
     res.status(200).json(updatedProjects);
   } catch (error) {
     res

@@ -78,9 +78,11 @@ const TodosView = () => {
     }
   }, []);
 
-  // 프로젝트 목록 로딩
+  // 프로젝트 목록 로딩 (모든 프로젝트, 하위 프로젝트 포함)
+  // 할일 페이지에서는 모든 프로젝트를 로드해야 projectMap에 포함시킬 수 있음
   const fetchProjects = useCallback(async () => {
     try {
+      // 옵션 없이 호출하면 모든 프로젝트 반환 (하위 프로젝트 포함)
       const data = await getProjects();
       setProjects(data);
     } catch (err) {

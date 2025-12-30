@@ -1,8 +1,18 @@
 import api from './client';
 
 // 1. 프로젝트 목록 조회
-export const getProjects = async () => {
-  const response = await api.get('/projects');
+export const getProjects = async (options = {}) => {
+  const params = {};
+  if (options.topLevelOnly) {
+    params.topLevelOnly = 'true';
+  }
+  if (options.parentProjectId) {
+    params.parentProjectId = options.parentProjectId;
+  }
+  if (options.status) {
+    params.status = options.status;
+  }
+  const response = await api.get('/projects', { params });
   return response.data;
 };
 

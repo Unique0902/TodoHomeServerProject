@@ -17,6 +17,7 @@ const ProjectSchema = new mongoose.Schema(
       default: 'active',
     },
     items: { type: [ProjectItemSchema], default: [] }, // 준비물 배열
+    parentProjectId: { type: String, required: false }, // 상위 프로젝트 ID (하위 프로젝트인 경우)
   },
   { timestamps: true }
 );

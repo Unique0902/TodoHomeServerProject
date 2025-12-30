@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getProjectById,
   createProject,
@@ -10,6 +10,7 @@ import '../styles/TodoAddView.css'; // Add/Edit View 스타일 재사용
 const ProjectAddView = () => {
   const { id } = useParams(); // ID가 있으면 수정 모드
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // 폼 상태 관리
   const [title, setTitle] = useState('');
@@ -18,6 +19,7 @@ const ProjectAddView = () => {
   const [loading, setLoading] = useState(true);
 
   const isEditMode = !!id;
+  const parentProjectIdFromUrl = searchParams.get('parentProjectId'); // 하위 프로젝트로 추가하는 경우
 
   // 데이터 로드 및 폼 초기화 (수정 모드 시)
   const fetchAndPopulateProject = useCallback(async () => {
@@ -57,6 +59,8 @@ const ProjectAddView = () => {
       title: title.trim(),
       description: description.trim(),
       status: status,
+      // 하위 프로젝트로 추가하는 경우 parentProjectId 포함
+      ...(parentProjectIdFromUrl && { parentProjectId: parentProjectIdFromUrl }),
     };
 
     try {
@@ -69,7 +73,12 @@ const ProjectAddView = () => {
         // 생성 API 호출
         await createProject(projectData);
         alert('프로젝트가 성공적으로 추가되었습니다!');
-        navigate('/projects', { replace: true }); // 목록 페이지로 이동 (히스토리에서 AddView 제거)
+        // 하위 프로젝트로 추가한 경우 상위 프로젝트 상세 페이지로, 아니면 프로젝트 목록으로 이동
+        if (parentProjectIdFromUrl) {
+          navigate(`/projects/${parentProjectIdFromUrl}`, { replace: true });
+        } else {
+          navigate('/projects', { replace: true }); // 목록 페이지로 이동 (히스토리에서 AddView 제거)
+        }
       }
     } catch (error) {
       console.error(
