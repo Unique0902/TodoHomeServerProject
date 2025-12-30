@@ -8,6 +8,7 @@ import {
   deleteProjectItem,
 } from '../api/projectApi';
 import { getTodosByProjectId, updateTodoStatus } from '../api/todoApi';
+import { getHabitsByProjectId } from '../api/habitApi';
 import TodoItem from '../components/TodoItem';
 import '../styles/TodoDetailView.css'; // 상세 뷰 스타일 재활용
 import '../styles/ProjectDetailView.css'; // 프로젝트 고유 스타일 (4번 섹션 참고)
@@ -17,11 +18,13 @@ const ProjectDetailView = () => {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [todos, setTodos] = useState([]);
+  const [habits, setHabits] = useState([]); // 프로젝트 관련 습관
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showItemForm, setShowItemForm] = useState(false); // 준비물 추가 폼 표시 여부
   const [newItemName, setNewItemName] = useState(''); // 새 준비물 이름
   const [newItemPrice, setNewItemPrice] = useState(''); // 새 준비물 가격
+  const [showAddMenu, setShowAddMenu] = useState(false); // 추가 메뉴 표시 여부
 
   // 날짜 포맷팅 헬퍼
   const formatDate = (dateString) => {
@@ -44,6 +47,10 @@ const ProjectDetailView = () => {
       // 하위 할일 목록 로드 (projectId로 필터링)
       const todoData = await getTodosByProjectId(id);
       setTodos(todoData);
+
+      // 프로젝트 관련 습관 로드
+      const habitData = await getHabitsByProjectId(id);
+      setHabits(habitData);
     } catch (err) {
       setError('프로젝트 정보를 불러오지 못했습니다.');
     } finally {
@@ -221,6 +228,25 @@ const ProjectDetailView = () => {
           </span>
         </div>
 
+        {/* --- 습관 섹션 --- */}
+        {habits.length > 0 && (
+          <>
+            <h2 className='todo-list-title'>습관</h2>
+            <section className='project-habits-section'>
+              <div className='project-habits-list'>
+                {habits.map((habit) => (
+                  <div key={habit._id} className='project-habit-item'>
+                    <div className='habit-title'>{habit.title}</div>
+                    {habit.description && (
+                      <div className='habit-description'>{habit.description}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
         {/* --- 준비물 섹션 --- */}
         <h2 className='todo-list-title'>준비물</h2>
         <section className='project-items-section'>
@@ -362,14 +388,44 @@ const ProjectDetailView = () => {
         </section>
       </main>
 
-      {/* 하단 액션 버튼 섹션: 삭제 버튼 제거, 추가 버튼만 남김 */}
+      {/* 하단 액션 버튼 섹션 */}
       <footer className='action-bar project-action-bar-bottom'>
-        {/* 할일 추가 버튼 (우측 하단 배치) */}
+        {/* 추가 메뉴 */}
+        {showAddMenu && (
+          <div className='add-menu-overlay' onClick={() => setShowAddMenu(false)}>
+            <div className='add-menu' onClick={(e) => e.stopPropagation()}>
+              <button
+                className='add-menu-item'
+                onClick={() => {
+                  setShowAddMenu(false);
+                  navigate(`/todos/add?projectId=${id}&projectName=${project.title}`);
+                }}
+              >
+                할일 추가
+              </button>
+              <button
+                className='add-menu-item'
+                onClick={() => {
+                  setShowAddMenu(false);
+                  navigate(`/habits/add?projectId=${id}`);
+                }}
+              >
+                습관 추가
+              </button>
+              <button
+                className='add-menu-cancel'
+                onClick={() => setShowAddMenu(false)}
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 플러스 버튼 (우측 하단 배치) */}
         <button
           className='add-todo-button'
-          onClick={() =>
-            navigate(`/todos/add?projectId=${id}&projectName=${project.title}`)
-          }
+          onClick={() => setShowAddMenu(true)}
         >
           +
         </button>

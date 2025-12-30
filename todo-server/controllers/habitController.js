@@ -15,15 +15,20 @@ exports.createHabit = async (req, res) => {
   }
 };
 
-// 2. 습관 목록 조회 (GET /habits?categoryId=...)
+// 2. 습관 목록 조회 (GET /habits?categoryId=...&projectId=...)
 exports.getAllHabits = async (req, res) => {
   try {
-    const { categoryId } = req.query;
+    const { categoryId, projectId } = req.query;
     let query = {};
 
     // categoryId를 통한 필터링
     if (categoryId) {
       query.habitCategoryId = categoryId;
+    }
+
+    // projectId를 통한 필터링
+    if (projectId) {
+      query.projectId = projectId;
     }
 
     const habits = await Habit.find(query).sort({ createdAt: 1 });

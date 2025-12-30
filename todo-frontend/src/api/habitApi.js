@@ -8,6 +8,14 @@ export const getHabitsByCategoryId = async (categoryId) => {
   return response.data;
 };
 
+// 1-1. 특정 프로젝트 ID로 습관 목록 조회 (GET /habits?projectId=...)
+export const getHabitsByProjectId = async (projectId) => {
+  const response = await api.get('/habits', {
+    params: { projectId },
+  });
+  return response.data;
+};
+
 // 2. 오늘의 Habit Category 정보 조회 (선택된 카테고리 정보와 날짜 배열)
 export const getTodayHabitCategory = async () => {
   // 현재는 '오늘' 날짜에 선택된 카테고리를 DB에서 직접 조회하는 API가 없으므로,

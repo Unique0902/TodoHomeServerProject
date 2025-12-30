@@ -325,3 +325,89 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     cursor: pointer;
 }
+
+/* 추가 메뉴 스타일 */
+.add-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.add-menu {
+    background-color: white;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-menu-item {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.add-menu-item:hover {
+    background-color: #e9ecef;
+}
+
+.add-menu-cancel {
+    padding: 15px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.add-menu-cancel:hover {
+    background-color: #545b62;
+}
+
+/* 프로젝트 습관 섹션 스타일 */
+.project-habits-section {
+    margin-bottom: 30px;
+}
+
+.project-habits-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-habit-item {
+    padding: 12px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.project-habit-item:last-child {
+    border-bottom: none;
+}
+
+.project-habit-item .habit-title {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.project-habit-item .habit-description {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+}

@@ -22,8 +22,9 @@ const HabitAddView = () => {
 
   const isEditMode = !!id; // ID가 있으면 수정 모드
   
-  // URL 쿼리 파라미터에서 카테고리 ID 가져오기
+  // URL 쿼리 파라미터에서 카테고리 ID 및 프로젝트 ID 가져오기
   const categoryIdFromUrl = useMemo(() => searchParams.get('categoryId'), [searchParams]);
+  const projectIdFromUrl = useMemo(() => searchParams.get('projectId'), [searchParams]);
 
   // 1. 카테고리 목록 로드 및 수정 데이터 불러오기
   const fetchInitialData = useCallback(async () => {
@@ -80,6 +81,8 @@ const HabitAddView = () => {
       title: title.trim(),
       description: description.trim(),
       habitCategoryId: selectedCategoryId,
+      // 프로젝트 ID가 URL에서 전달되었으면 추가
+      ...(projectIdFromUrl && { projectId: projectIdFromUrl }),
     };
 
     try {
@@ -92,7 +95,12 @@ const HabitAddView = () => {
         // 생성 API 호출
         await createHabit(habitData);
         alert('습관이 성공적으로 추가되었습니다!');
-        navigate('/habits', { replace: true }); // 목록 페이지로 이동 (히스토리에서 AddView 제거)
+        // 프로젝트에서 왔으면 프로젝트로, 아니면 습관 페이지로 이동
+        if (projectIdFromUrl) {
+          navigate(`/projects/${projectIdFromUrl}`, { replace: true });
+        } else {
+          navigate('/habits', { replace: true }); // 목록 페이지로 이동 (히스토리에서 AddView 제거)
+        }
       }
     } catch (error) {
       console.error(isEditMode ? '습관 수정 실패:' : '습관 추가 실패:', error);
