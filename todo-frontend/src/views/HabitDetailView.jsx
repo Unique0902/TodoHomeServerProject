@@ -5,6 +5,7 @@ import {
   deleteHabit,
   getHabitCategoryById,
 } from '../api/habitApi';
+import { getProjectById } from '../api/projectApi';
 import '../styles/TodoDetailView.css'; // 스타일 재활용
 
 const HabitDetailView = () => {
@@ -12,6 +13,7 @@ const HabitDetailView = () => {
   const navigate = useNavigate();
   const [habit, setHabit] = useState(null);
   const [categoryTitle, setCategoryTitle] = useState('로딩 중...');
+  const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -37,6 +39,17 @@ const HabitDetailView = () => {
         habitData.habitCategoryId
       );
       setCategoryTitle(categoryData.title || '카테고리 없음');
+
+      // 관련 프로젝트가 있으면 프로젝트 정보 조회
+      if (habitData.projectId) {
+        try {
+          const projectData = await getProjectById(habitData.projectId);
+          setProject(projectData);
+        } catch (projectErr) {
+          console.error('프로젝트 정보 로드 실패:', projectErr);
+          // 프로젝트 로드 실패해도 습관 정보는 표시
+        }
+      }
     } catch (err) {
       setError('습관 정보를 불러오지 못했습니다.');
       console.error(err);
@@ -86,6 +99,20 @@ const HabitDetailView = () => {
           <span className='label'>카테고리</span>
           <span className='value'>{categoryTitle}</span>
         </div>
+
+        {/* 관련 프로젝트 정보 */}
+        {project && (
+          <div
+            className='info-group'
+            onClick={() => navigate(`/projects/${project._id}`)}
+            style={{ cursor: 'pointer' }}
+          >
+            <span className='label'>관련 프로젝트</span>
+            <span className='value' style={{ textDecoration: 'underline' }}>
+              {project.title}
+            </span>
+          </div>
+        )}
 
         {/* 설명 */}
         <div className='info-group'>
