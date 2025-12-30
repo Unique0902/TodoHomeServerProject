@@ -337,7 +337,15 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    z-index: 1000;
+    z-index: 2000; /* 네비게이션 바(1000)보다 위에 표시 */
+    padding-bottom: 70px; /* 네비게이션 바 높이(60px) + 여유 공간(10px) */
+}
+
+/* iOS Safari의 safe area 고려 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .add-menu-overlay {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
 }
 
 .add-menu {
@@ -349,6 +357,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .add-menu-item {
