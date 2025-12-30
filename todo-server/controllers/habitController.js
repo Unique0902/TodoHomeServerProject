@@ -56,7 +56,7 @@ exports.getHabit = async (req, res) => {
 // 4. 습관 부분 수정 및 완료 날짜 배열 수정 (PATCH /habits/:id)
 exports.updateHabit = async (req, res) => {
   try {
-    const { action, date, title, description, habitCategoryId } = req.body;
+    const { action, date, title, description, habitCategoryId, projectId } = req.body;
     let updateOperation = {};
 
     // 배열 수정 로직 처리 (완료 날짜 추가/제거)
@@ -67,9 +67,15 @@ exports.updateHabit = async (req, res) => {
       // $pull: completedDates 배열에서 해당 날짜를 제거
       updateOperation = { $pull: { completedDates: new Date(date) } };
     } else if (Object.keys(req.body).length > 0) {
-      // 일반 필드 수정 (title, description, habitCategoryId)
+      // 일반 필드 수정 (title, description, habitCategoryId, projectId)
       // action과 date를 제외하고 나머지 필드를 업데이트 대상에 포함
       const { action, date, ...rest } = req.body;
+      
+      // projectId가 빈 문자열로 오면 null로 설정 (프로젝트 연결 해제)
+      if ('projectId' in rest && rest.projectId === '') {
+        rest.projectId = null;
+      }
+      
       updateOperation = rest;
     } else {
       return res

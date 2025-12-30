@@ -6,6 +6,7 @@ import {
   createHabit,
   updateHabit,
 } from '../api/habitApi';
+import { getProjects } from '../api/projectApi';
 import '../styles/TodoAddView.css'; // 스타일 재사용
 
 const HabitAddView = () => {
@@ -18,6 +19,8 @@ const HabitAddView = () => {
   const [description, setDescription] = useState('');
   const [categories, setCategories] = useState([]); // 선택 가능한 카테고리 목록
   const [selectedCategoryId, setSelectedCategoryId] = useState(''); // 현재 선택된 카테고리 ID
+  const [projects, setProjects] = useState([]); // 프로젝트 목록
+  const [selectedProjectId, setSelectedProjectId] = useState(''); // 현재 선택된 프로젝트 ID (빈 문자열 = 선택안함)
   const [loading, setLoading] = useState(true);
 
   const isEditMode = !!id; // ID가 있으면 수정 모드
@@ -32,6 +35,10 @@ const HabitAddView = () => {
       // 카테고리 목록 로드
       const categoryList = await getAllHabitCategories();
       setCategories(categoryList);
+
+      // 프로젝트 목록 로드
+      const projectList = await getProjects();
+      setProjects(projectList);
 
       if (categoryList.length > 0 && !isEditMode) {
         // 추가 모드일 경우
@@ -48,6 +55,13 @@ const HabitAddView = () => {
           // URL에서 카테고리 ID가 없으면 첫 번째 항목 선택
           setSelectedCategoryId(categoryList[0]._id);
         }
+
+        // 프로젝트 선택: URL에서 전달받은 projectId가 있으면 선택, 없으면 선택안함('')
+        if (projectIdFromUrl && projectList.some(p => p._id === projectIdFromUrl)) {
+          setSelectedProjectId(projectIdFromUrl);
+        } else {
+          setSelectedProjectId(''); // 선택안함
+        }
       }
 
       if (isEditMode) {
@@ -56,6 +70,7 @@ const HabitAddView = () => {
         setTitle(habitData.title);
         setDescription(habitData.description || '');
         setSelectedCategoryId(habitData.habitCategoryId); // 기존 카테고리 ID 설정
+        setSelectedProjectId(habitData.projectId || ''); // 기존 프로젝트 ID 설정 (없으면 선택안함)
       }
     } catch (err) {
       console.error('초기 데이터 로드 실패:', err);
@@ -64,7 +79,7 @@ const HabitAddView = () => {
     } finally {
       setLoading(false);
     }
-  }, [id, isEditMode, navigate, categoryIdFromUrl]);
+  }, [id, isEditMode, navigate, categoryIdFromUrl, projectIdFromUrl]);
 
   useEffect(() => {
     fetchInitialData();
@@ -81,8 +96,8 @@ const HabitAddView = () => {
       title: title.trim(),
       description: description.trim(),
       habitCategoryId: selectedCategoryId,
-      // 프로젝트 ID가 URL에서 전달되었으면 추가
-      ...(projectIdFromUrl && { projectId: projectIdFromUrl }),
+      // 프로젝트 ID 설정 (빈 문자열이어도 포함하여 백엔드에서 null로 처리)
+      projectId: selectedProjectId || '',
     };
 
     try {
@@ -96,8 +111,9 @@ const HabitAddView = () => {
         await createHabit(habitData);
         alert('습관이 성공적으로 추가되었습니다!');
         // 프로젝트에서 왔으면 프로젝트로, 아니면 습관 페이지로 이동
-        if (projectIdFromUrl) {
-          navigate(`/projects/${projectIdFromUrl}`, { replace: true });
+        const redirectProjectId = selectedProjectId || projectIdFromUrl;
+        if (redirectProjectId) {
+          navigate(`/projects/${redirectProjectId}`, { replace: true });
         } else {
           navigate('/habits', { replace: true }); // 목록 페이지로 이동 (히스토리에서 AddView 제거)
         }
@@ -158,7 +174,7 @@ const HabitAddView = () => {
           />
         </div>
 
-        {/* 2. 습관 카테고리 선택 (새로 추가된 부분) */}
+        {/* 2. 습관 카테고리 선택 */}
         <div className='input-group'>
           <label>카테고리</label>
           <select
@@ -174,7 +190,24 @@ const HabitAddView = () => {
           </select>
         </div>
 
-        {/* 3. 설명 입력 */}
+        {/* 3. 관련 프로젝트 선택 */}
+        <div className='input-group'>
+          <label>관련 프로젝트</label>
+          <select
+            value={selectedProjectId}
+            onChange={(e) => setSelectedProjectId(e.target.value)}
+            className='select-input'
+          >
+            <option value=''>선택안함</option>
+            {projects.map((project) => (
+              <option key={project._id} value={project._id}>
+                {project.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 4. 설명 입력 */}
         <div className='input-group'>
           <label>설명</label>
           <textarea
