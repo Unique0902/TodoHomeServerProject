@@ -1,4 +1,6 @@
 const Project = require('../models/Project');
+const Todo = require('../models/Todo');
+const Habit = require('../models/Habit');
 
 // 1. 프로젝트 생성 (POST /projects)
 exports.createProject = async (req, res) => {
@@ -137,14 +139,38 @@ exports.updateProjectFull = async (req, res) => {
   }
 };
 
+// 프로젝트와 관련된 모든 데이터를 재귀적으로 삭제하는 헬퍼 함수
+const deleteProjectRecursively = async (projectId) => {
+  // 1. 해당 프로젝트의 할일 삭제
+  await Todo.deleteMany({ projectId: projectId });
+
+  // 2. 해당 프로젝트의 습관 삭제
+  await Habit.deleteMany({ projectId: projectId });
+
+  // 3. 하위 프로젝트 찾기
+  const subProjects = await Project.find({ parentProjectId: projectId });
+
+  // 4. 각 하위 프로젝트에 대해 재귀적으로 삭제
+  for (const subProject of subProjects) {
+    await deleteProjectRecursively(subProject._id.toString());
+  }
+
+  // 5. 프로젝트 자체 삭제
+  await Project.findByIdAndDelete(projectId);
+};
+
 // 6. 프로젝트 삭제 (DELETE /projects/:id)
 exports.deleteProject = async (req, res) => {
   try {
-    const project = await Project.findByIdAndDelete(req.params.id);
+    const project = await Project.findById(req.params.id);
 
     if (!project) {
       return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
     }
+
+    // 재귀적으로 모든 관련 데이터 삭제
+    await deleteProjectRecursively(req.params.id);
+
     // 204 No Content 응답 (삭제 성공)
     res.status(204).send();
   } catch (error) {

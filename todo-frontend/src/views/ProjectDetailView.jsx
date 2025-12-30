@@ -80,12 +80,26 @@ const ProjectDetailView = () => {
 
   // 프로젝트 삭제 핸들러
   const handleDelete = async () => {
-    if (
-      window.confirm(`정말로 프로젝트 "${project.title}"을 삭제하시겠습니까?`)
-    ) {
+    // 삭제될 데이터 정보 수집
+    const todoCount = todos.length;
+    const habitCount = habits.length;
+    const subProjectCount = subProjects.length;
+
+    // 확인 메시지 생성
+    let confirmMessage = `정말로 프로젝트 "${project.title}"을 삭제하시겠습니까?\n\n`;
+    confirmMessage += `다음 데이터가 모두 삭제됩니다:\n`;
+    confirmMessage += `- 할일: ${todoCount}개\n`;
+    confirmMessage += `- 습관: ${habitCount}개\n`;
+    confirmMessage += `- 하위 프로젝트: ${subProjectCount}개`;
+
+    if (subProjectCount > 0) {
+      confirmMessage += `\n\n※ 하위 프로젝트의 할일, 습관, 하위 프로젝트도 모두 삭제됩니다.`;
+    }
+
+    if (window.confirm(confirmMessage)) {
       try {
         await deleteProject(id);
-        alert('프로젝트가 삭제되었습니다.');
+        alert('프로젝트와 관련된 모든 데이터가 삭제되었습니다.');
         navigate('/projects'); // 목록 페이지로 이동
       } catch (err) {
         alert('삭제에 실패했습니다.');
