@@ -121,6 +121,15 @@ const TodoDetailView = () => {
           </span>
         </div>
 
+        {todo.isCompleted && todo.completedDate && (
+          <div className='info-group'>
+            <span className='label'>수행 날짜 및 시간</span>
+            <span className='value completed-date'>
+              {formatCompletedDateTime(todo.completedDate)}
+            </span>
+          </div>
+        )}
+
         <div className='info-group'>
           <span className='label'>기한</span>
           <span className='value due-date'>{formatDateTime(todo.dueDate)}</span>

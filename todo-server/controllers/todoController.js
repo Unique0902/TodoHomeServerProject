@@ -79,19 +79,16 @@ exports.updateTodoPartial = async (req, res) => {
       return res.status(404).json({ message: '할일을 찾을 수 없습니다.' });
     }
 
-    // isCompleted가 변경되고, 기한이 없는 할일인 경우 completedDate 처리
+    // isCompleted가 변경될 때 completedDate 처리 (모든 할일에 대해)
     if (req.body.hasOwnProperty('isCompleted')) {
       const updateData = { ...req.body };
       
-      // 기한이 없는 할일(dueDate가 없거나 null)인 경우
-      if (!todo.dueDate) {
-        if (req.body.isCompleted === true) {
-          // 완료로 변경: 현재 날짜를 completedDate에 저장
-          updateData.completedDate = new Date();
-        } else if (req.body.isCompleted === false) {
-          // 미완료로 변경: completedDate를 null로 설정
-          updateData.completedDate = null;
-        }
+      if (req.body.isCompleted === true) {
+        // 완료로 변경: 현재 날짜 및 시간을 completedDate에 저장
+        updateData.completedDate = new Date();
+      } else if (req.body.isCompleted === false) {
+        // 미완료로 변경: completedDate를 null로 설정
+        updateData.completedDate = null;
       }
       
       const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, updateData, {
