@@ -42,6 +42,30 @@ const TodoDetailView = () => {
     }
   };
 
+  // 수행 날짜 및 시간 포맷팅 헬퍼 (항상 날짜와 시간 모두 표시)
+  const formatCompletedDateTime = (dateString) => {
+    if (!dateString) return '미정';
+
+    const date = new Date(dateString);
+
+    // 날짜 포맷
+    const datePart = date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    // 시간 포맷 (항상 표시, 초 포함)
+    const timePart = date.toLocaleTimeString('ko-KR', {
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+
+    return `${datePart} ${timePart}`;
+  };
+
   // 데이터 로드
   const fetchTodo = useCallback(async () => {
     try {
