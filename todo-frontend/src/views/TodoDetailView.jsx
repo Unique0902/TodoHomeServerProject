@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getTodoById, deleteTodo } from '../api/todoApi';
 import { getProjectById } from '../api/projectApi';
 import '../styles/TodoDetailView.css';
@@ -7,6 +7,7 @@ import '../styles/TodoDetailView.css';
 const TodoDetailView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [todo, setTodo] = useState(null);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -99,7 +100,14 @@ const TodoDetailView = () => {
       try {
         await deleteTodo(id);
         alert('할일이 삭제되었습니다.');
-        navigate('/todos'); // 목록 페이지로 이동
+        
+        // 프로젝트 상세 페이지에서 온 경우 프로젝트 상세 페이지로 이동
+        const fromProjectId = location.state?.fromProjectId;
+        if (fromProjectId) {
+          navigate(`/projects/${fromProjectId}`);
+        } else {
+          navigate('/todos'); // 그 외의 경우 할일 목록 페이지로 이동
+        }
       } catch (err) {
         alert('삭제에 실패했습니다.');
       }

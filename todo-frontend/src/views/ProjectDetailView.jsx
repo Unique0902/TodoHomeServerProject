@@ -423,8 +423,13 @@ const ProjectDetailView = () => {
                 todo={todo}
                 onToggle={handleTodoToggle}
                 projectMap={projectMap}
-                // 프로젝트 상세 뷰에서는 할일 상세로 바로 이동하지 않도록 클릭 이벤트 막음
-                onClick={(e) => e.stopPropagation()}
+                // 프로젝트 상세 페이지에서 할일 상세 페이지로 이동 시 프로젝트 ID 전달
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/todos/${todo._id}`, {
+                    state: { fromProjectId: id },
+                  });
+                }}
               />
             ))}
           </div>
@@ -437,7 +442,13 @@ const ProjectDetailView = () => {
                 todo={todo}
                 onToggle={handleTodoToggle}
                 projectMap={projectMap}
-                onClick={(e) => e.stopPropagation()}
+                // 프로젝트 상세 페이지에서 할일 상세 페이지로 이동 시 프로젝트 ID 전달
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/todos/${todo._id}`, {
+                    state: { fromProjectId: id },
+                  });
+                }}
               />
             ))}
           </div>

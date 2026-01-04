@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom'; // 👈 useNavigate 임포트
 // todo: 할일 데이터 객체
 // onToggle: 완료 상태 토글 핸들러 함수
 // projectMap: 프로젝트 ID를 키로 하는 프로젝트 정보 Map (선택사항)
-const TodoItem = ({ todo, onToggle, projectMap }) => {
+// onClick: 클릭 시 실행할 커스텀 핸들러 (선택사항, 있으면 기본 동작 대신 실행)
+const TodoItem = ({ todo, onToggle, projectMap, onClick }) => {
   const navigate = useNavigate(); // 👈 useNavigate 훅 사용
   // 시간 정보를 포맷하는 함수 (dueDate가 있으면 날짜/시간, 없으면 '기한없음')
   const formatTime = (dueDate) => {
@@ -110,7 +111,12 @@ const TodoItem = ({ todo, onToggle, projectMap }) => {
     ) {
       return;
     }
-    navigate(`/todos/${todo._id}`);
+    // 커스텀 onClick 핸들러가 있으면 그것을 사용, 없으면 기본 동작
+    if (onClick) {
+      onClick(e);
+    } else {
+      navigate(`/todos/${todo._id}`);
+    }
   };
   return (
     <div className={itemClasses} onClick={handleDetailClick}>
