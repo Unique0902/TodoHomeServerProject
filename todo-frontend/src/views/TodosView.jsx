@@ -41,12 +41,18 @@ const TodosView = () => {
     const newStart = new Date(currentWeekStart);
     newStart.setDate(newStart.getDate() - 7);
     setCurrentWeekStart(newStart);
+    // 선택된 날짜를 새로운 주의 첫 번째 날(일요일)로 변경
+    const firstDayOfNewWeek = formatDateString(newStart);
+    setSelectedDate(firstDayOfNewWeek);
   };
 
   const goToNextWeek = () => {
     const newStart = new Date(currentWeekStart);
     newStart.setDate(newStart.getDate() + 7);
     setCurrentWeekStart(newStart);
+    // 선택된 날짜를 새로운 주의 첫 번째 날(일요일)로 변경
+    const firstDayOfNewWeek = formatDateString(newStart);
+    setSelectedDate(firstDayOfNewWeek);
   };
 
   // --- 할일 로딩 및 토글 로직 ---
