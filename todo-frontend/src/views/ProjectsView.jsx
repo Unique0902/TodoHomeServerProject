@@ -7,7 +7,8 @@ import '../styles/ProjectsView.css';
 
 const ProjectsView = () => {
   const navigate = useNavigate();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState([]); // 최상위 프로젝트만
+  const [allProjects, setAllProjects] = useState([]); // 모든 프로젝트 (하위 포함)
   const [todos, setTodos] = useState([]); // 모든 할일 목록
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,8 +18,12 @@ const ProjectsView = () => {
     setError(null);
     try {
       // 최상위 프로젝트만 조회 (하위 프로젝트 제외)
-      const data = await getProjects({ topLevelOnly: true });
-      setProjects(data);
+      const topLevelData = await getProjects({ topLevelOnly: true });
+      setProjects(topLevelData);
+      
+      // 모든 프로젝트 조회 (하위 프로젝트 포함) - 통계 계산용
+      const allData = await getProjects();
+      setAllProjects(allData);
     } catch (err) {
       console.error('프로젝트 로드 실패:', err);
       setError('프로젝트 목록을 불러오지 못했습니다.');
@@ -44,11 +49,37 @@ const ProjectsView = () => {
     fetchAllTodos();
   }, [fetchProjects, fetchAllTodos]);
 
-  // 프로젝트별 할일 통계 계산
+  // 특정 프로젝트의 모든 하위 프로젝트 ID를 재귀적으로 찾는 함수
+  const getAllSubProjectIds = (projectId) => {
+    const subProjectIds = new Set([projectId]); // 자기 자신 포함 (Set으로 중복 방지)
+    
+    // 직접 하위 프로젝트 찾기
+    const directSubProjects = allProjects.filter(
+      (p) => p.parentProjectId === projectId
+    );
+    
+    // 각 하위 프로젝트에 대해 재귀적으로 하위 프로젝트 찾기
+    directSubProjects.forEach((subProject) => {
+      const subSubProjectIds = getAllSubProjectIds(subProject._id);
+      subSubProjectIds.forEach((id) => subProjectIds.add(id));
+    });
+    
+    return Array.from(subProjectIds);
+  };
+
+  // 프로젝트별 할일 통계 계산 (하위 프로젝트 포함)
   const getProjectTodoStats = (projectId) => {
-    const projectTodos = todos.filter((todo) => todo.projectId === projectId);
-    const totalCount = projectTodos.length;
-    const completedCount = projectTodos.filter((todo) => todo.isCompleted).length;
+    // 해당 프로젝트와 모든 하위 프로젝트의 ID 목록
+    const allRelatedProjectIds = getAllSubProjectIds(projectId, allProjects);
+    
+    // 관련된 모든 프로젝트의 할일 합산
+    const allRelatedTodos = todos.filter((todo) =>
+      allRelatedProjectIds.includes(todo.projectId)
+    );
+    
+    const totalCount = allRelatedTodos.length;
+    const completedCount = allRelatedTodos.filter((todo) => todo.isCompleted).length;
+    
     return { totalCount, completedCount };
   };
 
