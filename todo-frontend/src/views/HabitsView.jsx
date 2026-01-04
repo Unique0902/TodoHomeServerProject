@@ -39,15 +39,30 @@ const HabitsView = () => {
     const newStart = new Date(currentWeekStart);
     newStart.setDate(newStart.getDate() - 7);
     setCurrentWeekStart(newStart);
-    // 새로운 주를 로드할 때 해당 주의 첫날로 선택 날짜를 이동 (선택 사항)
-    setSelectedDate(formatDateString(newStart));
+    
+    // 현재 선택된 날짜의 요일을 유지
+    const currentSelectedDate = new Date(selectedDate);
+    const dayOfWeek = currentSelectedDate.getDay(); // 0(일) ~ 6(토)
+    
+    // 새로운 주의 시작일(일요일)에서 해당 요일만큼 더한 날짜
+    const newSelectedDate = new Date(newStart);
+    newSelectedDate.setDate(newStart.getDate() + dayOfWeek);
+    setSelectedDate(formatDateString(newSelectedDate));
   };
 
   const goToNextWeek = () => {
     const newStart = new Date(currentWeekStart);
     newStart.setDate(newStart.getDate() + 7);
     setCurrentWeekStart(newStart);
-    setSelectedDate(formatDateString(newStart));
+    
+    // 현재 선택된 날짜의 요일을 유지
+    const currentSelectedDate = new Date(selectedDate);
+    const dayOfWeek = currentSelectedDate.getDay(); // 0(일) ~ 6(토)
+    
+    // 새로운 주의 시작일(일요일)에서 해당 요일만큼 더한 날짜
+    const newSelectedDate = new Date(newStart);
+    newSelectedDate.setDate(newStart.getDate() + dayOfWeek);
+    setSelectedDate(formatDateString(newSelectedDate));
   };
 
   // --- 습관 데이터 로드 로직 ---

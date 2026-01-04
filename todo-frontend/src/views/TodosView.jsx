@@ -41,18 +41,30 @@ const TodosView = () => {
     const newStart = new Date(currentWeekStart);
     newStart.setDate(newStart.getDate() - 7);
     setCurrentWeekStart(newStart);
-    // 선택된 날짜를 새로운 주의 첫 번째 날(일요일)로 변경
-    const firstDayOfNewWeek = formatDateString(newStart);
-    setSelectedDate(firstDayOfNewWeek);
+    
+    // 현재 선택된 날짜의 요일을 유지
+    const currentSelectedDate = new Date(selectedDate);
+    const dayOfWeek = currentSelectedDate.getDay(); // 0(일) ~ 6(토)
+    
+    // 새로운 주의 시작일(일요일)에서 해당 요일만큼 더한 날짜
+    const newSelectedDate = new Date(newStart);
+    newSelectedDate.setDate(newStart.getDate() + dayOfWeek);
+    setSelectedDate(formatDateString(newSelectedDate));
   };
 
   const goToNextWeek = () => {
     const newStart = new Date(currentWeekStart);
     newStart.setDate(newStart.getDate() + 7);
     setCurrentWeekStart(newStart);
-    // 선택된 날짜를 새로운 주의 첫 번째 날(일요일)로 변경
-    const firstDayOfNewWeek = formatDateString(newStart);
-    setSelectedDate(firstDayOfNewWeek);
+    
+    // 현재 선택된 날짜의 요일을 유지
+    const currentSelectedDate = new Date(selectedDate);
+    const dayOfWeek = currentSelectedDate.getDay(); // 0(일) ~ 6(토)
+    
+    // 새로운 주의 시작일(일요일)에서 해당 요일만큼 더한 날짜
+    const newSelectedDate = new Date(newStart);
+    newSelectedDate.setDate(newStart.getDate() + dayOfWeek);
+    setSelectedDate(formatDateString(newSelectedDate));
   };
 
   // --- 할일 로딩 및 토글 로직 ---
