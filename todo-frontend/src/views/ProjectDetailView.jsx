@@ -182,7 +182,17 @@ const ProjectDetailView = () => {
     <div className='project-detail-view'>
       <header className='header-bar detail-header'>
         {/* 1. 뒤로가기 버튼 */}
-        <button className='back-button' onClick={() => navigate('/projects')}>
+        <button
+          className='back-button'
+          onClick={() => {
+            // 하위 프로젝트인 경우 부모 프로젝트 상세 페이지로, 아니면 프로젝트 목록으로
+            if (project.parentProjectId) {
+              navigate(`/projects/${project.parentProjectId}`);
+            } else {
+              navigate('/projects');
+            }
+          }}
+        >
           &lt;
         </button>
         {/* 2. 프로젝트 제목 */}
