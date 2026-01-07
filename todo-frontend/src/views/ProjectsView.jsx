@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProjects, updateProjectStatus } from '../api/projectApi';
 import { getTodos } from '../api/todoApi';
-import ProjectItem from '../components/ProjectItem';
+import ProjectItemWithChildren from '../components/ProjectItemWithChildren';
 import '../styles/ProjectsView.css';
 
 const ProjectsView = () => {
@@ -137,11 +137,14 @@ const ProjectsView = () => {
           {activeProjects.map((project) => {
             const stats = getProjectTodoStats(project._id);
             return (
-              <ProjectItem
+              <ProjectItemWithChildren
                 key={project._id}
                 project={project}
+                allProjects={allProjects}
                 onToggle={handleToggle}
                 todoStats={stats}
+                getProjectTodoStats={getProjectTodoStats}
+                level={0}
               />
             );
           })}
@@ -156,11 +159,14 @@ const ProjectsView = () => {
             {pausedProjects.map((project) => {
               const stats = getProjectTodoStats(project._id);
               return (
-                <ProjectItem
+                <ProjectItemWithChildren
                   key={project._id}
                   project={project}
+                  allProjects={allProjects}
                   onToggle={handleToggle}
                   todoStats={stats}
+                  getProjectTodoStats={getProjectTodoStats}
+                  level={0}
                 />
               );
             })}
@@ -176,11 +182,14 @@ const ProjectsView = () => {
             {wishProjects.map((project) => {
               const stats = getProjectTodoStats(project._id);
               return (
-                <ProjectItem
+                <ProjectItemWithChildren
                   key={project._id}
                   project={project}
+                  allProjects={allProjects}
                   onToggle={handleToggle}
                   todoStats={stats}
+                  getProjectTodoStats={getProjectTodoStats}
+                  level={0}
                 />
               );
             })}
@@ -198,11 +207,14 @@ const ProjectsView = () => {
           {completedProjects.map((project) => {
             const stats = getProjectTodoStats(project._id);
             return (
-              <ProjectItem
+              <ProjectItemWithChildren
                 key={project._id}
                 project={project}
+                allProjects={allProjects}
                 onToggle={handleToggle}
                 todoStats={stats}
+                getProjectTodoStats={getProjectTodoStats}
+                level={0}
               />
             );
           })}

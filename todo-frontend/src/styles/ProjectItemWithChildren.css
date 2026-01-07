@@ -1,0 +1,65 @@
+/* src/styles/ProjectItemWithChildren.css */
+
+.project-item-with-children {
+  width: 100%;
+}
+
+.project-item-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.indent-space {
+  flex-shrink: 0;
+}
+
+.project-toggle-button {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #666;
+  padding: 0;
+  margin-right: 4px;
+  transition: transform 0.2s;
+}
+
+.project-toggle-button:hover {
+  color: #007bff;
+}
+
+.project-toggle-button.expanded {
+  transform: rotate(0deg);
+}
+
+.project-toggle-spacer {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.project-item-container {
+  flex-grow: 1;
+}
+
+.sub-projects-list {
+  width: 100%;
+}
+
+/* 레벨별 스타일링 (선택사항) */
+.project-item-wrapper.level-1 {
+  /* 1단계 하위 프로젝트 */
+}
+
+.project-item-wrapper.level-2 {
+  /* 2단계 하위 프로젝트 */
+}
+
