@@ -8,10 +8,16 @@
   display: flex;
   align-items: center;
   position: relative;
+  width: 100%;
 }
 
 .indent-space {
   flex-shrink: 0;
+}
+
+.project-item-container {
+  flex-grow: 1;
+  min-width: 0; /* flex item이 overflow될 수 있도록 */
 }
 
 .project-toggle-button {
@@ -27,7 +33,7 @@
   font-size: 10px;
   color: #666;
   padding: 0;
-  margin-right: 4px;
+  margin-left: 8px; /* 프로젝트 아이템과의 간격 */
   transition: transform 0.2s;
 }
 
@@ -37,17 +43,6 @@
 
 .project-toggle-button.expanded {
   transform: rotate(0deg);
-}
-
-.project-toggle-spacer {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  margin-right: 4px;
-}
-
-.project-item-container {
-  flex-grow: 1;
 }
 
 .sub-projects-list {
