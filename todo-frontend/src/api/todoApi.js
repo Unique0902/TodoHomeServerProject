@@ -65,3 +65,16 @@ export const getTodosWithoutDate = async () => {
     throw error;
   }
 };
+
+// 9. 실행일이 지난 미완료 할일 목록 조회
+export const getOverdueTodos = async () => {
+  try {
+    const response = await api.get('/todos', {
+      params: { overdue: 'true' },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('지난 할일 조회 실패:', error);
+    throw error;
+  }
+};

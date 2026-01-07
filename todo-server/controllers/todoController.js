@@ -16,11 +16,11 @@ exports.createTodo = async (req, res) => {
   }
 };
 
-// 2. 할일 목록 조회 (GET /todos?date=...&projectId=...&noDueDate=true)
+// 2. 할일 목록 조회 (GET /todos?date=...&projectId=...&noDueDate=true&overdue=true)
 exports.getAllTodos = async (req, res) => {
   try {
-    // --- 쿼리 파라미터에서 date, projectId, noDueDate를 추출 ---
-    const { date, projectId, noDueDate } = req.query;
+    // --- 쿼리 파라미터에서 date, projectId, noDueDate, overdue를 추출 ---
+    const { date, projectId, noDueDate, overdue } = req.query;
     let query = {};
 
     // 1. 수행일이 없는 할일 조회 (noDueDate 파라미터가 우선순위)
@@ -31,7 +31,22 @@ exports.getAllTodos = async (req, res) => {
         { dueDate: null }
       ];
     }
-    // 2. 날짜 필터링 로직 (date와 noDueDate가 동시에 오지 않는다고 가정)
+    // 2. 실행일이 지난 미완료 할일 조회 (overdue 파라미터)
+    else if (overdue === 'true') {
+      // 오늘 날짜의 시작 시간 (UTC 기준)
+      const todayStart = new Date();
+      todayStart.setUTCHours(0, 0, 0, 0);
+      
+      // dueDate가 오늘보다 이전이고, 미완료인 할일
+      // dueDate가 존재하고 null이 아닌 것만
+      query.dueDate = {
+        $exists: true,
+        $ne: null,
+        $lt: todayStart,
+      };
+      query.isCompleted = false;
+    }
+    // 3. 날짜 필터링 로직 (date와 noDueDate, overdue가 동시에 오지 않는다고 가정)
     else if (date) {
       // 해당 날짜의 시작(00:00:00 UTC)부터 다음 날 시작 전까지
       // 프론트엔드에서 날짜만 선택한 경우 UTC 00:00:00으로 저장되므로 이 범위에 포함됨
@@ -42,7 +57,7 @@ exports.getAllTodos = async (req, res) => {
       query.dueDate = { $gte: startOfDay, $lt: endOfDay };
     }
 
-    // 3. 프로젝트 ID 필터링 로직
+    // 4. 프로젝트 ID 필터링 로직
     if (projectId) {
       query.projectId = projectId;
     }

@@ -4,6 +4,7 @@ import {
   getTodos,
   updateTodoStatus,
   getTodosWithoutDate,
+  getOverdueTodos,
 } from '../api/todoApi';
 import { getProjects } from '../api/projectApi';
 import TodoItem from '../components/TodoItem';
@@ -21,9 +22,11 @@ const TodosView = () => {
   const navigate = useNavigate();
   const [todos, setTodos] = useState([]);
   const [todosWithoutDate, setTodosWithoutDate] = useState([]); // 수행일 없는 할일
+  const [overdueTodos, setOverdueTodos] = useState([]); // 실행일이 지난 미완료 할일
   const [projects, setProjects] = useState([]); // 프로젝트 목록
   const [loading, setLoading] = useState(false);
   const [loadingWithoutDate, setLoadingWithoutDate] = useState(false);
+  const [loadingOverdue, setLoadingOverdue] = useState(false);
 
   // 현재 주의 시작 날짜 (Date 객체)
   const [currentWeekStart, setCurrentWeekStart] = useState(getStartOfWeek());
@@ -96,6 +99,20 @@ const TodosView = () => {
     }
   }, []);
 
+  // 실행일이 지난 미완료 할일 로딩
+  const fetchOverdueTodos = useCallback(async () => {
+    setLoadingOverdue(true);
+    try {
+      const data = await getOverdueTodos();
+      setOverdueTodos(data);
+    } catch (err) {
+      console.error('지난 할일 로드 실패:', err);
+      setOverdueTodos([]);
+    } finally {
+      setLoadingOverdue(false);
+    }
+  }, []);
+
   // 프로젝트 목록 로딩 (모든 프로젝트, 하위 프로젝트 포함)
   // 할일 페이지에서는 모든 프로젝트를 로드해야 projectMap에 포함시킬 수 있음
   const fetchProjects = useCallback(async () => {
@@ -114,6 +131,7 @@ const TodosView = () => {
       await updateTodoStatus(todo._id, !todo.isCompleted);
       fetchTodos(); // 날짜별 목록 갱신
       fetchTodosWithoutDate(); // 수행일 없는 목록 갱신
+      fetchOverdueTodos(); // 지난 할일 목록 갱신
     } catch (error) {
       alert('상태 업데이트에 실패했습니다.');
     }
@@ -124,12 +142,14 @@ const TodosView = () => {
     // 여기서는 선택된 날짜를 유지하며 그 날짜의 데이터만 불러옵니다.
     fetchTodos();
     fetchTodosWithoutDate();
+    fetchOverdueTodos();
     fetchProjects();
   }, [
     currentWeekStart,
     selectedDate,
     fetchTodos,
     fetchTodosWithoutDate,
+    fetchOverdueTodos,
     fetchProjects,
   ]);
 
@@ -224,7 +244,24 @@ const TodosView = () => {
         </section>
       )}
 
-      {/* 4. 완료 목록 섹션 */}
+      {/* 4. 지난 할일 섹션 (실행일이 지난 미완료 할일) */}
+      {overdueTodos.length > 0 && (
+        <section className='todo-list-section'>
+          <h2 className='section-title'>지난 할일</h2>
+          <div className='todo-list active-list'>
+            {overdueTodos.map((todo) => (
+              <TodoItem
+                key={todo._id}
+                todo={todo}
+                onToggle={handleToggle}
+                projectMap={projectMap}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 5. 완료 목록 섹션 */}
       <section className='completed-section'>
         <h2 className='section-title completed-label'>완료</h2>
         <div className='todo-list completed-list'>
