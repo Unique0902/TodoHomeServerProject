@@ -68,7 +68,7 @@ const ProjectItemWithChildren = ({
             onClick={handleToggleClick}
             type='button'
           >
-            {isExpanded ? '▼' : '▶'}
+            {isExpanded ? '▲' : '◄'}
           </button>
         )}
       </div>
