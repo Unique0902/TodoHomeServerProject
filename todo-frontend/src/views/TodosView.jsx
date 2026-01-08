@@ -157,13 +157,25 @@ const TodosView = () => {
   const activeTodos = todos.filter((todo) => !todo.isCompleted);
   const completedTodos = todos.filter((todo) => todo.isCompleted);
 
-  // 수행일 없는 할일 목록 (완료되지 않은 것만)
-  const activeTodosWithoutDate = todosWithoutDate.filter(
-    (todo) => !todo.isCompleted
-  );
-
   // 프로젝트 Map 생성 (ID를 키로 사용)
   const projectMap = new Map(projects.map((project) => [project._id, project]));
+
+  // 수행일 없는 할일 목록 (완료되지 않은 것만, 진행중인 프로젝트의 할일만)
+  const activeTodosWithoutDate = todosWithoutDate.filter((todo) => {
+    // 완료되지 않은 할일만
+    if (todo.isCompleted) return false;
+    
+    // 프로젝트가 없는 할일은 표시
+    if (!todo.projectId) return true;
+    
+    // 프로젝트가 있는 경우, 진행중(active) 상태인 프로젝트의 할일만 표시
+    const project = projectMap.get(todo.projectId);
+    if (!project) return true; // 프로젝트를 찾을 수 없으면 표시
+    
+    // status가 없으면 isCompleted로 판단 (기존 데이터 호환성)
+    const projectStatus = project.status || (project.isCompleted ? 'completed' : 'active');
+    return projectStatus === 'active';
+  });
 
   return (
     <div className='todos-view'>
