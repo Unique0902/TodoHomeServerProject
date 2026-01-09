@@ -11,9 +11,10 @@ import {
   deleteProjectUrl,
   getProjects,
 } from '../api/projectApi';
-import { getTodosByProjectId, updateTodoStatus } from '../api/todoApi';
+import { getTodosByProjectId, updateTodoStatus, updateTodo } from '../api/todoApi';
 import { getHabitsByProjectId } from '../api/habitApi';
 import TodoItem from '../components/TodoItem';
+import { formatDateString } from '../utils/calendarUtils';
 import '../styles/TodoDetailView.css'; // 상세 뷰 스타일 재활용
 import '../styles/ProjectDetailView.css'; // 프로젝트 고유 스타일 (4번 섹션 참고)
 
@@ -81,6 +82,25 @@ const ProjectDetailView = () => {
       fetchProjectData(); // 목록 갱신
     } catch (error) {
       alert('할일 상태 업데이트 실패!');
+    }
+  };
+
+  // 오늘 날짜로 설정 핸들러 (기한 없는 할일을 오늘 날짜로 설정)
+  const handleSetToday = async (todo) => {
+    try {
+      // 오늘 날짜를 UTC 00:00:00으로 설정 (시간 없이 날짜만)
+      const today = new Date();
+      const todayString = formatDateString(today);
+      const todayUTC = new Date(todayString + 'T00:00:00.000Z');
+      
+      await updateTodo(todo._id, {
+        dueDate: todayUTC,
+      });
+      
+      // 목록 갱신
+      fetchProjectData();
+    } catch (error) {
+      alert('날짜 설정에 실패했습니다.');
     }
   };
 
@@ -549,6 +569,8 @@ const ProjectDetailView = () => {
                 todo={todo}
                 onToggle={handleTodoToggle}
                 projectMap={projectMap}
+                onSetToday={handleSetToday}
+                showTodayButton={!todo.dueDate && !todo.isCompleted}
                 // 프로젝트 상세 페이지에서 할일 상세 페이지로 이동 시 프로젝트 ID 전달
                 onClick={(e) => {
                   e.stopPropagation();
