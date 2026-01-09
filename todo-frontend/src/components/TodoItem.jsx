@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router-dom'; // 👈 useNavigate 임포트
 // onToggle: 완료 상태 토글 핸들러 함수
 // projectMap: 프로젝트 ID를 키로 하는 프로젝트 정보 Map (선택사항)
 // onClick: 클릭 시 실행할 커스텀 핸들러 (선택사항, 있으면 기본 동작 대신 실행)
-const TodoItem = ({ todo, onToggle, projectMap, onClick }) => {
+// onSetToday: 오늘 날짜로 설정하는 핸들러 (선택사항, 기한 없는 할일인 경우)
+// showTodayButton: 오늘 진행하기 버튼 표시 여부 (선택사항)
+const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayButton = false }) => {
   const navigate = useNavigate(); // 👈 useNavigate 훅 사용
   // 시간 정보를 포맷하는 함수 (dueDate가 있으면 날짜/시간, 없으면 '기한없음')
   const formatTime = (dueDate) => {
@@ -102,12 +104,21 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick }) => {
   
   // 프로젝트 정보 가져오기
   const project = todo.projectId && projectMap ? projectMap.get(todo.projectId) : null;
+  // 오늘 진행하기 버튼 클릭 핸들러
+  const handleSetToday = (e) => {
+    e.stopPropagation(); // 상세 페이지 이동 방지
+    if (onSetToday) {
+      onSetToday(todo);
+    }
+  };
+
   // 상세 페이지 이동 핸들러
   const handleDetailClick = (e) => {
-    // 이벤트 버블링 방지: 체크박스 클릭 이벤트가 상세 이동을 트리거하지 않도록 합니다.
+    // 이벤트 버블링 방지: 체크박스, 오늘 진행하기 버튼 클릭 이벤트가 상세 이동을 트리거하지 않도록 합니다.
     if (
-      e.target.className.includes('todo-checkbox') ||
-      e.target.className.includes('checkbox-input')
+      e.target.closest('.todo-checkbox') ||
+      e.target.className.includes('checkbox-input') ||
+      e.target.closest('.today-button')
     ) {
       return;
     }
@@ -138,8 +149,20 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick }) => {
         )}
       </div>
 
-      {/* 마감 시한 정보 영역 */}
-      <div className='todo-time'>{timeString}</div>
+      {/* 마감 시한 정보 영역 및 오늘 진행하기 버튼 */}
+      <div className='todo-time-section'>
+        <div className='todo-time'>{timeString}</div>
+        {/* 오늘 진행하기 버튼 (기한 없는 할일인 경우만) */}
+        {showTodayButton && !todo.dueDate && !todo.isCompleted && (
+          <button
+            className='today-button'
+            onClick={handleSetToday}
+            title='오늘 날짜로 설정'
+          >
+            오늘 진행하기
+          </button>
+        )}
+      </div>
     </div>
   );
 };

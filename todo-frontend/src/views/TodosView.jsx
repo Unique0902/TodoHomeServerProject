@@ -5,6 +5,7 @@ import {
   updateTodoStatus,
   getTodosWithoutDate,
   getOverdueTodos,
+  updateTodo,
 } from '../api/todoApi';
 import { getProjects } from '../api/projectApi';
 import TodoItem from '../components/TodoItem';
@@ -137,6 +138,27 @@ const TodosView = () => {
     }
   };
 
+  // 오늘 날짜로 설정 핸들러 (기한 없는 할일을 오늘 날짜로 설정)
+  const handleSetToday = async (todo) => {
+    try {
+      // 오늘 날짜를 UTC 00:00:00으로 설정 (시간 없이 날짜만)
+      const today = new Date();
+      const todayString = formatDateString(today);
+      const todayUTC = new Date(todayString + 'T00:00:00.000Z');
+      
+      await updateTodo(todo._id, {
+        dueDate: todayUTC,
+      });
+      
+      // 목록 갱신
+      fetchTodos(); // 날짜별 목록 갱신
+      fetchTodosWithoutDate(); // 수행일 없는 목록 갱신
+      fetchOverdueTodos(); // 지난 할일 목록 갱신
+    } catch (error) {
+      alert('날짜 설정에 실패했습니다.');
+    }
+  };
+
   useEffect(() => {
     // 주가 바뀔 때, 선택된 날짜가 그 주에 포함되도록 조정 (선택된 날짜를 유지하거나 주의 첫날로 변경 가능)
     // 여기서는 선택된 날짜를 유지하며 그 날짜의 데이터만 불러옵니다.
@@ -250,6 +272,8 @@ const TodosView = () => {
                 todo={todo}
                 onToggle={handleToggle}
                 projectMap={projectMap}
+                onSetToday={handleSetToday}
+                showTodayButton={true}
               />
             ))}
           </div>
