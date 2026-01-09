@@ -92,6 +92,15 @@
     font-weight: 500;
 }
 
+.value.project-name.project-link {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.value.project-name.project-link:hover {
+    color: #0056b3; /* 호버 시 더 어두운 파란색 */
+}
+
 
 /* 하단 액션 버튼 섹션 */
 .action-bar {

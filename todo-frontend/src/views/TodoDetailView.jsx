@@ -136,9 +136,18 @@ const TodoDetailView = () => {
         </div>
 
         {project && (
-          <div className='info-group'>
+          <div
+            className='info-group'
+            onClick={() => navigate(`/projects/${project._id}`)}
+            style={{ cursor: 'pointer' }}
+          >
             <span className='label'>프로젝트</span>
-            <span className='value project-name'>{project.title}</span>
+            <span
+              className='value project-name project-link'
+              style={{ textDecoration: 'underline' }}
+            >
+              {project.title}
+            </span>
           </div>
         )}
 
