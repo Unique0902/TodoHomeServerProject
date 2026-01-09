@@ -269,3 +269,95 @@ exports.deleteProjectItem = async (req, res) => {
     res.status(400).json({ message: '준비물 삭제 실패', error: error.message });
   }
 };
+
+// 10. 프로젝트에 URL 추가 (POST /projects/:id/urls)
+exports.addProjectUrl = async (req, res) => {
+  try {
+    const { title, url } = req.body;
+    
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'URL 제목은 필수입니다.' });
+    }
+    
+    if (!url || !url.trim()) {
+      return res.status(400).json({ message: 'URL은 필수입니다.' });
+    }
+
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    // 기존 데이터 마이그레이션
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+
+    project.urls.push({
+      title: title.trim(),
+      url: url.trim(),
+    });
+
+    await project.save();
+    res.status(201).json(project);
+  } catch (error) {
+    res.status(400).json({ message: 'URL 추가 실패', error: error.message });
+  }
+};
+
+// 11. 프로젝트 URL 수정 (PATCH /projects/:id/urls/:urlId)
+exports.updateProjectUrl = async (req, res) => {
+  try {
+    const { title, url } = req.body;
+    const project = await Project.findById(req.params.id);
+    
+    if (!project) {
+      return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const urlItem = project.urls.id(req.params.urlId);
+    if (!urlItem) {
+      return res.status(404).json({ message: 'URL을 찾을 수 없습니다.' });
+    }
+
+    // 기존 데이터 마이그레이션
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+
+    if (title !== undefined) urlItem.title = title.trim();
+    if (url !== undefined) urlItem.url = url.trim();
+
+    await project.save();
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(400).json({ message: 'URL 수정 실패', error: error.message });
+  }
+};
+
+// 12. 프로젝트 URL 삭제 (DELETE /projects/:id/urls/:urlId)
+exports.deleteProjectUrl = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    
+    if (!project) {
+      return res.status(404).json({ message: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const urlItem = project.urls.id(req.params.urlId);
+    if (!urlItem) {
+      return res.status(404).json({ message: 'URL을 찾을 수 없습니다.' });
+    }
+
+    // 기존 데이터 마이그레이션
+    if (!project.status && project.isCompleted !== undefined) {
+      project.status = project.isCompleted ? 'completed' : 'active';
+    }
+
+    urlItem.deleteOne();
+    await project.save();
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(400).json({ message: 'URL 삭제 실패', error: error.message });
+  }
+};

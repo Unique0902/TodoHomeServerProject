@@ -277,6 +277,64 @@
     background-color: #545b62;
 }
 
+/* --- URL 섹션 스타일 --- */
+.urls-list {
+    margin-bottom: 15px;
+}
+
+.url-item-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+}
+
+.url-item-row:last-child {
+    border-bottom: none;
+}
+
+.url-link {
+    flex-grow: 1;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.url-link:hover {
+    background-color: #f8f9fa;
+    padding: 4px;
+    border-radius: 4px;
+    margin: -4px;
+}
+
+.url-title {
+    font-size: 16px;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.url-address {
+    font-size: 12px;
+    color: #999;
+    word-break: break-all;
+}
+
+.url-delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    color: #999;
+    margin-left: 10px;
+}
+
+.url-delete-button:hover {
+    color: #dc3545;
+}
+
 /* --- 하위 할일 목록 스타일 --- */
 
 .todo-list-title {

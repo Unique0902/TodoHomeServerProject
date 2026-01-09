@@ -13,6 +13,11 @@ router.post('/:id/items', projectController.addProjectItem); // POST /api/v1/pro
 router.patch('/:id/items/:itemId', projectController.updateProjectItem); // PATCH /api/v1/projects/:id/items/:itemId (준비물 수정)
 router.delete('/:id/items/:itemId', projectController.deleteProjectItem); // DELETE /api/v1/projects/:id/items/:itemId (준비물 삭제)
 
+// URL 관련 라우팅 (프로젝트 ID 하위 경로) - :id 라우트보다 먼저 정의
+router.post('/:id/urls', projectController.addProjectUrl); // POST /api/v1/projects/:id/urls (URL 추가)
+router.patch('/:id/urls/:urlId', projectController.updateProjectUrl); // PATCH /api/v1/projects/:id/urls/:urlId (URL 수정)
+router.delete('/:id/urls/:urlId', projectController.deleteProjectUrl); // DELETE /api/v1/projects/:id/urls/:urlId (URL 삭제)
+
 // /api/v1/projects/:id 경로에 대한 라우팅
 router
   .route('/:id')

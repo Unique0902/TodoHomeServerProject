@@ -62,3 +62,21 @@ export const deleteProjectItem = async (projectId, itemId) => {
   const response = await api.delete(`/projects/${projectId}/items/${itemId}`);
   return response.data;
 };
+
+// 10. 프로젝트에 URL 추가
+export const addProjectUrl = async (projectId, urlData) => {
+  const response = await api.post(`/projects/${projectId}/urls`, urlData);
+  return response.data;
+};
+
+// 11. 프로젝트 URL 수정
+export const updateProjectUrl = async (projectId, urlId, urlData) => {
+  const response = await api.patch(`/projects/${projectId}/urls/${urlId}`, urlData);
+  return response.data;
+};
+
+// 12. 프로젝트 URL 삭제
+export const deleteProjectUrl = async (projectId, urlId) => {
+  const response = await api.delete(`/projects/${projectId}/urls/${urlId}`);
+  return response.data;
+};

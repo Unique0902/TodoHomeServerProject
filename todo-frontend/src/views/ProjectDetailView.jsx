@@ -6,6 +6,9 @@ import {
   addProjectItem,
   updateProjectItem,
   deleteProjectItem,
+  addProjectUrl,
+  updateProjectUrl,
+  deleteProjectUrl,
   getProjects,
 } from '../api/projectApi';
 import { getTodosByProjectId, updateTodoStatus } from '../api/todoApi';
@@ -26,6 +29,9 @@ const ProjectDetailView = () => {
   const [showItemForm, setShowItemForm] = useState(false); // 준비물 추가 폼 표시 여부
   const [newItemName, setNewItemName] = useState(''); // 새 준비물 이름
   const [newItemPrice, setNewItemPrice] = useState(''); // 새 준비물 가격
+  const [showUrlForm, setShowUrlForm] = useState(false); // URL 추가 폼 표시 여부
+  const [newUrlTitle, setNewUrlTitle] = useState(''); // 새 URL 제목
+  const [newUrl, setNewUrl] = useState(''); // 새 URL
   const [showAddMenu, setShowAddMenu] = useState(false); // 추가 메뉴 표시 여부
 
   // 날짜 포맷팅 헬퍼
@@ -405,6 +411,88 @@ const ProjectDetailView = () => {
               onClick={() => setShowItemForm(true)}
             >
               + 준비물 추가
+            </button>
+          )}
+        </section>
+
+        {/* --- URL 섹션 --- */}
+        <h2 className='todo-list-title'>URL</h2>
+        <section className='project-items-section'>
+          <div className='urls-list'>
+            {project.urls && project.urls.length > 0 ? (
+              project.urls.map((urlItem) => (
+                <div key={urlItem._id} className='url-item-row'>
+                  <a
+                    href={urlItem.url}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='url-link'
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className='url-title'>{urlItem.title}</div>
+                    <div className='url-address'>{urlItem.url}</div>
+                  </a>
+                  <button
+                    className='url-delete-button'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteUrl(urlItem._id, urlItem.title);
+                    }}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className='empty-message small'>등록된 URL이 없습니다.</p>
+            )}
+          </div>
+
+          {/* URL 추가 폼 */}
+          {showUrlForm ? (
+            <form onSubmit={handleAddUrl} className='item-add-form'>
+              <div className='form-row'>
+                <input
+                  type='text'
+                  placeholder='URL 제목'
+                  value={newUrlTitle}
+                  onChange={(e) => setNewUrlTitle(e.target.value)}
+                  className='item-name-input'
+                  autoFocus
+                />
+              </div>
+              <div className='form-row'>
+                <input
+                  type='url'
+                  placeholder='https://example.com'
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  className='item-name-input'
+                />
+              </div>
+              <div className='form-actions'>
+                <button type='submit' className='item-add-confirm-button'>
+                  추가
+                </button>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setShowUrlForm(false);
+                    setNewUrlTitle('');
+                    setNewUrl('');
+                  }}
+                  className='item-add-cancel-button'
+                >
+                  취소
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              className='add-item-button'
+              onClick={() => setShowUrlForm(true)}
+            >
+              + URL 추가
             </button>
           )}
         </section>
