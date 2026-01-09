@@ -179,6 +179,44 @@ const ProjectDetailView = () => {
     }
   };
 
+  // URL 추가 핸들러
+  const handleAddUrl = async (e) => {
+    e.preventDefault();
+    if (!newUrlTitle.trim()) {
+      alert('URL 제목을 입력해주세요.');
+      return;
+    }
+    if (!newUrl.trim()) {
+      alert('URL을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await addProjectUrl(id, {
+        title: newUrlTitle.trim(),
+        url: newUrl.trim(),
+      });
+      setNewUrlTitle('');
+      setNewUrl('');
+      setShowUrlForm(false);
+      fetchProjectData(); // 프로젝트 데이터 갱신
+    } catch (error) {
+      alert('URL 추가에 실패했습니다.');
+    }
+  };
+
+  // URL 삭제 핸들러
+  const handleDeleteUrl = async (urlId, urlTitle) => {
+    if (window.confirm(`"${urlTitle}" URL을 삭제하시겠습니까?`)) {
+      try {
+        await deleteProjectUrl(id, urlId);
+        fetchProjectData(); // 프로젝트 데이터 갱신
+      } catch (error) {
+        alert('URL 삭제에 실패했습니다.');
+      }
+    }
+  };
+
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
   if (!project)
