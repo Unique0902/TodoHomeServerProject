@@ -28,6 +28,12 @@ const TodosView = () => {
   const [loading, setLoading] = useState(false);
   const [loadingWithoutDate, setLoadingWithoutDate] = useState(false);
   const [loadingOverdue, setLoadingOverdue] = useState(false);
+  
+  // 섹션 토글 상태
+  const [isTodosExpanded, setIsTodosExpanded] = useState(true);
+  const [isWithoutDateExpanded, setIsWithoutDateExpanded] = useState(true);
+  const [isOverdueExpanded, setIsOverdueExpanded] = useState(true);
+  const [isCompletedExpanded, setIsCompletedExpanded] = useState(true);
 
   // 현재 주의 시작 날짜 (Date 객체)
   const [currentWeekStart, setCurrentWeekStart] = useState(getStartOfWeek());
@@ -242,78 +248,108 @@ const TodosView = () => {
 
       {/* 2. 할일 목록 섹션 (선택된 날짜의 할일) */}
       <section className='todo-list-section'>
-        <h2 className='section-title'>할일</h2>
-
-        {loading && <p className='loading-message'>할일 불러오는 중...</p>}
-
-        <div className='todo-list active-list'>
-          {activeTodos.length === 0 && !loading && (
-            <p className='empty-message'>선택된 날짜에 할일이 없습니다!</p>
-          )}
-          {activeTodos.map((todo) => (
-            <TodoItem
-              key={todo._id}
-              todo={todo}
-              onToggle={handleToggle}
-              projectMap={projectMap}
-              onSetToday={handleSetToday}
-              showTodayButton={true}
-            />
-          ))}
+        <div className='section-header' onClick={() => setIsTodosExpanded(!isTodosExpanded)}>
+          <h2 className='section-title'>할일</h2>
+          <button className='section-toggle-button' type='button'>
+            {isTodosExpanded ? '▼' : '▶'}
+          </button>
         </div>
+
+        {isTodosExpanded && (
+          <>
+            {loading && <p className='loading-message'>할일 불러오는 중...</p>}
+
+            <div className='todo-list active-list'>
+              {activeTodos.length === 0 && !loading && (
+                <p className='empty-message'>선택된 날짜에 할일이 없습니다!</p>
+              )}
+              {activeTodos.map((todo) => (
+                <TodoItem
+                  key={todo._id}
+                  todo={todo}
+                  onToggle={handleToggle}
+                  projectMap={projectMap}
+                  onSetToday={handleSetToday}
+                  showTodayButton={true}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
-      {/* 3. 해야할리스트 섹션 (수행일이 없는 할일) */}
+      {/* 3. 해야할일리스트 섹션 (수행일이 없는 할일) */}
       {activeTodosWithoutDate.length > 0 && (
         <section className='todo-list-section'>
-          <h2 className='section-title'>해야할리스트</h2>
-          <div className='todo-list active-list'>
-            {activeTodosWithoutDate.map((todo) => (
-              <TodoItem
-                key={todo._id}
-                todo={todo}
-                onToggle={handleToggle}
-                projectMap={projectMap}
-                onSetToday={handleSetToday}
-                showTodayButton={true}
-              />
-            ))}
+          <div className='section-header' onClick={() => setIsWithoutDateExpanded(!isWithoutDateExpanded)}>
+            <h2 className='section-title'>해야할일리스트</h2>
+            <button className='section-toggle-button' type='button'>
+              {isWithoutDateExpanded ? '▼' : '▶'}
+            </button>
           </div>
+          {isWithoutDateExpanded && (
+            <div className='todo-list active-list'>
+              {activeTodosWithoutDate.map((todo) => (
+                <TodoItem
+                  key={todo._id}
+                  todo={todo}
+                  onToggle={handleToggle}
+                  projectMap={projectMap}
+                  onSetToday={handleSetToday}
+                  showTodayButton={true}
+                />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
       {/* 4. 지난 할일 섹션 (실행일이 지난 미완료 할일) */}
       {overdueTodos.length > 0 && (
         <section className='todo-list-section'>
-          <h2 className='section-title'>지난 할일</h2>
-          <div className='todo-list active-list'>
-            {overdueTodos.map((todo) => (
-              <TodoItem
-                key={todo._id}
-                todo={todo}
-                onToggle={handleToggle}
-                projectMap={projectMap}
-                onSetToday={handleSetToday}
-                showTodayButton={true}
-              />
-            ))}
+          <div className='section-header' onClick={() => setIsOverdueExpanded(!isOverdueExpanded)}>
+            <h2 className='section-title'>지난 할일</h2>
+            <button className='section-toggle-button' type='button'>
+              {isOverdueExpanded ? '▼' : '▶'}
+            </button>
           </div>
+          {isOverdueExpanded && (
+            <div className='todo-list active-list'>
+              {overdueTodos.map((todo) => (
+                <TodoItem
+                  key={todo._id}
+                  todo={todo}
+                  onToggle={handleToggle}
+                  projectMap={projectMap}
+                  onSetToday={handleSetToday}
+                  showTodayButton={true}
+                />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
       {/* 5. 완료 목록 섹션 */}
       <section className='completed-section'>
-        <h2 className='section-title completed-label'>완료</h2>
-        <div className='todo-list completed-list'>
-          {completedTodos.map((todo) => (
-            <TodoItem
-              key={todo._id}
-              todo={todo}
-              onToggle={handleToggle}
-              projectMap={projectMap}
-            />
-          ))}
+        <div className='section-header' onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}>
+          <h2 className='section-title completed-label'>완료</h2>
+          <button className='section-toggle-button' type='button'>
+            {isCompletedExpanded ? '▼' : '▶'}
+          </button>
         </div>
+        {isCompletedExpanded && (
+          <div className='todo-list completed-list'>
+            {completedTodos.map((todo) => (
+              <TodoItem
+                key={todo._id}
+                todo={todo}
+                onToggle={handleToggle}
+                projectMap={projectMap}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 5. 할일 추가 버튼 */}

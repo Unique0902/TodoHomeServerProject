@@ -195,16 +195,43 @@
 }
 
 /* 할일 목록 섹션 (HomeView.css와 유사하게 스타일링) */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ddd;
+}
+
 .section-title {
     font-size: 20px;
     font-weight: 700;
-    margin-top: 25px;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 5px;
+    margin: 0;
 }
 
-.completed-section .section-title {
+.section-toggle-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.section-toggle-button:hover {
+    color: #007bff;
+}
+
+.completed-section .section-header {
     margin-top: 40px;
 }
 
