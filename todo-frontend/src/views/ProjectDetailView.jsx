@@ -10,6 +10,7 @@ import {
   updateProjectUrl,
   deleteProjectUrl,
   getProjects,
+  updateProjectStatus,
 } from '../api/projectApi';
 import { getTodosByProjectId, updateTodoStatus, updateTodo } from '../api/todoApi';
 import { getHabitsByProjectId } from '../api/habitApi';
@@ -163,6 +164,38 @@ const ProjectDetailView = () => {
         return '💡 위시';
       default:
         return '🔲 진행중';
+    }
+  };
+
+  // 현재 프로젝트 상태 가져오기
+  const getCurrentStatus = () => {
+    return project.status || (project.isCompleted ? 'completed' : 'active');
+  };
+
+  // 프로젝트 상태 변경 핸들러
+  const handleStatusChange = async (newStatus) => {
+    const currentStatus = getCurrentStatus();
+    
+    // 같은 상태로 변경하려는 경우 무시
+    if (currentStatus === newStatus) return;
+
+    const statusTexts = {
+      active: '진행중',
+      paused: '정지됨',
+      wish: '위시',
+      completed: '완료',
+    };
+
+    const currentStatusText = statusTexts[currentStatus] || '진행중';
+    const newStatusText = statusTexts[newStatus] || '진행중';
+
+    if (window.confirm(`프로젝트 상태를 "${currentStatusText}"에서 "${newStatusText}"로 변경하시겠습니까?`)) {
+      try {
+        await updateProjectStatus(id, newStatus);
+        fetchProjectData(); // 프로젝트 데이터 갱신
+      } catch (error) {
+        alert('상태 변경에 실패했습니다.');
+      }
     }
   };
 
@@ -330,25 +363,26 @@ const ProjectDetailView = () => {
 
         <div className='info-group'>
           <span className='label'>상태</span>
-          <span
-            className={`value status ${
-              (project.status || (project.isCompleted ? 'completed' : 'active')) === 'completed'
-                ? 'completed'
-                : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'paused'
-                ? 'paused'
-                : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'wish'
-                ? 'wish'
-                : 'active'
-            }`}
-          >
-            {(project.status || (project.isCompleted ? 'completed' : 'active')) === 'completed'
-              ? '✅ 완료'
-              : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'paused'
-              ? '⏸️ 정지됨'
-              : (project.status || (project.isCompleted ? 'completed' : 'active')) === 'wish'
-              ? '💡 위시'
-              : '🔲 진행중'}
-          </span>
+          <div className='status-buttons-container'>
+            {[
+              { value: 'active', label: '🔲 진행중' },
+              { value: 'paused', label: '⏸️ 정지됨' },
+              { value: 'wish', label: '💡 위시' },
+              { value: 'completed', label: '✅ 완료' },
+            ].map((statusOption) => {
+              const currentStatus = getCurrentStatus();
+              const isSelected = currentStatus === statusOption.value;
+              return (
+                <button
+                  key={statusOption.value}
+                  className={`status-button ${statusOption.value} ${isSelected ? 'selected' : ''}`}
+                  onClick={() => handleStatusChange(statusOption.value)}
+                >
+                  {statusOption.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* --- 하위 프로젝트 섹션 --- */}

@@ -109,6 +109,64 @@
     color: #9c27b0; /* 보라색 (위시) */
 }
 
+/* 상태 버튼 컨테이너 */
+.status-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.status-button {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #333;
+}
+
+.status-button:hover {
+    background-color: #f8f9fa;
+    border-color: #bbb;
+}
+
+.status-button.selected {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+    color: #007bff;
+    font-weight: 600;
+}
+
+.status-button.completed.selected {
+    border-color: #28a745;
+    background-color: #d4edda;
+    color: #28a745;
+}
+
+.status-button.paused.selected {
+    border-color: #ff9800;
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
+.status-button.wish.selected {
+    border-color: #9c27b0;
+    background-color: #f3e5f5;
+    color: #9c27b0;
+}
+
+.status-button.active.selected {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+    color: #007bff;
+}
+
 /* --- 준비물 섹션 스타일 --- */
 
 .project-items-section {
