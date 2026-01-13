@@ -206,11 +206,12 @@
     border-bottom: 2px solid #ddd;
 }
 
-.section-title {
+.section-header .section-title {
     font-size: 20px;
     font-weight: 700;
     margin: 0;
-    border-bottom: none;
+    border-bottom: none !important;
+    padding-bottom: 0;
 }
 
 .section-toggle-button {
