@@ -104,6 +104,17 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
   
   // 프로젝트 정보 가져오기
   const project = todo.projectId && projectMap ? projectMap.get(todo.projectId) : null;
+  
+  // 기간이 지난 할일인지 확인하는 함수
+  const isOverdue = () => {
+    if (!todo.dueDate || todo.isCompleted) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(todo.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  };
+  
   // 오늘 진행하기 버튼 클릭 핸들러
   const handleSetToday = (e) => {
     e.stopPropagation(); // 상세 페이지 이동 방지
@@ -152,8 +163,8 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
       {/* 마감 시한 정보 영역 및 오늘 진행하기 버튼 */}
       <div className='todo-time-section'>
         <div className='todo-time'>{timeString}</div>
-        {/* 오늘 진행하기 버튼 (기한 없는 할일인 경우만) */}
-        {showTodayButton && !todo.dueDate && !todo.isCompleted && (
+        {/* 오늘 진행하기 버튼 (기한 없는 할일 또는 기간이 지난 할일인 경우) */}
+        {showTodayButton && !todo.isCompleted && (!todo.dueDate || isOverdue()) && (
           <button
             className='today-button'
             onClick={handleSetToday}

@@ -570,7 +570,7 @@ const ProjectDetailView = () => {
                 onToggle={handleTodoToggle}
                 projectMap={projectMap}
                 onSetToday={handleSetToday}
-                showTodayButton={!todo.dueDate && !todo.isCompleted}
+                showTodayButton={true}
                 // 프로젝트 상세 페이지에서 할일 상세 페이지로 이동 시 프로젝트 ID 전달
                 onClick={(e) => {
                   e.stopPropagation();

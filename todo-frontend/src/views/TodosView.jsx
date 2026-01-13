@@ -256,6 +256,8 @@ const TodosView = () => {
               todo={todo}
               onToggle={handleToggle}
               projectMap={projectMap}
+              onSetToday={handleSetToday}
+              showTodayButton={true}
             />
           ))}
         </div>
@@ -291,6 +293,8 @@ const TodosView = () => {
                 todo={todo}
                 onToggle={handleToggle}
                 projectMap={projectMap}
+                onSetToday={handleSetToday}
+                showTodayButton={true}
               />
             ))}
           </div>
