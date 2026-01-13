@@ -72,6 +72,29 @@ const ProjectDetailView = () => {
     }
   }, [id]);
 
+  // 특정 프로젝트의 모든 하위 프로젝트를 재귀적으로 찾는 함수
+  const getAllSubProjects = useCallback(async (projectId) => {
+    const allProjectsData = await getProjects(); // 모든 프로젝트 가져오기
+    
+    const getAllSubProjectsRecursive = (parentId, allProjects) => {
+      const result = [];
+      const directSubProjects = allProjects.filter(
+        (p) => p.parentProjectId === parentId
+      );
+      
+      directSubProjects.forEach((subProject) => {
+        result.push(subProject);
+        // 재귀적으로 하위의 하위 프로젝트도 찾기
+        const subSubProjects = getAllSubProjectsRecursive(subProject._id, allProjects);
+        result.push(...subSubProjects);
+      });
+      
+      return result;
+    };
+    
+    return getAllSubProjectsRecursive(projectId, allProjectsData);
+  }, []);
+
   useEffect(() => {
     fetchProjectData();
   }, [fetchProjectData]);
@@ -189,9 +212,36 @@ const ProjectDetailView = () => {
     const currentStatusText = statusTexts[currentStatus] || '진행중';
     const newStatusText = statusTexts[newStatus] || '진행중';
 
-    if (window.confirm(`프로젝트 상태를 "${currentStatusText}"에서 "${newStatusText}"로 변경하시겠습니까?`)) {
+    // 모든 하위 프로젝트 가져오기 (재귀적으로)
+    const allSubProjects = await getAllSubProjects(id);
+    
+    // 완료되지 않은 하위 프로젝트만 필터링
+    const incompleteSubProjects = allSubProjects.filter((subProject) => {
+      const subStatus = subProject.status || (subProject.isCompleted ? 'completed' : 'active');
+      return subStatus !== 'completed';
+    });
+
+    // 확인 메시지 구성
+    let confirmMessage = `프로젝트 상태를 "${currentStatusText}"에서 "${newStatusText}"로 변경하시겠습니까?`;
+    
+    if (incompleteSubProjects.length > 0) {
+      confirmMessage += `\n\n하위 프로젝트 ${incompleteSubProjects.length}개도 함께 "${newStatusText}" 상태로 변경됩니다.`;
+    }
+
+    if (window.confirm(confirmMessage)) {
       try {
+        // 상위 프로젝트 상태 변경
         await updateProjectStatus(id, newStatus);
+        
+        // 완료되지 않은 하위 프로젝트들의 상태도 변경
+        if (incompleteSubProjects.length > 0) {
+          await Promise.all(
+            incompleteSubProjects.map((subProject) =>
+              updateProjectStatus(subProject._id, newStatus)
+            )
+          );
+        }
+        
         fetchProjectData(); // 프로젝트 데이터 갱신
       } catch (error) {
         alert('상태 변경에 실패했습니다.');
