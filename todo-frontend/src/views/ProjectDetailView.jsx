@@ -137,6 +137,35 @@ const ProjectDetailView = () => {
   const activeTodos = todos.filter((todo) => !todo.isCompleted);
   const completedTodos = todos.filter((todo) => todo.isCompleted);
 
+  // 프로젝트 상태 가져오기 헬퍼 함수
+  const getProjectStatus = (project) => {
+    return project.status || (project.isCompleted ? 'completed' : 'active');
+  };
+
+  // 하위 프로젝트 상태별 분리
+  const activeSubProjects = subProjects.filter((p) => {
+    const status = getProjectStatus(p);
+    return status !== 'completed';
+  });
+  const completedSubProjects = subProjects.filter((p) => {
+    const status = getProjectStatus(p);
+    return status === 'completed';
+  });
+
+  // 프로젝트 상태 텍스트 가져오기
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'completed':
+        return '✅ 완료';
+      case 'paused':
+        return '⏸️ 정지됨';
+      case 'wish':
+        return '💡 위시';
+      default:
+        return '🔲 진행중';
+    }
+  };
+
   // 프로젝트 Map 생성 (현재 프로젝트만 포함, 다른 프로젝트와 연결된 할일이 있을 수 있으므로)
   const projectMap = project ? new Map([[project._id, project]]) : new Map();
 
@@ -323,26 +352,60 @@ const ProjectDetailView = () => {
         </div>
 
         {/* --- 하위 프로젝트 섹션 --- */}
-        {subProjects.length > 0 && (
+        {activeSubProjects.length > 0 && (
           <>
             <h2 className='todo-list-title'>하위 프로젝트</h2>
             <section className='project-habits-section'>
               <div className='project-habits-list'>
-                {subProjects.map((subProject) => (
-                  <div
-                    key={subProject._id}
-                    className='project-habit-item'
-                    onClick={() => navigate(`/projects/${subProject._id}`)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className='habit-title'>{subProject.title}</div>
-                    {subProject.description && (
-                      <div className='habit-description'>
-                        {subProject.description}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {activeSubProjects.map((subProject) => {
+                  const status = getProjectStatus(subProject);
+                  return (
+                    <div
+                      key={subProject._id}
+                      className='project-habit-item'
+                      onClick={() => navigate(`/projects/${subProject._id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className='habit-title'>{subProject.title}</div>
+                      {subProject.description && (
+                        <div className='habit-description'>
+                          {subProject.description}
+                        </div>
+                      )}
+                      <div className='project-status-badge'>{getStatusText(status)}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* --- 완료된 하위 프로젝트 섹션 --- */}
+        {completedSubProjects.length > 0 && (
+          <>
+            <h2 className='todo-list-title'>완료된 하위 프로젝트</h2>
+            <section className='project-habits-section'>
+              <div className='project-habits-list'>
+                {completedSubProjects.map((subProject) => {
+                  const status = getProjectStatus(subProject);
+                  return (
+                    <div
+                      key={subProject._id}
+                      className='project-habit-item'
+                      onClick={() => navigate(`/projects/${subProject._id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className='habit-title'>{subProject.title}</div>
+                      {subProject.description && (
+                        <div className='habit-description'>
+                          {subProject.description}
+                        </div>
+                      )}
+                      <div className='project-status-badge'>{getStatusText(status)}</div>
+                    </div>
+                  );
+                })}
               </div>
             </section>
           </>

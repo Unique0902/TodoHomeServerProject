@@ -478,3 +478,9 @@
     color: #666;
     margin-top: 4px;
 }
+
+.project-status-badge {
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+}
