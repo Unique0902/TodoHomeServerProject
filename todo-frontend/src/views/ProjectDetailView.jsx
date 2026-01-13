@@ -215,17 +215,17 @@ const ProjectDetailView = () => {
     // 모든 하위 프로젝트 가져오기 (재귀적으로)
     const allSubProjects = await getAllSubProjects(id);
     
-    // 완료되지 않은 하위 프로젝트만 필터링
-    const incompleteSubProjects = allSubProjects.filter((subProject) => {
+    // 상태가 변경될 하위 프로젝트 필터링 (완료됨, 위시 상태는 제외)
+    const subProjectsToUpdate = allSubProjects.filter((subProject) => {
       const subStatus = subProject.status || (subProject.isCompleted ? 'completed' : 'active');
-      return subStatus !== 'completed';
+      return subStatus !== 'completed' && subStatus !== 'wish';
     });
 
     // 확인 메시지 구성
     let confirmMessage = `프로젝트 상태를 "${currentStatusText}"에서 "${newStatusText}"로 변경하시겠습니까?`;
     
-    if (incompleteSubProjects.length > 0) {
-      confirmMessage += `\n\n하위 프로젝트 ${incompleteSubProjects.length}개도 함께 "${newStatusText}" 상태로 변경됩니다.`;
+    if (subProjectsToUpdate.length > 0) {
+      confirmMessage += `\n\n하위 프로젝트 ${subProjectsToUpdate.length}개도 함께 "${newStatusText}" 상태로 변경됩니다.`;
     }
 
     if (window.confirm(confirmMessage)) {
@@ -233,10 +233,10 @@ const ProjectDetailView = () => {
         // 상위 프로젝트 상태 변경
         await updateProjectStatus(id, newStatus);
         
-        // 완료되지 않은 하위 프로젝트들의 상태도 변경
-        if (incompleteSubProjects.length > 0) {
+        // 상태 변경 대상 하위 프로젝트들의 상태도 변경
+        if (subProjectsToUpdate.length > 0) {
           await Promise.all(
-            incompleteSubProjects.map((subProject) =>
+            subProjectsToUpdate.map((subProject) =>
               updateProjectStatus(subProject._id, newStatus)
             )
           );
