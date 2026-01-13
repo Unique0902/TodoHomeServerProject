@@ -12,6 +12,12 @@ const ProjectsView = () => {
   const [todos, setTodos] = useState([]); // 모든 할일 목록
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // 섹션 토글 상태
+  const [isActiveExpanded, setIsActiveExpanded] = useState(true);
+  const [isPausedExpanded, setIsPausedExpanded] = useState(true);
+  const [isWishExpanded, setIsWishExpanded] = useState(true);
+  const [isCompletedExpanded, setIsCompletedExpanded] = useState(true);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -129,34 +135,18 @@ const ProjectsView = () => {
 
       {/* 1. 진행중 프로젝트 목록 */}
       <section className='project-list-section'>
-        <h2 className='section-title'>진행중</h2>
-        <div className='project-list active-list'>
-          {activeProjects.length === 0 && (
-            <p className='empty-message'>진행 중인 프로젝트가 없습니다.</p>
-          )}
-          {activeProjects.map((project) => {
-            const stats = getProjectTodoStats(project._id);
-            return (
-              <ProjectItemWithChildren
-                key={project._id}
-                project={project}
-                allProjects={allProjects}
-                onToggle={handleToggle}
-                todoStats={stats}
-                getProjectTodoStats={getProjectTodoStats}
-                level={0}
-              />
-            );
-          })}
+        <div className='section-header' onClick={() => setIsActiveExpanded(!isActiveExpanded)}>
+          <h2 className='section-title'>진행중</h2>
+          <button className='section-toggle-button' type='button'>
+            {isActiveExpanded ? '▼' : '▶'}
+          </button>
         </div>
-      </section>
-
-      {/* 2. 정지됨 프로젝트 목록 */}
-      {pausedProjects.length > 0 && (
-        <section className='project-list-section'>
-          <h2 className='section-title'>정지됨</h2>
-          <div className='project-list'>
-            {pausedProjects.map((project) => {
+        {isActiveExpanded && (
+          <div className='project-list active-list'>
+            {activeProjects.length === 0 && (
+              <p className='empty-message'>진행 중인 프로젝트가 없습니다.</p>
+            )}
+            {activeProjects.map((project) => {
               const stats = getProjectTodoStats(project._id);
               return (
                 <ProjectItemWithChildren
@@ -171,15 +161,83 @@ const ProjectsView = () => {
               );
             })}
           </div>
+        )}
+      </section>
+
+      {/* 2. 정지됨 프로젝트 목록 */}
+      {pausedProjects.length > 0 && (
+        <section className='project-list-section'>
+          <div className='section-header' onClick={() => setIsPausedExpanded(!isPausedExpanded)}>
+            <h2 className='section-title'>정지됨</h2>
+            <button className='section-toggle-button' type='button'>
+              {isPausedExpanded ? '▼' : '▶'}
+            </button>
+          </div>
+          {isPausedExpanded && (
+            <div className='project-list'>
+              {pausedProjects.map((project) => {
+                const stats = getProjectTodoStats(project._id);
+                return (
+                  <ProjectItemWithChildren
+                    key={project._id}
+                    project={project}
+                    allProjects={allProjects}
+                    onToggle={handleToggle}
+                    todoStats={stats}
+                    getProjectTodoStats={getProjectTodoStats}
+                    level={0}
+                  />
+                );
+              })}
+            </div>
+          )}
         </section>
       )}
 
       {/* 3. 위시 프로젝트 목록 */}
       {wishProjects.length > 0 && (
         <section className='project-list-section'>
-          <h2 className='section-title'>위시</h2>
-          <div className='project-list'>
-            {wishProjects.map((project) => {
+          <div className='section-header' onClick={() => setIsWishExpanded(!isWishExpanded)}>
+            <h2 className='section-title'>위시</h2>
+            <button className='section-toggle-button' type='button'>
+              {isWishExpanded ? '▼' : '▶'}
+            </button>
+          </div>
+          {isWishExpanded && (
+            <div className='project-list'>
+              {wishProjects.map((project) => {
+                const stats = getProjectTodoStats(project._id);
+                return (
+                  <ProjectItemWithChildren
+                    key={project._id}
+                    project={project}
+                    allProjects={allProjects}
+                    onToggle={handleToggle}
+                    todoStats={stats}
+                    getProjectTodoStats={getProjectTodoStats}
+                    level={0}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* 4. 완료 프로젝트 목록 */}
+      <section className='completed-section'>
+        <div className='section-header' onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}>
+          <h2 className='section-title completed-label'>완료</h2>
+          <button className='section-toggle-button' type='button'>
+            {isCompletedExpanded ? '▼' : '▶'}
+          </button>
+        </div>
+        {isCompletedExpanded && (
+          <div className='project-list completed-list'>
+            {completedProjects.length === 0 && (
+              <p className='empty-message'>완료된 프로젝트가 없습니다.</p>
+            )}
+            {completedProjects.map((project) => {
               const stats = getProjectTodoStats(project._id);
               return (
                 <ProjectItemWithChildren
@@ -194,31 +252,7 @@ const ProjectsView = () => {
               );
             })}
           </div>
-        </section>
-      )}
-
-      {/* 4. 완료 프로젝트 목록 */}
-      <section className='completed-section'>
-        <h2 className='section-title completed-label'>완료</h2>
-        <div className='project-list completed-list'>
-          {completedProjects.length === 0 && (
-            <p className='empty-message'>완료된 프로젝트가 없습니다.</p>
-          )}
-          {completedProjects.map((project) => {
-            const stats = getProjectTodoStats(project._id);
-            return (
-              <ProjectItemWithChildren
-                key={project._id}
-                project={project}
-                allProjects={allProjects}
-                onToggle={handleToggle}
-                todoStats={stats}
-                getProjectTodoStats={getProjectTodoStats}
-                level={0}
-              />
-            );
-          })}
-        </div>
+        )}
       </section>
 
       {/* 3. 프로젝트 추가 버튼 */}
