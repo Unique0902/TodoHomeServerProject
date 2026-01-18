@@ -5,6 +5,7 @@ const ProjectItemSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   isPurchased: { type: Boolean, default: false },
   price: { type: Number, default: null }, // null이면 가격 미입력
+  purchasedDate: { type: Date, default: null }, // 구매한 날짜/시간
 }, { _id: true }); // 각 아이템에 고유 ID 부여
 
 // URL 서브도큐먼트 스키마

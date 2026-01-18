@@ -215,7 +215,7 @@ exports.addProjectItem = async (req, res) => {
 // 8. 프로젝트 준비물 수정 (구매 여부, 이름, 가격) (PATCH /projects/:id/items/:itemId)
 exports.updateProjectItem = async (req, res) => {
   try {
-    const { name, isPurchased, price } = req.body;
+    const { name, isPurchased, price, purchasedDate } = req.body;
     const project = await Project.findById(req.params.id);
     
     if (!project) {
@@ -235,6 +235,9 @@ exports.updateProjectItem = async (req, res) => {
     if (name !== undefined) item.name = name.trim();
     if (isPurchased !== undefined) item.isPurchased = isPurchased;
     if (price !== undefined) item.price = price ? parseFloat(price) : null;
+    if (purchasedDate !== undefined) {
+      item.purchasedDate = purchasedDate ? new Date(purchasedDate) : null;
+    }
 
     await project.save();
     res.status(200).json(project);

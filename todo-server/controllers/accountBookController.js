@@ -88,7 +88,7 @@ exports.addWishItem = async (req, res) => {
 // 4. 사고 싶은 것 수정 (구매 여부, 이름, 가격) (PATCH /accountbook/items/:itemId)
 exports.updateWishItem = async (req, res) => {
   try {
-    const { name, isPurchased, price } = req.body;
+    const { name, isPurchased, price, purchasedDate } = req.body;
     const accountBook = await AccountBook.findOne();
     
     if (!accountBook) {
@@ -107,6 +107,9 @@ exports.updateWishItem = async (req, res) => {
         return res.status(400).json({ message: '가격은 0 이상이어야 합니다.' });
       }
       item.price = parseFloat(price);
+    }
+    if (purchasedDate !== undefined) {
+      item.purchasedDate = purchasedDate ? new Date(purchasedDate) : null;
     }
 
     await accountBook.save();

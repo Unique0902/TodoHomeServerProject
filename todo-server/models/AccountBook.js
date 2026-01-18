@@ -5,6 +5,7 @@ const WishItemSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   price: { type: Number, required: true }, // 가격은 필수 (예산 계산을 위해)
   isPurchased: { type: Boolean, default: false },
+  purchasedDate: { type: Date, default: null }, // 구매한 날짜/시간
 }, { _id: true }); // 각 아이템에 고유 ID 부여
 
 const AccountBookSchema = new mongoose.Schema(
