@@ -172,3 +172,80 @@ exports.resetCompletions = async (req, res) => {
       .json({ message: '습관 완료 기록 초기화 실패', error: error.message });
   }
 };
+
+// 7. 습관에 URL 추가 (POST /habits/:id/urls)
+exports.addHabitUrl = async (req, res) => {
+  try {
+    const { title, url } = req.body;
+    
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'URL 제목은 필수입니다.' });
+    }
+    
+    if (!url || !url.trim()) {
+      return res.status(400).json({ message: 'URL은 필수입니다.' });
+    }
+
+    const habit = await Habit.findById(req.params.id);
+    if (!habit) {
+      return res.status(404).json({ message: '습관을 찾을 수 없습니다.' });
+    }
+
+    habit.urls.push({
+      title: title.trim(),
+      url: url.trim(),
+    });
+
+    await habit.save();
+    res.status(201).json(habit);
+  } catch (error) {
+    res.status(400).json({ message: 'URL 추가 실패', error: error.message });
+  }
+};
+
+// 8. 습관 URL 수정 (PATCH /habits/:id/urls/:urlId)
+exports.updateHabitUrl = async (req, res) => {
+  try {
+    const { title, url } = req.body;
+    const habit = await Habit.findById(req.params.id);
+    
+    if (!habit) {
+      return res.status(404).json({ message: '습관을 찾을 수 없습니다.' });
+    }
+
+    const urlItem = habit.urls.id(req.params.urlId);
+    if (!urlItem) {
+      return res.status(404).json({ message: 'URL을 찾을 수 없습니다.' });
+    }
+
+    if (title !== undefined) urlItem.title = title.trim();
+    if (url !== undefined) urlItem.url = url.trim();
+
+    await habit.save();
+    res.status(200).json(habit);
+  } catch (error) {
+    res.status(400).json({ message: 'URL 수정 실패', error: error.message });
+  }
+};
+
+// 9. 습관 URL 삭제 (DELETE /habits/:id/urls/:urlId)
+exports.deleteHabitUrl = async (req, res) => {
+  try {
+    const habit = await Habit.findById(req.params.id);
+    
+    if (!habit) {
+      return res.status(404).json({ message: '습관을 찾을 수 없습니다.' });
+    }
+
+    const urlItem = habit.urls.id(req.params.urlId);
+    if (!urlItem) {
+      return res.status(404).json({ message: 'URL을 찾을 수 없습니다.' });
+    }
+
+    urlItem.deleteOne();
+    await habit.save();
+    res.status(200).json(habit);
+  } catch (error) {
+    res.status(400).json({ message: 'URL 삭제 실패', error: error.message });
+  }
+};

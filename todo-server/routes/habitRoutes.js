@@ -11,6 +11,11 @@ router
 // **[새로운 커스텀 엔드포인트 추가]**
 router.post('/reset-completions', habitController.resetCompletions); // POST /api/v1/habits/reset-completions
 
+// URL 관련 라우팅 (습관 ID 하위 경로) - :id 라우트보다 먼저 정의
+router.post('/:id/urls', habitController.addHabitUrl); // POST /api/v1/habits/:id/urls (URL 추가)
+router.patch('/:id/urls/:urlId', habitController.updateHabitUrl); // PATCH /api/v1/habits/:id/urls/:urlId (URL 수정)
+router.delete('/:id/urls/:urlId', habitController.deleteHabitUrl); // DELETE /api/v1/habits/:id/urls/:urlId (URL 삭제)
+
 // /api/v1/habits/:id 경로에 대한 라우팅
 router
   .route('/:id')

@@ -111,3 +111,21 @@ export const updateHabit = async (id, habitData) => {
   const response = await api.patch(`/habits/${id}`, habitData);
   return response.data;
 };
+
+// 16. 습관 URL 추가
+export const addHabitUrl = async (habitId, urlData) => {
+  const response = await api.post(`/habits/${habitId}/urls`, urlData);
+  return response.data;
+};
+
+// 17. 습관 URL 수정
+export const updateHabitUrl = async (habitId, urlId, urlData) => {
+  const response = await api.patch(`/habits/${habitId}/urls/${urlId}`, urlData);
+  return response.data;
+};
+
+// 18. 습관 URL 삭제
+export const deleteHabitUrl = async (habitId, urlId) => {
+  const response = await api.delete(`/habits/${habitId}/urls/${urlId}`);
+  return response.data;
+};
