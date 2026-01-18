@@ -287,12 +287,45 @@ const ProjectDetailView = () => {
     }
   };
 
+  // 구매 날짜/시간 포맷팅 헬퍼
+  const formatPurchaseDateTime = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      const dateStr = date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      const timeStr = date.toLocaleTimeString('ko-KR', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+      return `${dateStr} ${timeStr}`;
+    } catch (e) {
+      console.error('구매 날짜 포맷 오류:', e);
+      return '';
+    }
+  };
+
   // 준비물 구매 여부 토글
   const handleItemToggle = async (item) => {
     try {
-      await updateProjectItem(id, item._id, {
-        isPurchased: !item.isPurchased,
-      });
+      const newIsPurchased = !item.isPurchased;
+      const updateData = {
+        isPurchased: newIsPurchased,
+      };
+      
+      // 구매 처리 시 현재 날짜/시간 저장, 구매 취소 시 null로 설정
+      if (newIsPurchased) {
+        updateData.purchasedDate = new Date();
+      } else {
+        updateData.purchasedDate = null;
+      }
+      
+      await updateProjectItem(id, item._id, updateData);
       fetchProjectData(); // 프로젝트 데이터 갱신
     } catch (error) {
       alert('구매 여부 업데이트에 실패했습니다.');
@@ -557,6 +590,11 @@ const ProjectDetailView = () => {
                       <div className='item-price'>{item.price.toLocaleString()}원</div>
                     )}
                   </div>
+                  {item.isPurchased && item.purchasedDate && (
+                    <div className='item-purchase-date'>
+                      {formatPurchaseDateTime(item.purchasedDate)}
+                    </div>
+                  )}
                   <button
                     className='item-delete-button'
                     onClick={(e) => {

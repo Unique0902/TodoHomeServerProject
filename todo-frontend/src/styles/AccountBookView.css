@@ -213,6 +213,15 @@
     margin-top: 4px;
 }
 
+.item-purchase-date {
+    font-size: 12px;
+    color: #999;
+    margin-left: auto;
+    margin-right: 10px;
+    white-space: nowrap;
+    font-style: italic;
+}
+
 .item-delete-button {
     background: none;
     border: none;
