@@ -1,0 +1,105 @@
+/* HabitsView - 축하 모달 */
+
+.congrats-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.congrats-modal {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px 18px 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: congrats-pop 240ms ease-out;
+  text-align: center;
+}
+
+@keyframes congrats-pop {
+  from {
+    transform: translateY(10px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.congrats-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 8px 0 6px;
+}
+
+.congrats-message {
+  font-size: 15px;
+  color: #444;
+  margin-bottom: 16px;
+}
+
+.congrats-close-button {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #007bff;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.congrats-close-button:hover {
+  background: #0056b3;
+}
+
+/* 간단한 컨페티 이펙트 (CSS only) */
+.congrats-confetti::before,
+.congrats-confetti::after {
+  content: '';
+  position: absolute;
+  left: -20%;
+  top: -40%;
+  width: 140%;
+  height: 140%;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(255, 99, 132, 0.9) 0 6px, transparent 7px),
+    radial-gradient(circle at 30% 20%, rgba(54, 162, 235, 0.9) 0 6px, transparent 7px),
+    radial-gradient(circle at 55% 15%, rgba(255, 206, 86, 0.9) 0 6px, transparent 7px),
+    radial-gradient(circle at 75% 25%, rgba(75, 192, 192, 0.9) 0 6px, transparent 7px),
+    radial-gradient(circle at 90% 18%, rgba(153, 102, 255, 0.9) 0 6px, transparent 7px);
+  background-size: 120px 120px;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: confetti-fall 900ms ease-out forwards;
+}
+
+.congrats-confetti::after {
+  animation-delay: 120ms;
+  opacity: 0.6;
+  filter: blur(0.2px);
+}
+
+@keyframes confetti-fall {
+  from {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 0.0;
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(70px) rotate(10deg);
+    opacity: 0;
+  }
+}
+

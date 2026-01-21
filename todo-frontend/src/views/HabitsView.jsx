@@ -13,6 +13,7 @@ import {
 } from '../utils/calendarUtils';
 import HabitItem from '../components/HabitItem';
 import '../styles/TodosView.css'; // 캘린더, 섹션 스타일 재사용
+import '../styles/HabitsView.css';
 
 const dayLabels = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -28,6 +29,7 @@ const HabitsView = () => {
     formatDateString(new Date())
   );
   const [selectedCategory, setSelectedCategory] = useState(null); // 선택된 날짜의 카테고리 정보
+  const [showCongrats, setShowCongrats] = useState(false);
 
   const todayString = formatDateString(new Date());
 
@@ -100,6 +102,23 @@ const HabitsView = () => {
   useEffect(() => {
     fetchHabits();
   }, [selectedDate, fetchHabits]);
+
+  // --- 오늘의 습관 올클리어 축하 모달 ---
+  useEffect(() => {
+    // "오늘의 습관 카테고리" 조건: 선택된 날짜가 오늘
+    if (selectedDate !== todayString) return;
+    if (!selectedCategory) return;
+    if (!habits || habits.length === 0) return;
+
+    const allCompleted = habits.every((h) => isHabitCompletedOnSelectedDate(h));
+    if (!allCompleted) return;
+
+    const storageKey = `habitCongratsShown:${selectedCategory._id}:${selectedDate}`;
+    if (localStorage.getItem(storageKey) === 'true') return;
+
+    setShowCongrats(true);
+    localStorage.setItem(storageKey, 'true');
+  }, [habits, selectedCategory, selectedDate, todayString]);
 
   // --- 습관 토글 로직 ---
   const handleToggle = async (habit, isCurrentlyCompleted) => {
@@ -229,6 +248,29 @@ const HabitsView = () => {
       >
         +
       </button>
+
+      {/* 축하 모달 */}
+      {showCongrats && (
+        <div
+          className='congrats-overlay'
+          onClick={() => setShowCongrats(false)}
+          role='dialog'
+          aria-modal='true'
+        >
+          <div className='congrats-modal' onClick={(e) => e.stopPropagation()}>
+            <div className='congrats-confetti' />
+            <div className='congrats-title'>축하합니다!</div>
+            <div className='congrats-message'>오늘도 레벨업하셨습니다!</div>
+            <button
+              type='button'
+              className='congrats-close-button'
+              onClick={() => setShowCongrats(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
