@@ -269,12 +269,33 @@ const TodoEditView = () => {
             </div>
             <div className='input-group time-input-group'>
               <label>실행 시간 (선택)</label>
-              <input
-                type='time'
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-                className='time-input'
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type='time'
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                  className='time-input'
+                  style={{ flex: 1 }}
+                />
+                {dueTime && (
+                  <button
+                    type='button'
+                    onClick={() => setDueTime('')}
+                    style={{
+                      background: 'none',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#666'
+                    }}
+                    title='시간 삭제'
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           </>
         )}
@@ -293,12 +314,33 @@ const TodoEditView = () => {
             </div>
             <div className='input-group time-input-group'>
               <label>시작 시간 (선택)</label>
-              <input
-                type='time'
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className='time-input'
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type='time'
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className='time-input'
+                  style={{ flex: 1 }}
+                />
+                {startTime && (
+                  <button
+                    type='button'
+                    onClick={() => setStartTime('')}
+                    style={{
+                      background: 'none',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#666'
+                    }}
+                    title='시간 삭제'
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
             <div className='input-group date-input-group'>
               <label>마감 날짜</label>
@@ -311,12 +353,33 @@ const TodoEditView = () => {
             </div>
             <div className='input-group time-input-group'>
               <label>마감 시간 (선택)</label>
-              <input
-                type='time'
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className='time-input'
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type='time'
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className='time-input'
+                  style={{ flex: 1 }}
+                />
+                {endTime && (
+                  <button
+                    type='button'
+                    onClick={() => setEndTime('')}
+                    style={{
+                      background: 'none',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#666'
+                    }}
+                    title='시간 삭제'
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           </>
         )}
