@@ -47,6 +47,22 @@
 
 .sub-projects-list {
   width: 100%;
+  margin-left: 20px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 10px;
+}
+
+.sub-projects-category {
+  margin-bottom: 10px;
+}
+
+.sub-projects-category-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  padding: 5px 0;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 /* 레벨별 스타일링 (선택사항) */

@@ -19,6 +19,23 @@ const ProjectItemWithChildren = ({
     (p) => p.parentProjectId === project._id
   );
 
+  // 하위 프로젝트를 상태별로 분류
+  const categorizeSubProjects = (projects) => {
+    const active = projects.filter((p) => {
+      const status = p.status || (p.isCompleted ? 'completed' : 'active');
+      return status === 'active';
+    });
+    const paused = projects.filter((p) => p.status === 'paused');
+    const wish = projects.filter((p) => p.status === 'wish');
+    const completed = projects.filter((p) => {
+      const status = p.status || (p.isCompleted ? 'completed' : 'active');
+      return status === 'completed';
+    });
+    return { active, paused, wish, completed };
+  };
+
+  const categorizedSubProjects = categorizeSubProjects(subProjects);
+
   // 토글 버튼 클릭 핸들러
   const handleToggleClick = (e) => {
     e.stopPropagation(); // 부모 클릭 이벤트 방지
@@ -76,23 +93,97 @@ const ProjectItemWithChildren = ({
       {/* 하위 프로젝트 리스트 (토글이 펼쳐진 경우만) */}
       {isExpanded && subProjects.length > 0 && (
         <div className='sub-projects-list'>
-          {subProjects.map((subProject) => {
-            // 하위 프로젝트의 통계 계산
-            const subStats = getProjectTodoStats
-              ? getProjectTodoStats(subProject._id)
-              : todoStats;
-            return (
-              <ProjectItemWithChildren
-                key={subProject._id}
-                project={subProject}
-                allProjects={allProjects}
-                onToggle={onToggle}
-                todoStats={subStats}
-                getProjectTodoStats={getProjectTodoStats}
-                level={level + 1}
-              />
-            );
-          })}
+          {/* 진행중 하위 프로젝트 */}
+          {categorizedSubProjects.active.length > 0 && (
+            <div className='sub-projects-category'>
+              <div className='sub-projects-category-header'>진행중</div>
+              {categorizedSubProjects.active.map((subProject) => {
+                const subStats = getProjectTodoStats
+                  ? getProjectTodoStats(subProject._id)
+                  : todoStats;
+                return (
+                  <ProjectItemWithChildren
+                    key={subProject._id}
+                    project={subProject}
+                    allProjects={allProjects}
+                    onToggle={onToggle}
+                    todoStats={subStats}
+                    getProjectTodoStats={getProjectTodoStats}
+                    level={level + 1}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* 정지됨 하위 프로젝트 */}
+          {categorizedSubProjects.paused.length > 0 && (
+            <div className='sub-projects-category'>
+              <div className='sub-projects-category-header'>정지됨</div>
+              {categorizedSubProjects.paused.map((subProject) => {
+                const subStats = getProjectTodoStats
+                  ? getProjectTodoStats(subProject._id)
+                  : todoStats;
+                return (
+                  <ProjectItemWithChildren
+                    key={subProject._id}
+                    project={subProject}
+                    allProjects={allProjects}
+                    onToggle={onToggle}
+                    todoStats={subStats}
+                    getProjectTodoStats={getProjectTodoStats}
+                    level={level + 1}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* 위시 하위 프로젝트 */}
+          {categorizedSubProjects.wish.length > 0 && (
+            <div className='sub-projects-category'>
+              <div className='sub-projects-category-header'>위시</div>
+              {categorizedSubProjects.wish.map((subProject) => {
+                const subStats = getProjectTodoStats
+                  ? getProjectTodoStats(subProject._id)
+                  : todoStats;
+                return (
+                  <ProjectItemWithChildren
+                    key={subProject._id}
+                    project={subProject}
+                    allProjects={allProjects}
+                    onToggle={onToggle}
+                    todoStats={subStats}
+                    getProjectTodoStats={getProjectTodoStats}
+                    level={level + 1}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* 완료 하위 프로젝트 */}
+          {categorizedSubProjects.completed.length > 0 && (
+            <div className='sub-projects-category'>
+              <div className='sub-projects-category-header'>완료</div>
+              {categorizedSubProjects.completed.map((subProject) => {
+                const subStats = getProjectTodoStats
+                  ? getProjectTodoStats(subProject._id)
+                  : todoStats;
+                return (
+                  <ProjectItemWithChildren
+                    key={subProject._id}
+                    project={subProject}
+                    allProjects={allProjects}
+                    onToggle={onToggle}
+                    todoStats={subStats}
+                    getProjectTodoStats={getProjectTodoStats}
+                    level={level + 1}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
