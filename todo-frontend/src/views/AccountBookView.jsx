@@ -345,83 +345,84 @@ const AccountBookView = () => {
         {isWishItemsExpanded && (
           <>
             <div className='wish-items-list'>
-          {unpurchasedItems.length === 0 && (
-            <p className='empty-message'>사고 싶은 것이 없습니다.</p>
-          )}
-          {unpurchasedItems.map((item) => (
-            <div key={item._id} className='wish-item-row'>
-              <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
-                <input
-                  type='checkbox'
-                  checked={item.isPurchased}
-                  readOnly
-                  className='checkbox-input'
-                />
-              </div>
-              <div className='item-content'>
-                <div className='item-name'>{item.name}</div>
-                <div className='item-price'>{item.price.toLocaleString()}원</div>
-              </div>
-              <button
-                className='item-delete-button'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteItem(item._id, item.name);
-                }}
-              >
-                🗑️
-              </button>
+              {unpurchasedItems.length === 0 && (
+                <p className='empty-message'>사고 싶은 것이 없습니다.</p>
+              )}
+              {unpurchasedItems.map((item) => (
+                <div key={item._id} className='wish-item-row'>
+                  <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
+                    <input
+                      type='checkbox'
+                      checked={item.isPurchased}
+                      readOnly
+                      className='checkbox-input'
+                    />
+                  </div>
+                  <div className='item-content'>
+                    <div className='item-name'>{item.name}</div>
+                    <div className='item-price'>{item.price.toLocaleString()}원</div>
+                  </div>
+                  <button
+                    className='item-delete-button'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteItem(item._id, item.name);
+                    }}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* 항목 추가 폼 */}
-        {showItemForm ? (
-          <form onSubmit={handleAddItem} className='item-add-form'>
-            <div className='form-row'>
-              <input
-                type='text'
-                placeholder='이름'
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                className='item-name-input'
-                autoFocus
-              />
-              <input
-                type='number'
-                placeholder='가격'
-                value={newItemPrice}
-                onChange={(e) => setNewItemPrice(e.target.value)}
-                className='item-price-input'
-                min='0'
-                step='1'
-                required
-              />
-            </div>
-            <div className='form-actions'>
-              <button type='submit' className='item-add-confirm-button'>
-                추가
-              </button>
+            {/* 항목 추가 폼 */}
+            {showItemForm ? (
+              <form onSubmit={handleAddItem} className='item-add-form'>
+                <div className='form-row'>
+                  <input
+                    type='text'
+                    placeholder='이름'
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                    className='item-name-input'
+                    autoFocus
+                  />
+                  <input
+                    type='number'
+                    placeholder='가격'
+                    value={newItemPrice}
+                    onChange={(e) => setNewItemPrice(e.target.value)}
+                    className='item-price-input'
+                    min='0'
+                    step='1'
+                    required
+                  />
+                </div>
+                <div className='form-actions'>
+                  <button type='submit' className='item-add-confirm-button'>
+                    추가
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setShowItemForm(false);
+                      setNewItemName('');
+                      setNewItemPrice('');
+                    }}
+                    className='item-add-cancel-button'
+                  >
+                    취소
+                  </button>
+                </div>
+              </form>
+            ) : (
               <button
-                type='button'
-                onClick={() => {
-                  setShowItemForm(false);
-                  setNewItemName('');
-                  setNewItemPrice('');
-                }}
-                className='item-add-cancel-button'
+                className='add-item-button'
+                onClick={() => setShowItemForm(true)}
               >
-                취소
+                + 사고 싶은 것 추가
               </button>
-            </div>
-          </form>
-        ) : (
-            <button
-              className='add-item-button'
-              onClick={() => setShowItemForm(true)}
-            >
-              + 사고 싶은 것 추가
-            </button>
+            )}
           </>
         )}
       </section>
