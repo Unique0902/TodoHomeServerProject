@@ -119,6 +119,27 @@ const TodoEditView = () => {
       todoData.startDate = null;
       todoData.endDate = null;
     } else if (dateType === 'period') {
+      // 기한 검증
+      // 1. 마감 날짜가 시작 날짜보다 이후인지 확인
+      if (endDate < startDate) {
+        alert('마감 날짜는 시작 날짜보다 이후여야 합니다.');
+        return;
+      }
+      
+      // 2. 시작 날짜와 마감 날짜가 같을 경우 시간 검증
+      if (startDate === endDate) {
+        if (!startTime || !endTime) {
+          alert('시작 날짜와 마감 날짜가 같을 경우, 시작 시간과 마감 시간을 모두 입력해야 합니다.');
+          return;
+        }
+        
+        // 3. 마감 시간이 시작 시간보다 이후여야 함
+        if (endTime <= startTime) {
+          alert('마감 시간은 시작 시간보다 이후여야 합니다.');
+          return;
+        }
+      }
+      
       // 기한 설정
       if (startTime) {
         const dateTimeString = `${startDate}T${startTime}`;
