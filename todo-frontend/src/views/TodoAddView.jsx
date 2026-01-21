@@ -31,9 +31,16 @@ const TodoAddView = () => {
   const [title, setTitle] = useState(''); // 프로젝트명을 제목에 붙이지 않음
   // ... (나머지 상태 유지) ...
   const [description, setDescription] = useState('');
-  const [isDueDateActive, setIsDueDateActive] = useState(false);
+  // 실행일/기한 타입 선택: 'none', 'dueDate', 'period'
+  const [dateType, setDateType] = useState('none');
+  // 실행일 관련
   const [dueDate, setDueDate] = useState(getTodayDateString());
-  const [time, setTime] = useState('');
+  const [dueTime, setDueTime] = useState('');
+  // 기한 관련
+  const [startDate, setStartDate] = useState(getTodayDateString());
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState(getTodayDateString());
+  const [endTime, setEndTime] = useState('');
 
   // 저장 버튼 (체크 버튼) 핸들러
   const handleSave = async () => {
@@ -42,28 +49,39 @@ const TodoAddView = () => {
       return;
     }
 
-    // 1. dueDate 필드 구성
-    let finalDueDate = null;
-    if (isDueDateActive) {
-      if (time) {
-        // 시간이 있는 경우: 로컬 시간으로 Date 객체 생성
-        // 예: 2025-01-15T14:30 -> 로컬 시간(KST) 기준
-        const dateTimeString = `${dueDate}T${time}`;
-        finalDueDate = new Date(dateTimeString);
-      } else {
-        // 시간이 없는 경우: UTC 기준으로 해당 날짜의 00:00:00으로 저장
-        // 이렇게 하면 백엔드의 날짜 필터링과 정확히 일치합니다
-        // 예: 2025-01-15 -> 2025-01-15T00:00:00.000Z (UTC)
-        finalDueDate = new Date(dueDate + 'T00:00:00.000Z');
-      }
-    }
-
     const todoData = {
       title,
       description: description.trim(),
-      dueDate: finalDueDate,
-      projectId: projectId || null, // 👈 projectId가 있다면 추가
+      projectId: projectId || null,
     };
+
+    // 실행일/기한 필드 구성
+    if (dateType === 'dueDate') {
+      // 실행일 설정
+      if (dueTime) {
+        // 시간이 있는 경우: 로컬 시간으로 Date 객체 생성
+        const dateTimeString = `${dueDate}T${dueTime}`;
+        todoData.dueDate = new Date(dateTimeString);
+      } else {
+        // 시간이 없는 경우: UTC 기준으로 해당 날짜의 00:00:00으로 저장
+        todoData.dueDate = new Date(dueDate + 'T00:00:00.000Z');
+      }
+    } else if (dateType === 'period') {
+      // 기한 설정
+      if (startTime) {
+        const dateTimeString = `${startDate}T${startTime}`;
+        todoData.startDate = new Date(dateTimeString);
+      } else {
+        todoData.startDate = new Date(startDate + 'T00:00:00.000Z');
+      }
+      
+      if (endTime) {
+        const dateTimeString = `${endDate}T${endTime}`;
+        todoData.endDate = new Date(dateTimeString);
+      } else {
+        todoData.endDate = new Date(endDate + 'T00:00:00.000Z');
+      }
+    }
 
     try {
       await createTodo(todoData);
@@ -123,22 +141,48 @@ const TodoAddView = () => {
           />
         </div>
 
-        {/* 5. 실행일/기한 활성화 토글 */}
-        <div className='input-group toggle-group'>
+        {/* 5. 실행일/기한 타입 선택 */}
+        <div className='input-group'>
           <label>실행일/기한</label>
-          <button
-            className={`toggle-button ${isDueDateActive ? 'active' : ''}`}
-            onClick={() => setIsDueDateActive(!isDueDateActive)}
-          >
-            {isDueDateActive ? '기한 설정됨' : '기한 설정'}
-          </button>
+          <div className='radio-group' style={{ display: 'flex', gap: '15px', marginTop: '8px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <input
+                type='radio'
+                name='dateType'
+                value='none'
+                checked={dateType === 'none'}
+                onChange={(e) => setDateType(e.target.value)}
+              />
+              없음
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <input
+                type='radio'
+                name='dateType'
+                value='dueDate'
+                checked={dateType === 'dueDate'}
+                onChange={(e) => setDateType(e.target.value)}
+              />
+              실행일
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <input
+                type='radio'
+                name='dateType'
+                value='period'
+                checked={dateType === 'period'}
+                onChange={(e) => setDateType(e.target.value)}
+              />
+              기한
+            </label>
+          </div>
         </div>
 
-        {/* 6. 기한 입력 (활성화 시 표시되는 영역) */}
-        {isDueDateActive && (
+        {/* 6. 실행일 입력 (실행일 선택 시 표시) */}
+        {dateType === 'dueDate' && (
           <>
             <div className='input-group date-input-group'>
-              <label>날짜</label>
+              <label>실행일</label>
               <input
                 type='date'
                 value={dueDate}
@@ -146,14 +190,54 @@ const TodoAddView = () => {
                 className='date-input'
               />
             </div>
-
-            {/* 7. 시간 입력 */}
             <div className='input-group time-input-group'>
-              <label>시간</label>
+              <label>실행 시간 (선택)</label>
               <input
                 type='time'
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
+                className='time-input'
+              />
+            </div>
+          </>
+        )}
+
+        {/* 7. 기한 입력 (기한 선택 시 표시) */}
+        {dateType === 'period' && (
+          <>
+            <div className='input-group date-input-group'>
+              <label>시작 날짜</label>
+              <input
+                type='date'
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className='date-input'
+              />
+            </div>
+            <div className='input-group time-input-group'>
+              <label>시작 시간 (선택)</label>
+              <input
+                type='time'
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className='time-input'
+              />
+            </div>
+            <div className='input-group date-input-group'>
+              <label>마감 날짜</label>
+              <input
+                type='date'
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className='date-input'
+              />
+            </div>
+            <div className='input-group time-input-group'>
+              <label>마감 시간 (선택)</label>
+              <input
+                type='time'
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
                 className='time-input'
               />
             </div>

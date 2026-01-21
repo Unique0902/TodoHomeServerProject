@@ -171,10 +171,31 @@ const TodoDetailView = () => {
           </div>
         )}
 
-        <div className='info-group'>
-          <span className='label'>기한</span>
-          <span className='value due-date'>{formatDateTime(todo.dueDate)}</span>
-        </div>
+        {/* 실행일 표시 */}
+        {todo.dueDate && (
+          <div className='info-group'>
+            <span className='label'>실행일</span>
+            <span className='value due-date'>{formatDateTime(todo.dueDate)}</span>
+          </div>
+        )}
+
+        {/* 기한 표시 */}
+        {(todo.startDate || todo.endDate) && (
+          <div className='info-group'>
+            <span className='label'>기한</span>
+            <span className='value due-date'>
+              {todo.startDate ? formatDateTime(todo.startDate) : '시작일 미정'} ~ {todo.endDate ? formatDateTime(todo.endDate) : '마감일 미정'}
+            </span>
+          </div>
+        )}
+
+        {/* 실행일도 기한도 없는 경우 */}
+        {!todo.dueDate && !todo.startDate && !todo.endDate && (
+          <div className='info-group'>
+            <span className='label'>실행일/기한</span>
+            <span className='value due-date'>미정</span>
+          </div>
+        )}
 
         <div className='info-group'>
           <span className='label'>생성일</span>

@@ -10,13 +10,12 @@ import { useNavigate } from 'react-router-dom'; // 👈 useNavigate 임포트
 // showTodayButton: 오늘 진행하기 버튼 표시 여부 (선택사항)
 const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayButton = false }) => {
   const navigate = useNavigate(); // 👈 useNavigate 훅 사용
-  // 시간 정보를 포맷하는 함수 (dueDate가 있으면 날짜/시간, 없으면 '기한없음')
-  const formatTime = (dueDate) => {
-    // 1. dueDate 필드가 아예 없거나 null일 경우 (기한이 설정되지 않은 경우)
-    if (!dueDate) return '기한없음';
-
+  // 날짜/시간 포맷 헬퍼 함수
+  const formatDateTime = (dateValue) => {
+    if (!dateValue) return '';
+    
     try {
-      const date = new Date(dueDate);
+      const date = new Date(dateValue);
       const today = new Date();
       
       // 오늘인지 확인 (날짜만 비교)
@@ -25,20 +24,15 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
         date.getMonth() === today.getMonth() &&
         date.getDate() === today.getDate();
 
-      // UTC로 저장된 날짜만 있는 경우 확인 (UTC 00:00:00.000Z)
-      // 원본 문자열이 "YYYY-MM-DDT00:00:00.000Z" 형태인지 확인
-      const dueDateStr = typeof dueDate === 'string' ? dueDate : date.toISOString();
-      const isUTCOnly = dueDateStr.endsWith('Z') && 
-                        (dueDateStr.includes('T00:00:00.000Z') || dueDateStr.includes('T00:00:00Z'));
+      // UTC로 저장된 날짜만 있는 경우 확인
+      const dateStr = typeof dateValue === 'string' ? dateValue : date.toISOString();
+      const isUTCOnly = dateStr.endsWith('Z') && 
+                        (dateStr.includes('T00:00:00.000Z') || dateStr.includes('T00:00:00Z'));
       
-      // 시간이 있는지 확인
-      // UTC로만 저장된 경우(time이 없었던 경우)는 시간이 없는 것으로 간주
       const hasTime = !isUTCOnly;
 
       if (isToday) {
-        // 오늘인 경우
         if (hasTime) {
-          // 시간이 있으면: "오늘 오후 10:00"
           const timeStr = date.toLocaleTimeString('ko-KR', {
             hour: 'numeric',
             minute: '2-digit',
@@ -46,13 +40,10 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
           });
           return `오늘 ${timeStr}`;
         } else {
-          // 시간이 없으면: "오늘"
           return '오늘';
         }
       } else {
-        // 오늘이 아닌 경우
         if (hasTime) {
-          // 시간이 있으면: "2025년 1월 15일 오후 10:00"
           const dateStr = date.toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: 'long',
@@ -65,7 +56,6 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
           });
           return `${dateStr} ${timeStr}`;
         } else {
-          // 시간이 없으면: "2025년 1월 15일"
           return date.toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: 'long',
@@ -75,14 +65,14 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
       }
     } catch (e) {
       console.error('날짜 포맷 오류:', e);
-      return '시간 오류';
+      return '';
     }
   };
 
-  // 할일 시간 표시 함수 (기한이 없는 완료된 할일의 경우 완료 날짜 표시)
+  // 할일 시간 표시 함수
   const getTimeString = () => {
-    if (!todo.dueDate && todo.isCompleted && todo.completedDate) {
-      // 기한이 없고 완료되었으며 completedDate가 있는 경우: 완료 날짜 표시
+    // 완료된 할일이고 실행일/기한이 없으며 완료 날짜가 있는 경우
+    if (!todo.dueDate && !todo.startDate && !todo.endDate && todo.isCompleted && todo.completedDate) {
       try {
         const completedDate = new Date(todo.completedDate);
         return completedDate.toLocaleDateString('ko-KR', {
@@ -95,8 +85,21 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
         return '완료됨';
       }
     }
-    // 기한이 있는 경우 또는 기한이 없는 미완료 할일: 기존 로직 사용
-    return formatTime(todo.dueDate);
+    
+    // 실행일이 있는 경우
+    if (todo.dueDate) {
+      return formatDateTime(todo.dueDate);
+    }
+    
+    // 기한이 있는 경우
+    if (todo.startDate || todo.endDate) {
+      const startStr = todo.startDate ? formatDateTime(todo.startDate) : '시작일 미정';
+      const endStr = todo.endDate ? formatDateTime(todo.endDate) : '마감일 미정';
+      return `${startStr} ~ ${endStr}`;
+    }
+    
+    // 둘 다 없는 경우
+    return '기한없음';
   };
 
   const timeString = getTimeString();
@@ -107,12 +110,27 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
   
   // 기간이 지난 할일인지 확인하는 함수
   const isOverdue = () => {
-    if (!todo.dueDate || todo.isCompleted) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(todo.dueDate);
-    dueDate.setHours(0, 0, 0, 0);
-    return dueDate < today;
+    if (todo.isCompleted) return false;
+    
+    // 실행일이 있는 경우
+    if (todo.dueDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueDate = new Date(todo.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      return dueDate < today;
+    }
+    
+    // 기한이 있는 경우 (마감일이 지났는지 확인)
+    if (todo.endDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endDate = new Date(todo.endDate);
+      endDate.setHours(0, 0, 0, 0);
+      return endDate < today;
+    }
+    
+    return false;
   };
   
   // 오늘 진행하기 버튼 클릭 핸들러
@@ -163,8 +181,8 @@ const TodoItem = ({ todo, onToggle, projectMap, onClick, onSetToday, showTodayBu
       {/* 마감 시한 정보 영역 및 오늘 진행하기 버튼 */}
       <div className='todo-time-section'>
         <div className='todo-time'>{timeString}</div>
-        {/* 오늘 진행하기 버튼 (기한 없는 할일 또는 기간이 지난 할일인 경우) */}
-        {showTodayButton && !todo.isCompleted && (!todo.dueDate || isOverdue()) && (
+        {/* 오늘 진행하기 버튼 (실행일/기한 없는 할일 또는 기간이 지난 할일인 경우) */}
+        {showTodayButton && !todo.isCompleted && (!todo.dueDate && !todo.startDate && !todo.endDate || isOverdue()) && (
           <button
             className='today-button'
             onClick={handleSetToday}

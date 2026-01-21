@@ -54,7 +54,21 @@ exports.getAllTodos = async (req, res) => {
       const endOfDay = new Date(date + 'T00:00:00.000Z');
       endOfDay.setDate(endOfDay.getDate() + 1);
 
-      query.dueDate = { $gte: startOfDay, $lt: endOfDay };
+      // 실행일(dueDate) 또는 기한(startDate/endDate)에 해당 날짜가 포함되는 할일 조회
+      query.$or = [
+        // 실행일이 해당 날짜인 경우
+        { dueDate: { $gte: startOfDay, $lt: endOfDay } },
+        // 기한이 해당 날짜를 포함하는 경우
+        // 시작일이 해당 날짜 이전이고 마감일이 해당 날짜 이후인 경우
+        {
+          $and: [
+            { startDate: { $exists: true, $ne: null } },
+            { endDate: { $exists: true, $ne: null } },
+            { startDate: { $lte: endOfDay } },
+            { endDate: { $gte: startOfDay } }
+          ]
+        }
+      ];
     }
 
     // 4. 프로젝트 ID 필터링 로직
