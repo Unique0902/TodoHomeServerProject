@@ -19,6 +19,12 @@ const AccountBookView = () => {
   const [newItemPrice, setNewItemPrice] = useState('');
   const [showAssetEdit, setShowAssetEdit] = useState(false);
   const [editAssetValue, setEditAssetValue] = useState('');
+  
+  // 섹션 토글 상태
+  const [isBudgetExpanded, setIsBudgetExpanded] = useState(true);
+  const [isWishItemsExpanded, setIsWishItemsExpanded] = useState(true);
+  const [isPurchasedItemsExpanded, setIsPurchasedItemsExpanded] = useState(true);
+  const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
   // 데이터 로드
   const fetchAccountBook = useCallback(async () => {
@@ -290,28 +296,55 @@ const AccountBookView = () => {
       {/* 예산 정보 */}
       {totalBudget > 0 && (
         <section className='budget-section'>
-          <div className='budget-info'>
-            <div className='budget-row'>
-              <div className='budget-label'>사고 싶은 것에 필요한 총 예산</div>
-              <div className='budget-value'>{wishItemsBudget.toLocaleString()}원</div>
-            </div>
-            <div className='budget-row'>
-              <div className='budget-label'>프로젝트에 추가로 필요한 총 예산</div>
-              <div className='budget-value'>{projectsBudget.toLocaleString()}원</div>
-            </div>
-            <div className='budget-row total'>
-              <div className='budget-label'>총 필요한 예산</div>
-              <div className='budget-value'>{totalBudget.toLocaleString()}원</div>
-            </div>
+          <div className='section-header' onClick={() => setIsBudgetExpanded(!isBudgetExpanded)}>
+            <h2 className='section-title' style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>예산 정보</h2>
+            <button
+              className='section-toggle-button'
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBudgetExpanded(!isBudgetExpanded);
+              }}
+            >
+              {isBudgetExpanded ? '▼' : '▶'}
+            </button>
           </div>
+          {isBudgetExpanded && (
+            <div className='budget-info'>
+              <div className='budget-row'>
+                <div className='budget-label'>사고 싶은 것에 필요한 총 예산</div>
+                <div className='budget-value'>{wishItemsBudget.toLocaleString()}원</div>
+              </div>
+              <div className='budget-row'>
+                <div className='budget-label'>프로젝트에 추가로 필요한 총 예산</div>
+                <div className='budget-value'>{projectsBudget.toLocaleString()}원</div>
+              </div>
+              <div className='budget-row total'>
+                <div className='budget-label'>총 필요한 예산</div>
+                <div className='budget-value'>{totalBudget.toLocaleString()}원</div>
+              </div>
+            </div>
+          )}
         </section>
       )}
 
       {/* 사고 싶은 것 목록 */}
       <section className='wish-items-section'>
-        <h2 className='section-title'>사고 싶은 것</h2>
+        <div className='section-header' onClick={() => setIsWishItemsExpanded(!isWishItemsExpanded)}>
+          <h2 className='section-title' style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>사고 싶은 것</h2>
+          <button
+            className='section-toggle-button'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsWishItemsExpanded(!isWishItemsExpanded);
+            }}
+          >
+            {isWishItemsExpanded ? '▼' : '▶'}
+          </button>
+        </div>
 
-        <div className='wish-items-list'>
+        {isWishItemsExpanded && (
+          <>
+            <div className='wish-items-list'>
           {unpurchasedItems.length === 0 && (
             <p className='empty-message'>사고 싶은 것이 없습니다.</p>
           )}
@@ -383,20 +416,33 @@ const AccountBookView = () => {
             </div>
           </form>
         ) : (
-          <button
-            className='add-item-button'
-            onClick={() => setShowItemForm(true)}
-          >
-            + 사고 싶은 것 추가
-          </button>
+            <button
+              className='add-item-button'
+              onClick={() => setShowItemForm(true)}
+            >
+              + 사고 싶은 것 추가
+            </button>
+          </>
         )}
       </section>
 
       {/* 구매한 것 목록 */}
       {purchasedItems.length > 0 && (
         <section className='purchased-items-section'>
-          <h2 className='section-title'>구매한 것</h2>
-          <div className='wish-items-list'>
+          <div className='section-header' onClick={() => setIsPurchasedItemsExpanded(!isPurchasedItemsExpanded)}>
+            <h2 className='section-title' style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>구매한 것</h2>
+            <button
+              className='section-toggle-button'
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPurchasedItemsExpanded(!isPurchasedItemsExpanded);
+              }}
+            >
+              {isPurchasedItemsExpanded ? '▼' : '▶'}
+            </button>
+          </div>
+          {isPurchasedItemsExpanded && (
+            <div className='wish-items-list'>
             {purchasedItems.map((item) => (
               <div key={item._id} className='wish-item-row purchased'>
                 <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
@@ -427,15 +473,29 @@ const AccountBookView = () => {
                 </button>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </section>
       )}
 
       {/* 프로젝트 준비물 섹션 */}
       {projectsWithBudget.length > 0 && (
         <section className='projects-items-section'>
-          <h2 className='section-title'>프로젝트 준비물</h2>
-          {projectsWithBudget.map((project) => {
+          <div className='section-header' onClick={() => setIsProjectsExpanded(!isProjectsExpanded)}>
+            <h2 className='section-title' style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>프로젝트 준비물</h2>
+            <button
+              className='section-toggle-button'
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsProjectsExpanded(!isProjectsExpanded);
+              }}
+            >
+              {isProjectsExpanded ? '▼' : '▶'}
+            </button>
+          </div>
+          {isProjectsExpanded && (
+            <>
+              {projectsWithBudget.map((project) => {
             // 프로젝트 예산 계산
             const projectBudget = project.items.reduce((sum, item) => {
               if (item.price !== null && item.price !== undefined) {
@@ -498,8 +558,10 @@ const AccountBookView = () => {
                     ))}
                 </div>
               </div>
-            );
-          })}
+              );
+            })}
+            </>
+          )}
         </section>
       )}
     </div>

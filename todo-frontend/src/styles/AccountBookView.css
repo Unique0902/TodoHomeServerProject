@@ -148,6 +148,43 @@
     color: #856404;
 }
 
+/* 섹션 헤더 및 토글 버튼 스타일 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+.section-header .section-title {
+    margin: 0;
+    border-bottom: none !important;
+    padding-bottom: 0;
+}
+
+.section-toggle-button {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+    cursor: pointer;
+    padding: 4px 8px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.section-toggle-button:hover {
+    background: #e0e0e0;
+}
+
 .budget-row.total .budget-label,
 .budget-row.total .budget-value {
     font-size: 16px;
