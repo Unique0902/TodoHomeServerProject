@@ -166,23 +166,24 @@
 }
 
 .section-toggle-button {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #666;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
     cursor: pointer;
-    padding: 4px 8px;
-    width: 30px;
-    height: 30px;
+    padding: 0;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    border-radius: 50%;
 }
 
 .section-toggle-button:hover {
-    background: #e0e0e0;
+    color: #007bff;
+    background-color: #f0f7ff;
 }
 
 .budget-row.total .budget-label,
@@ -342,6 +343,15 @@
 
 .item-add-cancel-button:hover {
     background-color: #545b62;
+}
+
+.item-edit-form {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 8px 0;
 }
 
 /* 구매한 것 섹션 */

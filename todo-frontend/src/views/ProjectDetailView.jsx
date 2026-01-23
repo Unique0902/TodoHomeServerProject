@@ -627,14 +627,14 @@ const ProjectDetailView = () => {
                         handleSaveEditItem(item._id);
                       }}
                       className='item-edit-form'
-                      style={{ width: '100%', display: 'flex', gap: '8px', alignItems: 'center' }}
+                      style={{ width: '100%', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}
                     >
                       <input
                         type='text'
                         value={editItemName}
                         onChange={(e) => setEditItemName(e.target.value)}
                         className='item-name-input'
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, minWidth: '120px' }}
                         autoFocus
                       />
                       <input
@@ -647,14 +647,14 @@ const ProjectDetailView = () => {
                         placeholder='가격 (선택)'
                         style={{ width: '120px' }}
                       />
-                      <button type='submit' className='item-edit-save-button' style={{ padding: '6px 12px' }}>
+                      <button type='submit' className='item-edit-save-button' title='저장'>
                         ✓
                       </button>
                       <button
                         type='button'
                         onClick={handleCancelEditItem}
                         className='item-edit-cancel-button'
-                        style={{ padding: '6px 12px' }}
+                        title='취소'
                       >
                         ✕
                       </button>
@@ -687,7 +687,7 @@ const ProjectDetailView = () => {
                           e.stopPropagation();
                           handleStartEditItem(item);
                         }}
-                        style={{ marginRight: '8px' }}
+                        title='수정'
                       >
                         ✏️
                       </button>
