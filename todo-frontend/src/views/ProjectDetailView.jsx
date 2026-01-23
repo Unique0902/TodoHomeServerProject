@@ -31,6 +31,10 @@ const ProjectDetailView = () => {
   const [showItemForm, setShowItemForm] = useState(false); // 준비물 추가 폼 표시 여부
   const [newItemName, setNewItemName] = useState(''); // 새 준비물 이름
   const [newItemPrice, setNewItemPrice] = useState(''); // 새 준비물 가격
+  // 수정 관련 상태
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editItemName, setEditItemName] = useState('');
+  const [editItemPrice, setEditItemPrice] = useState('');
   const [showUrlForm, setShowUrlForm] = useState(false); // URL 추가 폼 표시 여부
   const [newUrlTitle, setNewUrlTitle] = useState(''); // 새 URL 제목
   const [newUrl, setNewUrl] = useState(''); // 새 URL
@@ -344,6 +348,45 @@ const ProjectDetailView = () => {
     }
   };
 
+  // 준비물 수정 시작 핸들러
+  const handleStartEditItem = (item) => {
+    setEditingItemId(item._id);
+    setEditItemName(item.name);
+    setEditItemPrice(item.price !== null && item.price !== undefined ? item.price.toString() : '');
+  };
+
+  // 준비물 수정 취소 핸들러
+  const handleCancelEditItem = () => {
+    setEditingItemId(null);
+    setEditItemName('');
+    setEditItemPrice('');
+  };
+
+  // 준비물 수정 저장 핸들러
+  const handleSaveEditItem = async (itemId) => {
+    if (!editItemName.trim()) {
+      alert('준비물 이름을 입력해주세요.');
+      return;
+    }
+
+    const priceValue = editItemPrice ? parseFloat(editItemPrice) : null;
+    if (priceValue !== null && (isNaN(priceValue) || priceValue < 0)) {
+      alert('올바른 가격을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await updateProjectItem(id, itemId, {
+        name: editItemName.trim(),
+        price: priceValue,
+      });
+      handleCancelEditItem();
+      fetchProjectData(); // 프로젝트 데이터 갱신
+    } catch (error) {
+      alert('준비물 수정에 실패했습니다.');
+    }
+  };
+
   // URL 추가 핸들러
   const handleAddUrl = async (e) => {
     e.preventDefault();
@@ -576,34 +619,89 @@ const ProjectDetailView = () => {
                   key={item._id}
                   className={`project-item-row ${item.isPurchased ? 'purchased' : ''}`}
                 >
-                  <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
-                    <input
-                      type='checkbox'
-                      checked={item.isPurchased}
-                      readOnly
-                      className='checkbox-input'
-                    />
-                  </div>
-                  <div className='item-content'>
-                    <div className='item-name'>{item.name}</div>
-                    {item.price !== null && item.price !== undefined && (
-                      <div className='item-price'>{item.price.toLocaleString()}원</div>
-                    )}
-                  </div>
-                  {item.isPurchased && item.purchasedDate && (
-                    <div className='item-purchase-date'>
-                      {formatPurchaseDateTime(item.purchasedDate)}
-                    </div>
+                  {editingItemId === item._id ? (
+                    // 수정 폼
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSaveEditItem(item._id);
+                      }}
+                      className='item-edit-form'
+                      style={{ width: '100%', display: 'flex', gap: '8px', alignItems: 'center' }}
+                    >
+                      <input
+                        type='text'
+                        value={editItemName}
+                        onChange={(e) => setEditItemName(e.target.value)}
+                        className='item-name-input'
+                        style={{ flex: 1 }}
+                        autoFocus
+                      />
+                      <input
+                        type='number'
+                        value={editItemPrice}
+                        onChange={(e) => setEditItemPrice(e.target.value)}
+                        className='item-price-input'
+                        min='0'
+                        step='1'
+                        placeholder='가격 (선택)'
+                        style={{ width: '120px' }}
+                      />
+                      <button type='submit' className='item-edit-save-button' style={{ padding: '6px 12px' }}>
+                        ✓
+                      </button>
+                      <button
+                        type='button'
+                        onClick={handleCancelEditItem}
+                        className='item-edit-cancel-button'
+                        style={{ padding: '6px 12px' }}
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  ) : (
+                    // 일반 표시
+                    <>
+                      <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
+                        <input
+                          type='checkbox'
+                          checked={item.isPurchased}
+                          readOnly
+                          className='checkbox-input'
+                        />
+                      </div>
+                      <div className='item-content'>
+                        <div className='item-name'>{item.name}</div>
+                        {item.price !== null && item.price !== undefined && (
+                          <div className='item-price'>{item.price.toLocaleString()}원</div>
+                        )}
+                      </div>
+                      {item.isPurchased && item.purchasedDate && (
+                        <div className='item-purchase-date'>
+                          {formatPurchaseDateTime(item.purchasedDate)}
+                        </div>
+                      )}
+                      <button
+                        className='item-edit-button'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartEditItem(item);
+                        }}
+                        style={{ marginRight: '8px' }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className='item-delete-button'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteItem(item._id, item.name);
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </>
                   )}
-                  <button
-                    className='item-delete-button'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteItem(item._id, item.name);
-                    }}
-                  >
-                    🗑️
-                  </button>
                 </div>
               ))
             )}
