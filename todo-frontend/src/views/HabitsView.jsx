@@ -190,16 +190,36 @@ const HabitsView = () => {
     
     // 드롭 위치에 시각적 피드백 추가
     const targetElement = e.currentTarget;
+    const rect = targetElement.getBoundingClientRect();
+    const mouseY = e.clientY;
+    const elementMiddle = rect.top + rect.height / 2;
+    
     if (draggedIndex !== null && draggedIndex < index) {
-      // 아래로 드래그하는 경우
-      targetElement.style.borderTop = '2px solid #007bff';
-      targetElement.style.borderBottom = 'none';
-      targetElement.style.paddingTop = '20px';
+      // 아래로 드래그하는 경우 - 마우스가 요소의 중간보다 아래에 있으면 아래쪽에 선 표시
+      if (mouseY > elementMiddle) {
+        targetElement.style.borderBottom = '2px solid #007bff';
+        targetElement.style.borderTop = 'none';
+        targetElement.style.paddingBottom = '20px';
+        targetElement.style.paddingTop = '';
+      } else {
+        targetElement.style.borderTop = '2px solid #007bff';
+        targetElement.style.borderBottom = 'none';
+        targetElement.style.paddingTop = '20px';
+        targetElement.style.paddingBottom = '';
+      }
     } else if (draggedIndex !== null && draggedIndex > index) {
-      // 위로 드래그하는 경우
-      targetElement.style.borderBottom = '2px solid #007bff';
-      targetElement.style.borderTop = 'none';
-      targetElement.style.paddingBottom = '20px';
+      // 위로 드래그하는 경우 - 마우스가 요소의 중간보다 위에 있으면 위쪽에 선 표시
+      if (mouseY < elementMiddle) {
+        targetElement.style.borderTop = '2px solid #007bff';
+        targetElement.style.borderBottom = 'none';
+        targetElement.style.paddingTop = '20px';
+        targetElement.style.paddingBottom = '';
+      } else {
+        targetElement.style.borderBottom = '2px solid #007bff';
+        targetElement.style.borderTop = 'none';
+        targetElement.style.paddingBottom = '20px';
+        targetElement.style.paddingTop = '';
+      }
     }
   };
 
@@ -249,12 +269,62 @@ const HabitsView = () => {
       return;
     }
 
+    const targetElement = e.currentTarget;
+    const rect = targetElement.getBoundingClientRect();
+    const mouseY = e.clientY;
+    const elementMiddle = rect.top + rect.height / 2;
+    
+    // 실제 드롭 위치 계산 - 파란색 선이 표시된 위치에 맞춰서
+    let actualDropIndex = dropIndex;
+    
+    if (draggedIndex < dropIndex) {
+      // 아래로 드래그하는 경우
+      if (mouseY > elementMiddle) {
+        // 마우스가 요소 중간보다 아래에 있으면 그 다음 위치
+        actualDropIndex = dropIndex + 1;
+      } else {
+        // 마우스가 요소 중간보다 위에 있으면 그 위치
+        actualDropIndex = dropIndex;
+      }
+    } else if (draggedIndex > dropIndex) {
+      // 위로 드래그하는 경우
+      if (mouseY < elementMiddle) {
+        // 마우스가 요소 중간보다 위에 있으면 그 위치
+        actualDropIndex = dropIndex;
+      } else {
+        // 마우스가 요소 중간보다 아래에 있으면 그 다음 위치
+        actualDropIndex = dropIndex + 1;
+      }
+    }
+    
+    // 배열 범위 체크
+    if (actualDropIndex > habits.length) {
+      actualDropIndex = habits.length;
+    }
+    if (actualDropIndex < 0) {
+      actualDropIndex = 0;
+    }
+    
+    // 같은 위치면 변경 없음
+    if (draggedIndex === actualDropIndex || (draggedIndex < actualDropIndex && actualDropIndex === draggedIndex + 1)) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
     const newHabits = [...habits];
     const draggedHabit = newHabits[draggedIndex];
     
     // 배열에서 제거하고 새 위치에 삽입
     newHabits.splice(draggedIndex, 1);
-    newHabits.splice(dropIndex, 0, draggedHabit);
+    
+    // 실제 드롭 인덱스 조정 (제거 후 인덱스가 변경될 수 있음)
+    let insertIndex = actualDropIndex;
+    if (draggedIndex < actualDropIndex) {
+      insertIndex = actualDropIndex - 1;
+    }
+    
+    newHabits.splice(insertIndex, 0, draggedHabit);
 
     // 순서 업데이트된 습관 ID 배열
     const habitIds = newHabits.map(h => h._id);
@@ -350,6 +420,7 @@ const HabitsView = () => {
           {habits.map((habit, index) => (
             <HabitItem
               key={habit._id}
+              index={index}
               habit={habit}
               onDetailClick={() => navigate(`/habits/${habit._id}`)}
               onToggle={(h) =>
@@ -358,6 +429,7 @@ const HabitsView = () => {
               isCompletedToday={isHabitCompletedOnSelectedDate(habit)}
               onDragStart={(e) => handleDragStart(e, index)}
               onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
               isDragging={draggedIndex === index}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const HabitItem = ({ 
@@ -12,10 +12,13 @@ const HabitItem = ({
   onDrop,
   onDragEnd,
   isDragging,
-  dragOverIndex
+  dragOverIndex,
+  index
 }) => {
   const navigate = useNavigate();
   const isChecked = isCompletedToday;
+  const itemRef = useRef(null);
+  const dragHandleRef = useRef(null);
 
   const formatTime = (time) => {
     return '매일';
@@ -34,12 +37,37 @@ const HabitItem = ({
     navigate(`/habits/${habit._id}`);
   };
 
+  // 햄버거 아이콘에서만 드래그 시작
+  const handleDragHandleMouseDown = (e) => {
+    e.stopPropagation();
+    if (itemRef.current) {
+      itemRef.current.setAttribute('draggable', 'true');
+    }
+  };
+
+  const handleDragHandleMouseUp = (e) => {
+    e.stopPropagation();
+    if (itemRef.current) {
+      itemRef.current.setAttribute('draggable', 'false');
+    }
+  };
+
+  const handleItemDragStart = (e) => {
+    // 드래그 핸들에서 시작된 경우에만 드래그 허용
+    if (!e.target.closest('.drag-handle') && !dragHandleRef.current?.contains(e.target)) {
+      e.preventDefault();
+      return;
+    }
+    onDragStart(e, index);
+  };
+
   return (
     <div
+      ref={itemRef}
       className={`habit-item ${isChecked ? 'completed' : ''} ${isDragging ? 'dragging' : ''}`}
       onClick={handleDetailClick}
-      draggable={true}
-      onDragStart={onDragStart}
+      draggable={false}
+      onDragStart={handleItemDragStart}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
@@ -47,9 +75,16 @@ const HabitItem = ({
     >
       {/* 드래그 핸들 (햄버거 아이콘) */}
       <div
+        ref={dragHandleRef}
         className='drag-handle'
         onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
+        onMouseDown={handleDragHandleMouseDown}
+        onMouseUp={handleDragHandleMouseUp}
+        draggable={true}
+        onDragStart={(e) => {
+          e.stopPropagation();
+          onDragStart(e, index);
+        }}
       >
         <span className='hamburger-icon'>☰</span>
       </div>
