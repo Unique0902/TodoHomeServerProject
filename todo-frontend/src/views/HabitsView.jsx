@@ -4,6 +4,7 @@ import {
   getHabitsByCategoryId,
   getTodayHabitCategory,
   toggleHabitCompletion,
+  reorderHabits,
 } from '../api/habitApi';
 import {
   getStartOfWeek,
@@ -30,6 +31,8 @@ const HabitsView = () => {
   );
   const [selectedCategory, setSelectedCategory] = useState(null); // 선택된 날짜의 카테고리 정보
   const [showCongrats, setShowCongrats] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
 
   const todayString = formatDateString(new Date());
 
@@ -148,6 +151,101 @@ const HabitsView = () => {
     navigate(`/habit-categories?date=${selectedDate}`);
   };
 
+  // 드래그 앤 드롭 핸들러
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target);
+    // 드래그 중인 요소는 반투명하게
+    if (e.target.classList) {
+      e.target.classList.add('dragging');
+    }
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    // 같은 인덱스면 무시
+    if (draggedIndex === index) return;
+    
+    setDragOverIndex(index);
+    
+    // 드롭 위치에 시각적 피드백 추가
+    const targetElement = e.currentTarget;
+    if (draggedIndex !== null && draggedIndex < index) {
+      // 아래로 드래그하는 경우
+      targetElement.style.borderTop = '2px solid #007bff';
+      targetElement.style.borderBottom = 'none';
+      targetElement.style.paddingTop = '20px';
+    } else if (draggedIndex !== null && draggedIndex > index) {
+      // 위로 드래그하는 경우
+      targetElement.style.borderBottom = '2px solid #007bff';
+      targetElement.style.borderTop = 'none';
+      targetElement.style.paddingBottom = '20px';
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    // 다른 요소로 이동할 때 스타일 초기화
+    const targetElement = e.currentTarget;
+    targetElement.style.borderTop = '';
+    targetElement.style.borderBottom = '';
+    targetElement.style.paddingTop = '';
+    targetElement.style.paddingBottom = '';
+  };
+
+  const handleDragEnd = (e) => {
+    // 모든 스타일 초기화
+    if (e.target.classList) {
+      e.target.classList.remove('dragging');
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = async (e, dropIndex) => {
+    e.preventDefault();
+    
+    // 스타일 초기화
+    const targetElement = e.currentTarget;
+    targetElement.style.borderTop = '';
+    targetElement.style.borderBottom = '';
+    targetElement.style.paddingTop = '';
+    targetElement.style.paddingBottom = '';
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const newHabits = [...habits];
+    const draggedHabit = newHabits[draggedIndex];
+    
+    // 배열에서 제거하고 새 위치에 삽입
+    newHabits.splice(draggedIndex, 1);
+    newHabits.splice(dropIndex, 0, draggedHabit);
+
+    // 순서 업데이트된 습관 ID 배열
+    const habitIds = newHabits.map(h => h._id);
+
+    try {
+      // API 호출로 순서 업데이트
+      await reorderHabits(habitIds);
+      // 로컬 상태 업데이트
+      setHabits(newHabits);
+    } catch (error) {
+      console.error('순서 변경 실패:', error);
+      alert('순서 변경에 실패했습니다.');
+      // 실패 시 원래 상태로 복구
+      fetchHabits();
+    }
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
 
@@ -220,16 +318,21 @@ const HabitsView = () => {
             </p>
           )}
 
-          {habits.map((habit) => (
+          {habits.map((habit, index) => (
             <HabitItem
               key={habit._id}
               habit={habit}
-              // 체크박스 제외한 부분 클릭 시 상세 페이지로 이동
               onDetailClick={() => navigate(`/habits/${habit._id}`)}
               onToggle={(h) =>
                 handleToggle(h, isHabitCompletedOnSelectedDate(h))
               }
               isCompletedToday={isHabitCompletedOnSelectedDate(habit)}
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
+              isDragging={draggedIndex === index}
+              dragOverIndex={dragOverIndex === index ? index : null}
             />
           ))}
         </div>

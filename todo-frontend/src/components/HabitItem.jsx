@@ -1,39 +1,59 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // 👈 useNavigate 임포트
+import { useNavigate } from 'react-router-dom';
 
-const HabitItem = ({ habit, todayString, onToggle, isCompletedToday }) => {
-  const navigate = useNavigate(); // 👈 useNavigate 훅 사용
-  // DB의 completedDates 배열에 오늘 날짜가 있는지 확인
+const HabitItem = ({ 
+  habit, 
+  todayString, 
+  onToggle, 
+  isCompletedToday,
+  onDragStart,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onDragEnd,
+  isDragging,
+  dragOverIndex
+}) => {
+  const navigate = useNavigate();
   const isChecked = isCompletedToday;
 
-  // 시간 정보를 표시하는 함수 (와이어프레임의 "오전 10:00" 등)
   const formatTime = (time) => {
-    // 실제 Habit 모델에는 시간 필드가 없으므로, 현재는 '매일' 등으로 임시 표시
-    // 와이어프레임처럼 "오전 10:00" 같은 필드를 원하시면 DB 모델에 time 필드를 추가해야 합니다.
     return '매일';
   };
 
-  // 습관이 어떤 카테고리인지 (와이어프레임의 "평일" 텍스트 역할)
-  // 현재는 카테고리 제목을 직접 가져올 수 없어 임시로 표시합니다.
   const categoryTitle = '평일';
 
-  // 상세 페이지 이동 핸들러
   const handleDetailClick = (e) => {
-    // 체크박스 클릭 이벤트 방지
     if (
       e.target.closest('.habit-checkbox') ||
+      e.target.closest('.drag-handle') ||
       e.target.className.includes('checkbox-input')
     ) {
       return;
     }
-    navigate(`/habits/${habit._id}`); // 👈 상세 페이지로 이동
+    navigate(`/habits/${habit._id}`);
   };
 
   return (
     <div
-      className={`habit-item ${isChecked ? 'completed' : ''}`}
+      className={`habit-item ${isChecked ? 'completed' : ''} ${isDragging ? 'dragging' : ''}`}
       onClick={handleDetailClick}
+      draggable={true}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
     >
+      {/* 드래그 핸들 (햄버거 아이콘) */}
+      <div
+        className='drag-handle'
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <span className='hamburger-icon'>☰</span>
+      </div>
+
       {/* 체크박스 영역 */}
       <div
         className='habit-checkbox'

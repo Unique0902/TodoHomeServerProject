@@ -103,3 +103,62 @@
   }
 }
 
+/* 습관 아이템 스타일 */
+.habit-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #eee;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.habit-item:hover {
+    background-color: #f8f9fa;
+}
+
+.habit-item.completed {
+    opacity: 0.6;
+}
+
+.habit-item.completed .habit-title {
+    text-decoration: line-through;
+}
+
+.habit-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.drag-handle {
+    cursor: grab;
+    padding: 8px 12px;
+    margin-right: 8px;
+    color: #999;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.drag-handle:hover {
+    color: #666;
+}
+
+.hamburger-icon {
+    font-size: 18px;
+    line-height: 1;
+    display: inline-block;
+    transform: rotate(90deg);
+}
+
+.habit-item[draggable="true"] {
+    cursor: default;
+}
+

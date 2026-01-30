@@ -17,6 +17,7 @@ const HabitSchema = new mongoose.Schema(
     // 습관을 완료한 날짜 배열
     completedDates: { type: [Date], default: [] },
     urls: { type: [HabitUrlSchema], default: [] }, // URL 배열
+    order: { type: Number, default: 0 }, // 순서 필드
   },
   { timestamps: true }
 );

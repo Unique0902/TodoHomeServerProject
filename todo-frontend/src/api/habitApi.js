@@ -129,3 +129,9 @@ export const deleteHabitUrl = async (habitId, urlId) => {
   const response = await api.delete(`/habits/${habitId}/urls/${urlId}`);
   return response.data;
 };
+
+// 19. 습관 순서 변경
+export const reorderHabits = async (habitIds) => {
+  const response = await api.patch('/habits/reorder', { habitIds });
+  return response.data;
+};

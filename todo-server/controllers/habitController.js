@@ -3,6 +3,16 @@ const Habit = require('../models/Habit');
 // 1. 습관 생성 (POST /habits)
 exports.createHabit = async (req, res) => {
   try {
+    // order가 제공되지 않으면 해당 카테고리의 최대 order + 1로 설정
+    if (req.body.order === undefined && req.body.habitCategoryId) {
+      const maxOrderHabit = await Habit.findOne({ habitCategoryId: req.body.habitCategoryId })
+        .sort({ order: -1 })
+        .select('order');
+      req.body.order = maxOrderHabit && maxOrderHabit.order !== undefined 
+        ? maxOrderHabit.order + 1 
+        : 0;
+    }
+    
     const habit = await Habit.create(req.body);
     res.status(201).json(habit);
   } catch (error) {
@@ -31,7 +41,29 @@ exports.getAllHabits = async (req, res) => {
       query.projectId = projectId;
     }
 
-    const habits = await Habit.find(query).sort({ createdAt: 1 });
+    // order 필드로 정렬, 없으면 createdAt으로 정렬 (기존 데이터 호환성)
+    let habits = await Habit.find(query).sort({ order: 1, createdAt: 1 });
+    
+    // order가 없는 습관들을 자동으로 마이그레이션 (기존 데이터 호환성)
+    const habitsWithoutOrder = habits.filter(h => h.order === undefined || h.order === null);
+    if (habitsWithoutOrder.length > 0) {
+      // 같은 카테고리/프로젝트 내에서 order가 있는 습관들의 최대 order 값 찾기
+      const habitsWithOrder = habits.filter(h => h.order !== undefined && h.order !== null);
+      let maxOrder = habitsWithOrder.length > 0 
+        ? Math.max(...habitsWithOrder.map(h => h.order))
+        : -1;
+      
+      // order가 없는 습관들에 순차적으로 order 값 부여
+      for (const habit of habitsWithoutOrder) {
+        maxOrder += 1;
+        habit.order = maxOrder;
+        await habit.save();
+      }
+      
+      // 다시 조회하여 업데이트된 order로 정렬
+      habits = await Habit.find(query).sort({ order: 1, createdAt: 1 });
+    }
+    
     res.status(200).json(habits);
   } catch (error) {
     res
@@ -247,5 +279,29 @@ exports.deleteHabitUrl = async (req, res) => {
     res.status(200).json(habit);
   } catch (error) {
     res.status(400).json({ message: 'URL 삭제 실패', error: error.message });
+  }
+};
+
+// 10. 습관 순서 일괄 업데이트 (PATCH /habits/reorder)
+exports.reorderHabits = async (req, res) => {
+  try {
+    const { habitIds } = req.body; // 순서대로 정렬된 습관 ID 배열
+    
+    if (!Array.isArray(habitIds) || habitIds.length === 0) {
+      return res.status(400).json({ message: '습관 ID 배열이 필요합니다.' });
+    }
+
+    // 각 습관의 order를 배열 인덱스로 업데이트
+    const updatePromises = habitIds.map((habitId, index) => 
+      Habit.findByIdAndUpdate(habitId, { order: index }, { new: true })
+    );
+
+    await Promise.all(updatePromises);
+    
+    // 업데이트된 습관 목록 반환
+    const updatedHabits = await Habit.find({ _id: { $in: habitIds } }).sort({ order: 1 });
+    res.status(200).json(updatedHabits);
+  } catch (error) {
+    res.status(400).json({ message: '습관 순서 업데이트 실패', error: error.message });
   }
 };

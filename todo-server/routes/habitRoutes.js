@@ -10,6 +10,7 @@ router
 
 // **[새로운 커스텀 엔드포인트 추가]**
 router.post('/reset-completions', habitController.resetCompletions); // POST /api/v1/habits/reset-completions
+router.patch('/reorder', habitController.reorderHabits); // PATCH /api/v1/habits/reorder (순서 변경)
 
 // URL 관련 라우팅 (습관 ID 하위 경로) - :id 라우트보다 먼저 정의
 router.post('/:id/urls', habitController.addHabitUrl); // POST /api/v1/habits/:id/urls (URL 추가)
