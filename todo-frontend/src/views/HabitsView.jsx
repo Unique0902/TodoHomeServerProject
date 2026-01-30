@@ -156,9 +156,44 @@ const HabitsView = () => {
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.target);
+    
+    // 드래그 핸들에서 시작된 경우, 부모 habit-item을 찾아서 드래그 이미지로 설정
+    const dragHandle = e.target.closest('.drag-handle');
+    const habitItem = dragHandle ? dragHandle.closest('.habit-item') : e.currentTarget.closest('.habit-item');
+    
+    if (habitItem) {
+      // 원본 요소를 복제하여 드래그 이미지로 사용
+      const dragImage = habitItem.cloneNode(true);
+      dragImage.style.width = habitItem.offsetWidth + 'px';
+      dragImage.style.opacity = '0.9';
+      dragImage.style.position = 'absolute';
+      dragImage.style.top = '-1000px';
+      dragImage.style.left = '-1000px';
+      dragImage.style.pointerEvents = 'none';
+      dragImage.style.backgroundColor = '#fff';
+      dragImage.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+      dragImage.style.borderRadius = '4px';
+      document.body.appendChild(dragImage);
+      
+      // 드래그 이미지 설정 (마우스 오프셋 조정)
+      const itemRect = habitItem.getBoundingClientRect();
+      const handleRect = dragHandle?.getBoundingClientRect();
+      const offsetX = handleRect ? e.clientX - itemRect.left : 20;
+      const offsetY = handleRect ? e.clientY - itemRect.top : itemRect.height / 2;
+      
+      e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+      
+      // 드래그 종료 후 복제본 제거를 위해 setTimeout 사용
+      setTimeout(() => {
+        if (document.body.contains(dragImage)) {
+          document.body.removeChild(dragImage);
+        }
+      }, 0);
+    }
+    
     // 드래그 중인 요소는 반투명하게
-    if (e.target.classList) {
-      e.target.classList.add('dragging');
+    if (habitItem) {
+      habitItem.classList.add('dragging');
     }
   };
 

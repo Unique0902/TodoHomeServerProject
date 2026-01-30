@@ -38,26 +38,9 @@ const HabitItem = ({
   };
 
   // 햄버거 아이콘에서만 드래그 시작
-  const handleDragHandleMouseDown = (e) => {
+  const handleDragHandleDragStart = (e) => {
     e.stopPropagation();
-    if (itemRef.current) {
-      itemRef.current.setAttribute('draggable', 'true');
-    }
-  };
-
-  const handleDragHandleMouseUp = (e) => {
-    e.stopPropagation();
-    if (itemRef.current) {
-      itemRef.current.setAttribute('draggable', 'false');
-    }
-  };
-
-  const handleItemDragStart = (e) => {
-    // 드래그 핸들에서 시작된 경우에만 드래그 허용
-    if (!e.target.closest('.drag-handle') && !dragHandleRef.current?.contains(e.target)) {
-      e.preventDefault();
-      return;
-    }
+    // 드래그 핸들에서 드래그 시작 시 전체 아이템 정보를 전달
     onDragStart(e, index);
   };
 
@@ -67,7 +50,6 @@ const HabitItem = ({
       className={`habit-item ${isChecked ? 'completed' : ''} ${isDragging ? 'dragging' : ''}`}
       onClick={handleDetailClick}
       draggable={false}
-      onDragStart={handleItemDragStart}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
@@ -78,13 +60,8 @@ const HabitItem = ({
         ref={dragHandleRef}
         className='drag-handle'
         onClick={(e) => e.stopPropagation()}
-        onMouseDown={handleDragHandleMouseDown}
-        onMouseUp={handleDragHandleMouseUp}
         draggable={true}
-        onDragStart={(e) => {
-          e.stopPropagation();
-          onDragStart(e, index);
-        }}
+        onDragStart={handleDragHandleDragStart}
       >
         <span className='hamburger-icon'>☰</span>
       </div>
