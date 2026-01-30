@@ -167,7 +167,24 @@ const HabitsView = () => {
     e.dataTransfer.dropEffect = 'move';
     
     // 같은 인덱스면 무시
-    if (draggedIndex === index) return;
+    if (draggedIndex === index) {
+      // 같은 인덱스에서도 스타일 초기화
+      const targetElement = e.currentTarget;
+      targetElement.style.borderTop = '';
+      targetElement.style.borderBottom = '';
+      targetElement.style.paddingTop = '';
+      targetElement.style.paddingBottom = '';
+      return;
+    }
+    
+    // 모든 습관 아이템의 스타일을 먼저 초기화
+    const allItems = document.querySelectorAll('.habit-item');
+    allItems.forEach((item) => {
+      item.style.borderTop = '';
+      item.style.borderBottom = '';
+      item.style.paddingTop = '';
+      item.style.paddingBottom = '';
+    });
     
     setDragOverIndex(index);
     
@@ -189,17 +206,26 @@ const HabitsView = () => {
   const handleDragLeave = (e) => {
     // 다른 요소로 이동할 때 스타일 초기화
     const targetElement = e.currentTarget;
-    targetElement.style.borderTop = '';
-    targetElement.style.borderBottom = '';
-    targetElement.style.paddingTop = '';
-    targetElement.style.paddingBottom = '';
+    // relatedTarget이 자식 요소인지 확인 (실제로 떠나는 경우만)
+    if (!targetElement.contains(e.relatedTarget)) {
+      targetElement.style.borderTop = '';
+      targetElement.style.borderBottom = '';
+      targetElement.style.paddingTop = '';
+      targetElement.style.paddingBottom = '';
+    }
   };
 
   const handleDragEnd = (e) => {
-    // 모든 스타일 초기화
-    if (e.target.classList) {
-      e.target.classList.remove('dragging');
-    }
+    // 모든 습관 아이템의 스타일 초기화
+    const allItems = document.querySelectorAll('.habit-item');
+    allItems.forEach((item) => {
+      item.style.borderTop = '';
+      item.style.borderBottom = '';
+      item.style.paddingTop = '';
+      item.style.paddingBottom = '';
+      item.classList.remove('dragging');
+    });
+    
     setDraggedIndex(null);
     setDragOverIndex(null);
   };
@@ -207,12 +233,15 @@ const HabitsView = () => {
   const handleDrop = async (e, dropIndex) => {
     e.preventDefault();
     
-    // 스타일 초기화
-    const targetElement = e.currentTarget;
-    targetElement.style.borderTop = '';
-    targetElement.style.borderBottom = '';
-    targetElement.style.paddingTop = '';
-    targetElement.style.paddingBottom = '';
+    // 모든 습관 아이템의 스타일 초기화
+    const allItems = document.querySelectorAll('.habit-item');
+    allItems.forEach((item) => {
+      item.style.borderTop = '';
+      item.style.borderBottom = '';
+      item.style.paddingTop = '';
+      item.style.paddingBottom = '';
+      item.classList.remove('dragging');
+    });
     
     if (draggedIndex === null || draggedIndex === dropIndex) {
       setDraggedIndex(null);
