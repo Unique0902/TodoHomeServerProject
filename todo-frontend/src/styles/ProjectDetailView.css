@@ -148,34 +148,34 @@
 }
 
 .status-button.selected {
-    border-color: #007bff;
-    background-color: #e7f3ff;
-    color: #007bff;
+    border-color: var(--accent);
+    background-color: var(--bg-tertiary);
+    color: var(--accent);
     font-weight: 600;
 }
 
 .status-button.completed.selected {
-    border-color: #28a745;
-    background-color: #d4edda;
-    color: #28a745;
+    border-color: var(--success);
+    background-color: var(--bg-tertiary);
+    color: var(--success);
 }
 
 .status-button.paused.selected {
-    border-color: #ff9800;
-    background-color: #fff3e0;
-    color: #ff9800;
+    border-color: var(--warning);
+    background-color: var(--bg-tertiary);
+    color: var(--warning);
 }
 
 .status-button.wish.selected {
     border-color: #9c27b0;
-    background-color: #f3e5f5;
+    background-color: var(--bg-tertiary);
     color: #9c27b0;
 }
 
 .status-button.active.selected {
-    border-color: #007bff;
-    background-color: #e7f3ff;
-    color: #007bff;
+    border-color: var(--accent);
+    background-color: var(--bg-tertiary);
+    color: var(--accent);
 }
 
 /* --- 준비물 섹션 스타일 --- */
@@ -186,10 +186,11 @@
 }
 
 .budget-info {
-    background-color: #f8f9fa;
+    background-color: var(--bg-secondary);
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 15px;
+    transition: background-color 0.3s ease;
 }
 
 .budget-item {
@@ -214,7 +215,8 @@
 }
 
 .budget-value.remaining {
-    color: #dc3545;
+    color: var(--danger);
+    transition: color 0.3s ease;
 }
 
 .project-items-list {
@@ -225,7 +227,8 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px dashed #eee;
+    border-bottom: 1px dashed var(--border-dashed);
+    transition: border-color 0.3s ease;
 }
 
 .project-item-row:last-child {
@@ -292,11 +295,11 @@
 
 .item-edit-button:hover {
     color: var(--accent);
-    background-color: #f0f7ff;
+    background-color: var(--bg-tertiary);
 }
 
 .item-edit-save-button {
-    background: #28a745;
+    background: var(--success);
     border: none;
     color: white;
     cursor: pointer;
@@ -310,13 +313,14 @@
 }
 
 .item-edit-save-button:hover {
-    background: #218838;
+    background: var(--success);
+    opacity: 0.9;
 }
 
 .item-edit-cancel-button {
-    background: #6c757d;
+    background: var(--bg-tertiary);
     border: none;
-    color: white;
+    color: var(--text-primary);
     cursor: pointer;
     font-size: 14px;
     padding: 6px 12px;
@@ -328,7 +332,8 @@
 }
 
 .item-edit-cancel-button:hover {
-    background: #5a6268;
+    background: var(--bg-tertiary);
+    opacity: 0.8;
 }
 
 .item-delete-button {
@@ -337,12 +342,13 @@
     font-size: 18px;
     cursor: pointer;
     padding: 5px;
-    color: #999;
+    color: var(--text-tertiary);
     margin-left: 10px;
+    transition: color 0.2s;
 }
 
 .item-delete-button:hover {
-    color: #dc3545;
+    color: var(--danger);
 }
 
 .add-item-button {
@@ -358,14 +364,15 @@
 }
 
 .add-item-button:hover {
-    background-color: #e9ecef;
+    background-color: var(--bg-tertiary);
 }
 
 .item-add-form {
-    background-color: #f8f9fa;
+    background-color: var(--bg-secondary);
     padding: 15px;
     border-radius: 8px;
     margin-top: 10px;
+    transition: background-color 0.3s ease;
 }
 
 .form-row {
@@ -378,9 +385,12 @@
 .item-price-input {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
 }
 
 .form-actions {
@@ -399,21 +409,22 @@
 }
 
 .item-add-confirm-button {
-    background-color: #007bff;
+    background-color: var(--accent);
     color: white;
 }
 
 .item-add-confirm-button:hover {
-    background-color: #0056b3;
+    background-color: var(--accent-hover);
 }
 
 .item-add-cancel-button {
-    background-color: #6c757d;
-    color: white;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .item-add-cancel-button:hover {
-    background-color: #545b62;
+    background-color: var(--bg-tertiary);
+    opacity: 0.8;
 }
 
 /* --- URL 섹션 스타일 --- */
@@ -425,7 +436,8 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed var(--border-dashed);
+    transition: border-color 0.3s ease;
 }
 
 .url-item-row:last-child {
@@ -442,10 +454,11 @@
 }
 
 .url-link:hover {
-    background-color: #f8f9fa;
+    background-color: var(--bg-secondary);
     padding: 4px;
     border-radius: 4px;
     margin: -4px;
+    transition: background-color 0.2s;
 }
 
 .url-title {
@@ -474,7 +487,7 @@
 }
 
 .url-delete-button:hover {
-    color: #dc3545;
+    color: var(--danger);
 }
 
 /* --- 하위 할일 목록 스타일 --- */
@@ -484,21 +497,25 @@
     font-weight: 700;
     margin-top: 30px;
     margin-bottom: 15px;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 5px;
+    color: var(--text-primary);
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .completed-sub-title {
     font-size: 16px;
-    color: #888;
+    color: var(--text-secondary);
     margin-top: 20px;
     margin-bottom: 10px;
+    transition: color 0.3s ease;
 }
 
 .empty-message.small {
     padding: 10px;
     font-size: 14px;
-    color: #999;
+    color: var(--text-tertiary);
+    transition: color 0.3s ease;
 }
 
 /* --- 하단 액션 버튼 (할일 추가 버튼) --- */
@@ -517,12 +534,12 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #007bff; /* Todo의 기본 파란색 */
+    background-color: var(--accent);
     color: white;
     font-size: 30px;
     line-height: 1;
     border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px var(--shadow);
     cursor: pointer;
 }
 
@@ -549,7 +566,7 @@
 }
 
 .add-menu {
-    background-color: white;
+    background-color: var(--bg-primary);
     border-radius: 20px 20px 0 0;
     padding: 20px;
     width: 100%;
@@ -557,37 +574,41 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -4px 8px var(--shadow);
+    transition: background-color 0.3s ease;
 }
 
 .add-menu-item {
     padding: 15px;
-    background-color: #f8f9fa;
+    background-color: var(--bg-secondary);
     border: none;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
     text-align: left;
     transition: background-color 0.2s;
+    color: var(--text-primary);
 }
 
 .add-menu-item:hover {
-    background-color: #e9ecef;
+    background-color: var(--bg-tertiary);
 }
 
 .add-menu-cancel {
     padding: 15px;
-    background-color: #6c757d;
-    color: white;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
     border: none;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
     margin-top: 10px;
+    transition: background-color 0.2s;
 }
 
 .add-menu-cancel:hover {
-    background-color: #545b62;
+    background-color: var(--bg-tertiary);
+    opacity: 0.8;
 }
 
 /* 프로젝트 습관 섹션 스타일 */
