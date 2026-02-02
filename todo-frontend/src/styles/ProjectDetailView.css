@@ -5,7 +5,9 @@
     max-width: 600px;
     margin: 0 auto;
     /* 하단 버튼을 위해 공간 확보 */
-    padding-bottom: 120px; 
+    padding-bottom: 120px;
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease;
 }
 
 /* 상단 헤더 스타일 재정의 */
@@ -14,9 +16,10 @@
     align-items: center;
     justify-content: space-between; /* 요소들을 양 끝으로 분리 */
     margin-bottom: 30px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     padding-top: 10px;
+    transition: border-color 0.3s ease;
 }
 
 .back-button {
@@ -25,8 +28,9 @@
     font-size: 24px;
     cursor: pointer;
     padding: 5px 15px 5px 0;
-    color: #333;
+    color: var(--text-primary);
     font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 .title {
@@ -39,6 +43,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 /* 우측 상단 관리 버튼 그룹 */
@@ -57,11 +63,13 @@
 }
 
 .edit-button-icon {
-    color: #ffc107; /* 노란색 (수정) */
+    color: var(--warning);
+    transition: color 0.3s ease;
 }
 
 .delete-button-icon {
-    color: #dc3545; /* 빨간색 (삭제) */
+    color: var(--danger);
+    transition: color 0.3s ease;
 }
 
 
@@ -71,20 +79,23 @@
     display: flex;
     flex-direction: column;
     padding: 15px 0;
-    border-bottom: 1px dashed #eee;
+    border-bottom: 1px dashed var(--border-dashed);
+    transition: border-color 0.3s ease;
 }
 
 .label {
     font-size: 14px;
     font-weight: 600;
-    color: #888;
+    color: var(--text-secondary);
     margin-bottom: 5px;
+    transition: color 0.3s ease;
 }
 
 .value {
     font-size: 18px;
-    color: #333;
+    color: var(--text-primary);
     line-height: 1.5;
+    transition: color 0.3s ease;
 }
 
 .value.description {
@@ -93,20 +104,20 @@
 }
 
 .value.status.completed {
-    color: #28a745; /* 초록색 (완료) */
+    color: var(--success);
     font-weight: bold;
 }
 
 .value.status.active {
-    color: #333; /* 기본 색상 (진행중) */
+    color: var(--text-primary);
 }
 
 .value.status.paused {
-    color: #ff9800; /* 오렌지색 (정지됨) */
+    color: var(--warning);
 }
 
 .value.status.wish {
-    color: #9c27b0; /* 보라색 (위시) */
+    color: #9c27b0; /* 보라색 (위시) - 다크모드에서도 유지 */
 }
 
 /* 상태 버튼 컨테이너 */
@@ -121,19 +132,19 @@
     flex: 1;
     min-width: 80px;
     padding: 10px 12px;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
-    background-color: #fff;
+    background-color: var(--bg-primary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .status-button:hover {
-    background-color: #f8f9fa;
-    border-color: #bbb;
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
 }
 
 .status-button.selected {
@@ -190,14 +201,16 @@
 
 .budget-label {
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .budget-value {
     font-size: 16px;
     font-weight: bold;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .budget-value.remaining {
@@ -241,22 +254,25 @@
 
 .item-name {
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .item-price {
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
     margin-top: 4px;
+    transition: color 0.3s ease;
 }
 
 .item-purchase-date {
     font-size: 12px;
-    color: #999;
+    color: var(--text-tertiary);
     margin-left: auto;
     margin-right: 10px;
     white-space: nowrap;
     font-style: italic;
+    transition: color 0.3s ease;
 }
 
 .item-edit-button {
@@ -265,7 +281,7 @@
     cursor: pointer;
     font-size: 16px;
     padding: 6px 8px;
-    color: #666;
+    color: var(--text-secondary);
     transition: all 0.2s;
     border-radius: 4px;
     display: flex;
@@ -275,7 +291,7 @@
 }
 
 .item-edit-button:hover {
-    color: #007bff;
+    color: var(--accent);
     background-color: #f0f7ff;
 }
 
@@ -332,13 +348,13 @@
 .add-item-button {
     width: 100%;
     padding: 12px;
-    background-color: #f8f9fa;
-    border: 1px dashed #ddd;
+    background-color: var(--bg-secondary);
+    border: 1px dashed var(--border-color);
     border-radius: 8px;
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .add-item-button:hover {
@@ -434,14 +450,16 @@
 
 .url-title {
     font-size: 16px;
-    color: #007bff;
+    color: var(--accent);
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .url-address {
     font-size: 12px;
-    color: #999;
+    color: var(--text-tertiary);
     word-break: break-all;
+    transition: color 0.3s ease;
 }
 
 .url-delete-button {
@@ -450,8 +468,9 @@
     cursor: pointer;
     font-size: 16px;
     padding: 5px;
-    color: #999;
+    color: var(--text-tertiary);
     margin-left: 10px;
+    transition: color 0.2s;
 }
 
 .url-delete-button:hover {
@@ -583,7 +602,8 @@
 
 .project-habit-item {
     padding: 12px 0;
-    border-bottom: 1px dashed #eee;
+    border-bottom: 1px dashed var(--border-dashed);
+    transition: border-color 0.3s ease;
 }
 
 .project-habit-item:last-child {

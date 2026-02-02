@@ -4,9 +4,9 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed var(--border-dashed);
     cursor: pointer;
-    transition: background-color 0.1s;
+    transition: background-color 0.1s, border-color 0.3s ease;
 }
 
 .project-item:last-child {
@@ -21,10 +21,11 @@
 .checkbox-input {
     width: 20px;
     height: 20px;
-    border: 2px solid #ccc; 
+    border: 2px solid var(--border-color); 
     border-radius: 4px; 
     cursor: pointer;
-    accent-color: #007bff;
+    accent-color: var(--accent);
+    transition: border-color 0.3s ease;
 }
 
 .project-content {
@@ -35,19 +36,21 @@
 
 .project-title {
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .project-todo-stats {
     font-size: 12px;
-    color: #999;
+    color: var(--text-tertiary);
     margin-top: 4px;
+    transition: color 0.3s ease;
 }
 
 /* 완료된 프로젝트 스타일 */
 .project-item.completed .project-title {
     text-decoration: line-through; 
-    color: #999; 
+    color: var(--text-tertiary); 
 }
 
 /* 정지된 프로젝트 스타일 */

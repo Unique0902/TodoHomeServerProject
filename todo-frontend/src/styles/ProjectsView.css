@@ -4,6 +4,8 @@
     padding: 20px;
     max-width: 600px;
     margin: 0 auto;
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease;
 }
 
 .main-title {
@@ -11,6 +13,8 @@
     font-weight: bold;
     text-align: center;
     margin-bottom: 25px;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .section-header {
@@ -21,7 +25,8 @@
     margin-top: 25px;
     margin-bottom: 10px;
     padding-bottom: 5px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .section-header .section-title {
@@ -30,13 +35,15 @@
     margin: 0;
     border-bottom: none !important;
     padding-bottom: 0;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .section-toggle-button {
     background: none;
     border: none;
     font-size: 16px;
-    color: #666;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 0;
     width: 24px;
@@ -48,7 +55,7 @@
 }
 
 .section-toggle-button:hover {
-    color: #007bff;
+    color: var(--accent);
 }
 
 .completed-section .section-header {
@@ -56,13 +63,15 @@
 }
 
 .completed-label {
-    color: #888;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
 }
 
 .empty-message {
     text-align: center;
-    color: #999;
+    color: var(--text-tertiary);
     padding: 20px;
+    transition: color 0.3s ease;
 }
 
 /* 프로젝트 추가 버튼 (TodoAddView 스타일 재활용) */
@@ -73,12 +82,12 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #007bff; /* 파란색 계열 */
+    background-color: var(--accent);
     color: white;
     font-size: 30px;
     line-height: 1;
     border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px var(--shadow);
     cursor: pointer;
     z-index: 100;
 }

@@ -4,9 +4,9 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed var(--border-dashed);
     cursor: pointer;
-    transition: background-color 0.1s;
+    transition: background-color 0.1s, border-color 0.3s ease;
 }
 
 .wishlist-item:last-child {
@@ -21,20 +21,22 @@
 .checkbox-input {
     width: 20px;
     height: 20px;
-    border: 2px solid #ccc; 
+    border: 2px solid var(--border-color); 
     border-radius: 4px; 
     cursor: pointer;
-    accent-color: #ffc107; /* 위시리스트 고유 색상 (노란색 계열) */
+    accent-color: var(--warning);
+    transition: border-color 0.3s ease;
 }
 
 .wishlist-title {
     flex-grow: 1; 
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 /* 완료된 위시리스트 스타일 */
 .wishlist-item.completed .wishlist-title {
     text-decoration: line-through; 
-    color: #999; 
+    color: var(--text-tertiary); 
 }

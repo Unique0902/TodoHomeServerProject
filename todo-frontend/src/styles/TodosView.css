@@ -122,9 +122,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed var(--border-dashed);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.3s ease;
 }
 
 .todo-item:last-child {
@@ -139,10 +139,11 @@
 .checkbox-input {
     width: 20px;
     height: 20px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
-    accent-color: #007bff;
+    accent-color: var(--accent);
+    transition: border-color 0.3s ease;
 }
 
 .todo-title-section {
@@ -154,14 +155,16 @@
 
 .todo-title {
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .todo-project-name {
     font-size: 12px;
-    color: #007bff;
+    color: var(--accent);
     margin-top: 4px;
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .todo-time-section {
@@ -174,15 +177,16 @@
 
 .todo-time {
     font-size: 14px;
-    color: #999;
+    color: var(--text-tertiary);
     font-style: italic;
     text-align: right;
+    transition: color 0.3s ease;
 }
 
 .today-button {
     flex-shrink: 0;
     padding: 6px 12px;
-    background-color: #007bff;
+    background-color: var(--accent);
     color: white;
     border: none;
     border-radius: 4px;
@@ -194,16 +198,17 @@
 }
 
 .today-button:hover {
-    background-color: #0056b3;
+    background-color: var(--accent-hover);
 }
 
 .today-button:active {
-    background-color: #004085;
+    background-color: var(--accent-hover);
+    opacity: 0.8;
 }
 
 .todo-item.completed .todo-title {
     text-decoration: line-through;
-    color: #999;
+    color: var(--text-tertiary);
 }
 
 /* 할일 목록 섹션 (HomeView.css와 유사하게 스타일링) */
@@ -215,7 +220,8 @@
     margin-top: 25px;
     margin-bottom: 10px;
     padding-bottom: 5px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .section-header .section-title {
@@ -230,7 +236,7 @@
     background: none;
     border: none;
     font-size: 16px;
-    color: #666;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 0;
     width: 24px;
@@ -242,7 +248,7 @@
 }
 
 .section-toggle-button:hover {
-    color: #007bff;
+    color: var(--accent);
 }
 
 .completed-section .section-header {
@@ -251,8 +257,9 @@
 
 .loading-message, .empty-message {
     text-align: center;
-    color: #999;
+    color: var(--text-tertiary);
     padding: 20px;
+    transition: color 0.3s ease;
 }
 
 /* 할일 추가 버튼 (AddButton) */
@@ -263,12 +270,12 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #007bff;
+    background-color: var(--accent);
     color: white;
     font-size: 30px;
     line-height: 1;
     border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px var(--shadow);
     cursor: pointer;
     z-index: 100;
 }
@@ -281,13 +288,15 @@
     margin-top: 25px;
     margin-bottom: 10px;
     padding-bottom: 5px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .category-title {
     font-size: 16px;
     font-weight: 600;
-    color: #444;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .category-edit-button {
@@ -296,12 +305,13 @@
     cursor: pointer;
     font-size: 18px;
     padding: 5px;
-    color: #666;
+    color: var(--text-secondary);
+    transition: color 0.2s;
     transition: color 0.2s;
 }
 
 .category-edit-button:hover {
-    color: #007bff;
+    color: var(--accent);
 }
 
 /* 습관 추가 버튼 (AddButton) */

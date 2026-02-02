@@ -38,18 +38,21 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 0;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--border-dashed);
+    transition: border-color 0.3s ease;
 }
 
 .category-text {
     font-size: 16px;
     cursor: pointer;
     flex-grow: 1;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .category-item.selected .category-text {
     font-weight: bold;
-    color: #007bff;
+    color: var(--accent);
 }
 
 .edit-button {
@@ -58,13 +61,13 @@
     cursor: pointer;
     font-size: 18px;
     padding: 5px;
-    color: #999;
+    color: var(--text-tertiary);
     margin-left: 5px;
     transition: color 0.2s;
 }
 
 .edit-button:hover {
-    color: #007bff;
+    color: var(--accent);
 }
 
 .delete-button {
@@ -73,7 +76,7 @@
     cursor: pointer;
     font-size: 18px;
     padding: 5px;
-    color: #999;
+    color: var(--text-tertiary);
     margin-left: 5px;
     transition: color 0.2s;
 }
