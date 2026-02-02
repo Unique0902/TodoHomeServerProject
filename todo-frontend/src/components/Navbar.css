@@ -30,13 +30,14 @@
     left: 0;
     width: 100%;
     height: 60px; 
-    background-color: #ffffff; /* 배경색을 확실히 흰색으로 */
-    border-top: 1px solid #ddd;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* 약간의 그림자 추가 */
+    background-color: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -2px 5px var(--shadow);
     display: flex;
     justify-content: space-around; 
     align-items: center;
     z-index: 1000;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .nav-item {
@@ -44,13 +45,14 @@
     flex-direction: column;
     align-items: center;
     text-decoration: none; 
-    color: #999; /* 기본 색상 연하게 */
+    color: var(--text-secondary);
     font-size: 11px; /* 글자 크기 조정 */
     padding: 5px;
+    transition: color 0.3s ease;
 }
 
 .nav-item.active {
-    color: #007bff; /* 활성화된 항목 색상 */
+    color: var(--accent);
     font-weight: bold;
 }
 

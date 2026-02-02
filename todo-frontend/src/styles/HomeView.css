@@ -5,8 +5,9 @@
     padding: 20px;
     max-width: 600px;
     margin: 0 auto;
-    background-color: #ffffff; /* 배경색 다시 확인 */
+    background-color: var(--bg-primary);
     min-height: 100%; /* 콘텐츠가 적어도 전체 높이를 차지하도록 */
+    transition: background-color 0.3s ease;
 }
 
 /* 상단 헤더 */
@@ -21,15 +22,17 @@
 .main-title {
     font-size: 32px;
     font-weight: 900;
-    color: #1a1a1a; 
+    color: var(--text-primary); 
     margin-bottom: 5px;
+    transition: color 0.3s ease;
 }
 
 .date-info {
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
     display: flex;
     gap: 8px;
+    transition: color 0.3s ease;
 }
 
 /* 섹션 타이틀 (할일, 습관, 완료) */
@@ -38,11 +41,12 @@
     font-weight: 700;
     margin-top: 25px; /* 섹션 간격 */
     margin-bottom: 10px;
-    color: #333;
+    color: var(--text-primary);
     /* 와이어프레임의 수평선을 CSS로 구현 */
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 5px;
     width: 100%; /* 너비를 꽉 채우도록 */
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 /* 할일 아이템 공통 스타일 */
@@ -51,9 +55,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed var(--border-dashed);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.3s ease;
 }
 
 .todo-item:last-child {
@@ -69,10 +73,11 @@
 .checkbox-input {
     width: 20px;
     height: 20px;
-    border: 2px solid #ccc; /* 와이어프레임처럼 테두리 강조 */
+    border: 2px solid var(--border-color); /* 와이어프레임처럼 테두리 강조 */
     border-radius: 4px; /* 약간의 둥근 모서리 */
     cursor: pointer;
-    accent-color: #007bff;
+    accent-color: var(--accent);
+    transition: border-color 0.3s ease;
 }
 
 .todo-title-section {
@@ -84,14 +89,16 @@
 
 .todo-title {
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .todo-project-name {
     font-size: 12px;
-    color: #007bff;
+    color: var(--accent);
     margin-top: 4px;
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .todo-time-section {
@@ -104,15 +111,16 @@
 
 .todo-time {
     font-size: 14px;
-    color: #999; 
+    color: var(--text-tertiary); 
     font-style: italic;
     text-align: right;
+    transition: color 0.3s ease;
 }
 
 .today-button {
     flex-shrink: 0;
     padding: 6px 12px;
-    background-color: #007bff;
+    background-color: var(--accent);
     color: white;
     border: none;
     border-radius: 4px;
@@ -124,7 +132,7 @@
 }
 
 .today-button:hover {
-    background-color: #0056b3;
+    background-color: var(--accent-hover);
 }
 
 .today-button:active {
@@ -134,23 +142,25 @@
 /* 완료된 할일 (Completed) 스타일 */
 .todo-item.completed .todo-title {
     text-decoration: line-through; 
-    color: #999; 
+    color: var(--text-tertiary); 
 }
 
 .completed-label {
-    color: #888;
+    color: var(--text-secondary);
     margin-top: 40px; 
+    transition: color 0.3s ease;
 }
 
 .todo-list.completed-list .todo-item {
-    border-bottom: 1px dashed #f0f0f0; /* 완료 목록도 구분선 유지 */
+    border-bottom: 1px dashed var(--border-dashed); /* 완료 목록도 구분선 유지 */
     padding-left: 5px; 
 }
 
 .empty-message {
     text-align: center;
-    color: #999;
+    color: var(--text-tertiary);
     padding: 20px;
+    transition: color 0.3s ease;
 }
 
 /* ... 기존 Todo 섹션 및 공통 스타일 ... */
@@ -162,13 +172,15 @@
     align-items: center;
     margin-bottom: 10px;
     padding: 5px 0;
-    border-bottom: 1px dashed #ddd;
+    border-bottom: 1px dashed var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .habit-category-info {
     font-size: 16px;
     font-weight: 600;
-    color: #444;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .category-edit-button {
@@ -177,12 +189,12 @@
     cursor: pointer;
     font-size: 18px;
     padding: 5px;
-    color: #666;
+    color: var(--text-secondary);
     transition: color 0.2s;
 }
 
 .category-edit-button:hover {
-    color: #007bff;
+    color: var(--accent);
 }
 
 /* 습관 아이템 스타일 (HabitItem.css에 넣을 수도 있지만 일단 통합) */
@@ -191,25 +203,56 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed var(--border-dashed);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.3s ease;
 }
 
 .habit-item.completed .habit-title {
     /* 습관은 완료되어도 줄이 그어지지 않음 (요청 사항) */
-    color: #444; 
+    color: var(--text-secondary); 
 }
 
 .habit-title {
     flex-grow: 1;
     margin: 0 10px;
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .habit-meta {
     font-size: 12px;
-    color: #888;
+    color: var(--text-tertiary);
     margin-top: 2px;
+    transition: color 0.3s ease;
+}
+
+/* 다크모드 토글 버튼 */
+.dark-mode-section {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px dashed var(--border-dashed);
+    transition: border-color 0.3s ease;
+}
+
+.dark-mode-toggle {
+    padding: 12px 24px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dark-mode-toggle:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow);
 }

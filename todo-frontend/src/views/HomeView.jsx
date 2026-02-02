@@ -7,6 +7,7 @@ import {
   toggleHabitCompletion,
 } from '../api/habitApi'; // Habit API 임포트
 import { getProjects } from '../api/projectApi';
+import { useDarkMode } from '../contexts/DarkModeContext';
 import TodoItem from '../components/TodoItem';
 import HabitItem from '../components/HabitItem';
 import '../styles/HomeView.css';
@@ -22,6 +23,7 @@ const getTodayDateString = () => {
 
 const HomeView = () => {
   const navigate = useNavigate(); // 페이지 이동 훅
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [todos, setTodos] = useState([]);
   const [habits, setHabits] = useState([]);
   const [projects, setProjects] = useState([]); // 프로젝트 목록
@@ -214,6 +216,13 @@ const HomeView = () => {
             />
           ))}
         </div>
+      </section>
+
+      {/* 다크모드 토글 버튼 */}
+      <section className='dark-mode-section'>
+        <button className='dark-mode-toggle' onClick={toggleDarkMode}>
+          {isDarkMode ? '☀️ 라이트 모드' : '🌙 다크 모드'}
+        </button>
       </section>
     </div>
   );
