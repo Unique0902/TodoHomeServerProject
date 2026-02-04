@@ -633,18 +633,22 @@
 
 .project-habit-item .habit-title {
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .project-habit-item .habit-description {
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
     margin-top: 4px;
+    transition: color 0.3s ease;
 }
 
 .project-status-badge {
     font-size: 13px;
     margin-top: 6px;
     font-weight: 500;
+    color: var(--text-tertiary);
+    transition: color 0.3s ease;
 }
