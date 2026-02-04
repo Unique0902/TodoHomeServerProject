@@ -48,8 +48,9 @@
 .sub-projects-list {
   width: 100%;
   margin-left: 20px;
-  border-left: 2px solid #e0e0e0;
+  border-left: 2px solid var(--border-color);
   padding-left: 10px;
+  transition: border-color 0.3s ease;
 }
 
 .sub-projects-category {
@@ -59,7 +60,7 @@
 .sub-projects-category-header {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   padding: 5px 0;
   margin-bottom: 5px;
   border-bottom: 1px solid var(--border-color);
