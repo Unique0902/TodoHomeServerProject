@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위해 추가
 import { getTodos, updateTodoStatus } from '../api/todoApi';
 import {
@@ -30,6 +30,9 @@ const HomeView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [todayCategory, setTodayCategory] = useState(null); // 오늘 선택된 습관 카테고리
+  
+  // 스크롤 위치 저장용 ref
+  const scrollPositionRef = useRef(0);
 
   const todayString = getTodayDateString();
 
@@ -83,9 +86,19 @@ const HomeView = () => {
 
   // --- 2. 할일 (Todo) 토글 로직 ---
   const handleTodoToggle = async (todo) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
-      fetchHomeData();
+      
+      // 데이터 갱신
+      await fetchHomeData();
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('할일 상태 업데이트 실패!');
     }
@@ -93,6 +106,9 @@ const HomeView = () => {
 
   // --- 3. 습관 (Habit) 토글 로직 ---
   const handleHabitToggle = async (habit, isCurrentlyCompleted) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       // isCurrentlyCompleted: DB의 completedDates 배열에 오늘 날짜가 있는지 여부
       await toggleHabitCompletion(
@@ -100,7 +116,14 @@ const HomeView = () => {
         !isCurrentlyCompleted,
         todayString
       );
-      fetchHomeData(); // 상태 갱신
+      
+      // 데이터 갱신
+      await fetchHomeData();
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('습관 완료 상태 업데이트 실패!');
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   getProjectById,
@@ -39,6 +39,9 @@ const ProjectDetailView = () => {
   const [newUrlTitle, setNewUrlTitle] = useState(''); // 새 URL 제목
   const [newUrl, setNewUrl] = useState(''); // 새 URL
   const [showAddMenu, setShowAddMenu] = useState(false); // 추가 메뉴 표시 여부
+  
+  // 스크롤 위치 저장용 ref
+  const scrollPositionRef = useRef(0);
 
   // 날짜 포맷팅 헬퍼
   const formatDate = (dateString) => {
@@ -105,9 +108,19 @@ const ProjectDetailView = () => {
 
   // 할일 완료 상태 토글 (하위 목록)
   const handleTodoToggle = async (todo) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
-      fetchProjectData(); // 목록 갱신
+      
+      // 데이터 갱신
+      await fetchProjectData();
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('할일 상태 업데이트 실패!');
     }
@@ -115,6 +128,9 @@ const ProjectDetailView = () => {
 
   // 오늘 날짜로 설정 핸들러 (기한 없는 할일을 오늘 날짜로 설정)
   const handleSetToday = async (todo) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       // 오늘 날짜를 UTC 00:00:00으로 설정 (시간 없이 날짜만)
       const today = new Date();
@@ -126,7 +142,12 @@ const ProjectDetailView = () => {
       });
       
       // 목록 갱신
-      fetchProjectData();
+      await fetchProjectData();
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('날짜 설정에 실패했습니다.');
     }

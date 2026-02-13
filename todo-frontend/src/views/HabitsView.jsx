@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   getHabitsByCategoryId,
@@ -24,6 +24,9 @@ const HabitsView = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(getStartOfWeek());
+  
+  // 스크롤 위치 저장용 ref
+  const scrollPositionRef = useRef(0);
 
   // 이 뷰에서 날짜를 선택하므로, 선택된 날짜 상태를 관리
   const [selectedDate, setSelectedDate] = useState(
@@ -125,13 +128,23 @@ const HabitsView = () => {
 
   // --- 습관 토글 로직 ---
   const handleToggle = async (habit, isCurrentlyCompleted) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       await toggleHabitCompletion(
         habit._id,
         !isCurrentlyCompleted,
         selectedDate
       );
-      fetchHabits(); // 목록 갱신
+      
+      // 데이터 갱신
+      await fetchHabits();
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('습관 완료 상태 업데이트 실패!');
     }

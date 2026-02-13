@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProjects, updateProjectStatus } from '../api/projectApi';
 import { getTodos } from '../api/todoApi';
@@ -12,6 +12,9 @@ const ProjectsView = () => {
   const [todos, setTodos] = useState([]); // 모든 할일 목록
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // 스크롤 위치 저장용 ref
+  const scrollPositionRef = useRef(0);
   
   // 섹션 토글 상태
   const [isActiveExpanded, setIsActiveExpanded] = useState(true);
@@ -91,6 +94,9 @@ const ProjectsView = () => {
 
   // 상태 변경 핸들러 (체크박스 클릭 시 토글)
   const handleToggle = async (project) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       // status가 없으면 isCompleted 기반으로 변환
       const currentStatus = project.status || (project.isCompleted ? 'completed' : 'active');
@@ -107,8 +113,17 @@ const ProjectsView = () => {
       }
       
       await updateProjectStatus(project._id, newStatus);
-      fetchProjects(); // 목록 갱신
-      fetchAllTodos(); // 할일 통계 갱신
+      
+      // 데이터 갱신
+      await Promise.all([
+        fetchProjects(),
+        fetchAllTodos()
+      ]);
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('상태 업데이트에 실패했습니다.');
     }

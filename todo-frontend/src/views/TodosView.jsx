@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   getTodos,
@@ -28,6 +28,9 @@ const TodosView = () => {
   const [loading, setLoading] = useState(false);
   const [loadingWithoutDate, setLoadingWithoutDate] = useState(false);
   const [loadingOverdue, setLoadingOverdue] = useState(false);
+  
+  // 스크롤 위치 저장용 ref
+  const scrollPositionRef = useRef(0);
   
   // 섹션 토글 상태
   const [isTodosExpanded, setIsTodosExpanded] = useState(true);
@@ -134,11 +137,23 @@ const TodosView = () => {
   }, []);
 
   const handleToggle = async (todo) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
-      fetchTodos(); // 날짜별 목록 갱신
-      fetchTodosWithoutDate(); // 수행일 없는 목록 갱신
-      fetchOverdueTodos(); // 지난 할일 목록 갱신
+      
+      // 데이터 갱신
+      await Promise.all([
+        fetchTodos(),
+        fetchTodosWithoutDate(),
+        fetchOverdueTodos()
+      ]);
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('상태 업데이트에 실패했습니다.');
     }
@@ -146,6 +161,9 @@ const TodosView = () => {
 
   // 오늘 날짜로 설정 핸들러 (기한 없는 할일을 오늘 날짜로 설정)
   const handleSetToday = async (todo) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       // 오늘 날짜를 UTC 00:00:00으로 설정 (시간 없이 날짜만)
       const today = new Date();
@@ -157,9 +175,16 @@ const TodosView = () => {
       });
       
       // 목록 갱신
-      fetchTodos(); // 날짜별 목록 갱신
-      fetchTodosWithoutDate(); // 수행일 없는 목록 갱신
-      fetchOverdueTodos(); // 지난 할일 목록 갱신
+      await Promise.all([
+        fetchTodos(),
+        fetchTodosWithoutDate(),
+        fetchOverdueTodos()
+      ]);
+      
+      // 스크롤 위치 복원
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     } catch (error) {
       alert('날짜 설정에 실패했습니다.');
     }
