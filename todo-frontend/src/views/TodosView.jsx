@@ -81,8 +81,10 @@ const TodosView = () => {
   };
 
   // --- 할일 로딩 및 토글 로직 ---
-  const fetchTodos = useCallback(async () => {
-    setLoading(true);
+  const fetchTodos = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     try {
       // 선택된 날짜 기준으로 API 호출
       const data = await getTodos(selectedDate);
@@ -91,13 +93,17 @@ const TodosView = () => {
       console.error('Todo 로드 실패:', err);
       setTodos([]);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [selectedDate]);
 
   // 수행일 없는 할일 로딩
-  const fetchTodosWithoutDate = useCallback(async () => {
-    setLoadingWithoutDate(true);
+  const fetchTodosWithoutDate = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoadingWithoutDate(true);
+    }
     try {
       const data = await getTodosWithoutDate();
       setTodosWithoutDate(data);
@@ -105,13 +111,17 @@ const TodosView = () => {
       console.error('수행일 없는 Todo 로드 실패:', err);
       setTodosWithoutDate([]);
     } finally {
-      setLoadingWithoutDate(false);
+      if (showLoading) {
+        setLoadingWithoutDate(false);
+      }
     }
   }, []);
 
   // 실행일이 지난 미완료 할일 로딩
-  const fetchOverdueTodos = useCallback(async () => {
-    setLoadingOverdue(true);
+  const fetchOverdueTodos = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoadingOverdue(true);
+    }
     try {
       const data = await getOverdueTodos();
       setOverdueTodos(data);
@@ -119,7 +129,9 @@ const TodosView = () => {
       console.error('지난 할일 로드 실패:', err);
       setOverdueTodos([]);
     } finally {
-      setLoadingOverdue(false);
+      if (showLoading) {
+        setLoadingOverdue(false);
+      }
     }
   }, []);
 
@@ -143,11 +155,11 @@ const TodosView = () => {
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
       
-      // 데이터 갱신
+      // 데이터 갱신 (로딩 상태 변경 없이)
       await Promise.all([
-        fetchTodos(),
-        fetchTodosWithoutDate(),
-        fetchOverdueTodos()
+        fetchTodos(false),
+        fetchTodosWithoutDate(false),
+        fetchOverdueTodos(false)
       ]);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
@@ -179,11 +191,11 @@ const TodosView = () => {
         dueDate: todayUTC,
       });
       
-      // 목록 갱신
+      // 목록 갱신 (로딩 상태 변경 없이)
       await Promise.all([
-        fetchTodos(),
-        fetchTodosWithoutDate(),
-        fetchOverdueTodos()
+        fetchTodos(false),
+        fetchTodosWithoutDate(false),
+        fetchOverdueTodos(false)
       ]);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원

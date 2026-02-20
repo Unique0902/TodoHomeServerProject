@@ -22,8 +22,10 @@ const ProjectsView = () => {
   const [isWishExpanded, setIsWishExpanded] = useState(true);
   const [isCompletedExpanded, setIsCompletedExpanded] = useState(true);
 
-  const fetchProjects = useCallback(async () => {
-    setLoading(true);
+  const fetchProjects = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     setError(null);
     try {
       // 최상위 프로젝트만 조회 (하위 프로젝트 제외)
@@ -37,7 +39,9 @@ const ProjectsView = () => {
       console.error('프로젝트 로드 실패:', err);
       setError('프로젝트 목록을 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -114,9 +118,9 @@ const ProjectsView = () => {
       
       await updateProjectStatus(project._id, newStatus);
       
-      // 데이터 갱신
+      // 데이터 갱신 (로딩 상태 변경 없이)
       await Promise.all([
-        fetchProjects(),
+        fetchProjects(false),
         fetchAllTodos()
       ]);
       

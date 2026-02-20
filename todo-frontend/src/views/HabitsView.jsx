@@ -74,8 +74,10 @@ const HabitsView = () => {
   };
 
   // --- 습관 데이터 로드 로직 ---
-  const fetchHabits = useCallback(async () => {
-    setLoading(true);
+  const fetchHabits = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     setError(null);
     try {
       // 1. 모든 카테고리를 불러와 선택된 날짜에 해당하는 카테고리를 찾습니다.
@@ -101,7 +103,9 @@ const HabitsView = () => {
       console.error('습관 데이터 로드 실패:', err);
       setError('습관 데이터를 불러오는 데 실패했습니다.');
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [selectedDate]);
 
@@ -138,8 +142,8 @@ const HabitsView = () => {
         selectedDate
       );
       
-      // 데이터 갱신
-      await fetchHabits();
+      // 데이터 갱신 (로딩 상태 변경 없이)
+      await fetchHabits(false);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
       // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장

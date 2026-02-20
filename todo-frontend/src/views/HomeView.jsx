@@ -37,8 +37,10 @@ const HomeView = () => {
   const todayString = getTodayDateString();
 
   // --- 1. 데이터 로딩 로직 ---
-  const fetchHomeData = useCallback(async () => {
-    setLoading(true);
+  const fetchHomeData = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     setError(null);
     try {
       // 1. TODO 데이터 로드
@@ -76,7 +78,9 @@ const HomeView = () => {
       console.error(err);
       setError('데이터를 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [todayString]);
 
@@ -92,8 +96,8 @@ const HomeView = () => {
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
       
-      // 데이터 갱신
-      await fetchHomeData();
+      // 데이터 갱신 (로딩 상태 변경 없이)
+      await fetchHomeData(false);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
       // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
@@ -122,8 +126,8 @@ const HomeView = () => {
         todayString
       );
       
-      // 데이터 갱신
-      await fetchHomeData();
+      // 데이터 갱신 (로딩 상태 변경 없이)
+      await fetchHomeData(false);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
       // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장

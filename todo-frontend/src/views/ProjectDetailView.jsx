@@ -55,7 +55,10 @@ const ProjectDetailView = () => {
   };
 
   // 데이터 로드
-  const fetchProjectData = useCallback(async () => {
+  const fetchProjectData = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     try {
       // 프로젝트 정보 로드
       const projectData = await getProjectById(id);
@@ -75,7 +78,9 @@ const ProjectDetailView = () => {
     } catch (err) {
       setError('프로젝트 정보를 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [id]);
 
@@ -114,8 +119,8 @@ const ProjectDetailView = () => {
     try {
       await updateTodoStatus(todo._id, !todo.isCompleted);
       
-      // 데이터 갱신
-      await fetchProjectData();
+      // 데이터 갱신 (로딩 상태 변경 없이)
+      await fetchProjectData(false);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
       // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
@@ -146,8 +151,8 @@ const ProjectDetailView = () => {
         dueDate: todayUTC,
       });
       
-      // 목록 갱신
-      await fetchProjectData();
+      // 목록 갱신 (로딩 상태 변경 없이)
+      await fetchProjectData(false);
       
       // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
       // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
