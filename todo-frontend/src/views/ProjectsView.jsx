@@ -120,9 +120,14 @@ const ProjectsView = () => {
         fetchAllTodos()
       ]);
       
-      // 스크롤 위치 복원
+      // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
+      // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
       requestAnimationFrame(() => {
-        window.scrollTo(0, scrollPositionRef.current);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            window.scrollTo(0, scrollPositionRef.current);
+          });
+        });
       });
     } catch (error) {
       alert('상태 업데이트에 실패했습니다.');
