@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   getAccountBook,
   updateTotalAsset,
@@ -24,6 +24,9 @@ const AccountBookView = () => {
   const [editItemName, setEditItemName] = useState('');
   const [editItemPrice, setEditItemPrice] = useState('');
   
+  // 스크롤 위치 저장용 ref
+  const scrollPositionRef = useRef(0);
+  
   // 섹션 토글 상태
   const [isBudgetExpanded, setIsBudgetExpanded] = useState(true);
   const [isWishItemsExpanded, setIsWishItemsExpanded] = useState(true);
@@ -31,8 +34,10 @@ const AccountBookView = () => {
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
   // 데이터 로드
-  const fetchAccountBook = useCallback(async () => {
-    setLoading(true);
+  const fetchAccountBook = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const data = await getAccountBook();
@@ -41,7 +46,9 @@ const AccountBookView = () => {
       console.error('가계부 로드 실패:', err);
       setError('가계부 정보를 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -110,6 +117,9 @@ const AccountBookView = () => {
 
   // 프로젝트 준비물 토글 핸들러
   const handleProjectItemToggle = async (projectId, item) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       const newIsPurchased = !item.isPurchased;
       const updateData = {
@@ -124,7 +134,19 @@ const AccountBookView = () => {
       }
       
       await updateProjectItem(projectId, item._id, updateData);
-      fetchProjects(); // 프로젝트 목록 갱신
+      
+      // 프로젝트 목록 갱신
+      await fetchProjects();
+      
+      // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
+      // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            window.scrollTo(0, scrollPositionRef.current);
+          });
+        });
+      });
     } catch (error) {
       alert('구매 여부 업데이트에 실패했습니다.');
     }
@@ -179,6 +201,9 @@ const AccountBookView = () => {
 
   // 구매 여부 토글 핸들러
   const handleItemToggle = async (item) => {
+    // 스크롤 위치 저장
+    scrollPositionRef.current = window.scrollY;
+    
     try {
       const newIsPurchased = !item.isPurchased;
       const updateData = {
@@ -193,7 +218,19 @@ const AccountBookView = () => {
       }
       
       await updateWishItem(item._id, updateData);
-      fetchAccountBook();
+      
+      // 데이터 갱신 (로딩 상태 변경 없이)
+      await fetchAccountBook(false);
+      
+      // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
+      // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            window.scrollTo(0, scrollPositionRef.current);
+          });
+        });
+      });
     } catch (error) {
       alert('구매 여부 업데이트에 실패했습니다.');
     }
