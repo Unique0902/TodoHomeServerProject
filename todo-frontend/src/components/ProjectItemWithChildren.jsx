@@ -6,7 +6,6 @@ import '../styles/ProjectItemWithChildren.css';
 const ProjectItemWithChildren = ({
   project,
   allProjects,
-  onToggle,
   todoStats,
   getProjectTodoStats, // 통계 계산 함수 전달
   level = 0, // 들여쓰기 레벨 (0이 최상위)
@@ -44,12 +43,9 @@ const ProjectItemWithChildren = ({
 
   // 상세 페이지 이동 핸들러
   const handleDetailClick = (e) => {
-    // 체크박스나 토글 버튼 클릭 시 상세 페이지로 이동하지 않음
+    // 토글 버튼 클릭 시 상세 페이지로 이동하지 않음
     if (
-      e.target.closest('.project-checkbox') ||
-      e.target.className.includes('checkbox-input') ||
-      e.target.closest('.project-toggle-button') ||
-      e.target.closest('.project-item-container')?.querySelector('.project-checkbox')?.contains(e.target)
+      e.target.closest('.project-toggle-button')
     ) {
       return;
     }
@@ -72,7 +68,6 @@ const ProjectItemWithChildren = ({
         <div className='project-item-container' onClick={handleDetailClick}>
           <ProjectItem
             project={project}
-            onToggle={onToggle}
             todoStats={todoStats}
             disableNavigation={true}
           />
@@ -106,7 +101,6 @@ const ProjectItemWithChildren = ({
                     key={subProject._id}
                     project={subProject}
                     allProjects={allProjects}
-                    onToggle={onToggle}
                     todoStats={subStats}
                     getProjectTodoStats={getProjectTodoStats}
                     level={level + 1}
@@ -129,7 +123,6 @@ const ProjectItemWithChildren = ({
                     key={subProject._id}
                     project={subProject}
                     allProjects={allProjects}
-                    onToggle={onToggle}
                     todoStats={subStats}
                     getProjectTodoStats={getProjectTodoStats}
                     level={level + 1}
@@ -152,7 +145,6 @@ const ProjectItemWithChildren = ({
                     key={subProject._id}
                     project={subProject}
                     allProjects={allProjects}
-                    onToggle={onToggle}
                     todoStats={subStats}
                     getProjectTodoStats={getProjectTodoStats}
                     level={level + 1}
@@ -175,7 +167,6 @@ const ProjectItemWithChildren = ({
                     key={subProject._id}
                     project={subProject}
                     allProjects={allProjects}
-                    onToggle={onToggle}
                     todoStats={subStats}
                     getProjectTodoStats={getProjectTodoStats}
                     level={level + 1}

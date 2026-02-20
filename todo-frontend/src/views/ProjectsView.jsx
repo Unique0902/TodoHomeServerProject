@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProjects, updateProjectStatus } from '../api/projectApi';
+import { getProjects } from '../api/projectApi';
 import { getTodos } from '../api/todoApi';
 import ProjectItemWithChildren from '../components/ProjectItemWithChildren';
 import '../styles/ProjectsView.css';
@@ -12,9 +12,6 @@ const ProjectsView = () => {
   const [todos, setTodos] = useState([]); // 모든 할일 목록
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // 스크롤 위치 저장용 ref
-  const scrollPositionRef = useRef(0);
   
   // 섹션 토글 상태
   const [isActiveExpanded, setIsActiveExpanded] = useState(true);
@@ -96,47 +93,6 @@ const ProjectsView = () => {
     return { totalCount, completedCount };
   };
 
-  // 상태 변경 핸들러 (체크박스 클릭 시 토글)
-  const handleToggle = async (project) => {
-    // 스크롤 위치 저장
-    scrollPositionRef.current = window.scrollY;
-    
-    try {
-      // status가 없으면 isCompleted 기반으로 변환
-      const currentStatus = project.status || (project.isCompleted ? 'completed' : 'active');
-      
-      // 체크박스 토글: completed ↔ active (다른 상태는 그대로 유지)
-      let newStatus;
-      if (currentStatus === 'completed') {
-        newStatus = 'active';
-      } else if (currentStatus === 'active') {
-        newStatus = 'completed';
-      } else {
-        // paused나 wish 상태는 active로 변경
-        newStatus = 'active';
-      }
-      
-      await updateProjectStatus(project._id, newStatus);
-      
-      // 데이터 갱신 (로딩 상태 변경 없이)
-      await Promise.all([
-        fetchProjects(false),
-        fetchAllTodos()
-      ]);
-      
-      // DOM 업데이트가 완료될 때까지 기다린 후 스크롤 위치 복원
-      // 여러 번의 requestAnimationFrame을 사용하여 리렌더링 완료 보장
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            window.scrollTo(0, scrollPositionRef.current);
-          });
-        });
-      });
-    } catch (error) {
-      alert('상태 업데이트에 실패했습니다.');
-    }
-  };
 
   // 프로젝트 목록을 상태별로 분리 (기존 isCompleted도 호환성 처리)
   const activeProjects = projects.filter((p) => {
@@ -177,7 +133,6 @@ const ProjectsView = () => {
                   key={project._id}
                   project={project}
                   allProjects={allProjects}
-                  onToggle={handleToggle}
                   todoStats={stats}
                   getProjectTodoStats={getProjectTodoStats}
                   level={0}
@@ -206,7 +161,6 @@ const ProjectsView = () => {
                     key={project._id}
                     project={project}
                     allProjects={allProjects}
-                    onToggle={handleToggle}
                     todoStats={stats}
                     getProjectTodoStats={getProjectTodoStats}
                     level={0}
@@ -236,7 +190,6 @@ const ProjectsView = () => {
                     key={project._id}
                     project={project}
                     allProjects={allProjects}
-                    onToggle={handleToggle}
                     todoStats={stats}
                     getProjectTodoStats={getProjectTodoStats}
                     level={0}
@@ -268,7 +221,6 @@ const ProjectsView = () => {
                   key={project._id}
                   project={project}
                   allProjects={allProjects}
-                  onToggle={handleToggle}
                   todoStats={stats}
                   getProjectTodoStats={getProjectTodoStats}
                   level={0}
