@@ -34,6 +34,7 @@ const AccountBookView = () => {
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
   // 캘린더 관련 상태
+  const [viewMode, setViewMode] = useState('week'); // 'week' or 'month'
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -526,6 +527,9 @@ const AccountBookView = () => {
     const newMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     setCurrentMonth(newMonth);
     
+    // 월 변경 시 항상 월간뷰로 전환
+    setViewMode('month');
+    
     // 해당 월의 첫 번째 주로 이동
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     const day = firstDay.getDay();
@@ -533,6 +537,37 @@ const AccountBookView = () => {
     const sunday = new Date(firstDay.setDate(diff));
     setCurrentWeekStart(sunday.toISOString().split('T')[0]);
   };
+
+  // 월간뷰의 모든 날짜 계산
+  const monthDates = useMemo(() => {
+    const [year, month] = currentMonth.split('-');
+    const firstDay = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const lastDay = new Date(parseInt(year), parseInt(month), 0);
+    const dates = [];
+    
+    // 첫 날의 요일 계산 (일요일 = 0)
+    const firstDayOfWeek = firstDay.getDay();
+    
+    // 첫 주의 일요일부터 시작
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDayOfWeek);
+    
+    // 마지막 날의 요일 계산
+    const lastDayOfWeek = lastDay.getDay();
+    
+    // 마지막 주의 토요일까지
+    const endDate = new Date(lastDay);
+    endDate.setDate(endDate.getDate() + (6 - lastDayOfWeek));
+    
+    // 모든 날짜 생성
+    const current = new Date(startDate);
+    while (current <= endDate) {
+      dates.push(current.toISOString().split('T')[0]);
+      current.setDate(current.getDate() + 1);
+    }
+    
+    return dates;
+  }, [currentMonth]);
 
   // 선택된 날짜의 항목들
   const selectedDateItems = useMemo(() => {
@@ -924,50 +959,113 @@ const AccountBookView = () => {
                     </button>
                   </div>
 
-                  {/* 주간 캘린더 */}
-                  <div 
-                    className='week-calendar'
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
-                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-                  >
-                    {/* 요일 헤더 */}
-                    <div className='weekday-header'>
-                      {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
-                        <div key={index} className='weekday'>{day}</div>
-                      ))}
-                    </div>
+                  {/* 주간/월간 캘린더 */}
+                  {viewMode === 'week' ? (
+                    <>
+                      <div 
+                        className='week-calendar'
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                      >
+                        {/* 요일 헤더 */}
+                        <div className='weekday-header'>
+                          {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
+                            <div key={index} className='weekday'>{day}</div>
+                          ))}
+                        </div>
 
-                    {/* 날짜 및 금액 */}
-                    <div className='week-dates'>
-                      {currentWeekDates.map((dateKey) => {
-                        const date = new Date(dateKey);
-                        const day = date.getDate();
-                        const items = itemsByDate[dateKey] || [];
-                        const dateTotal = getDateTotal(items);
-                        const isSelected = selectedDate === dateKey;
-                        const isToday = dateKey === new Date().toISOString().split('T')[0];
-                        
-                        return (
-                          <div 
-                            key={dateKey} 
-                            className={`week-date-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
-                            onClick={() => setSelectedDate(dateKey)}
-                          >
-                            <div className='week-date-number'>{day}</div>
-                            {dateTotal > 0 && (
-                              <div className='week-date-amount'>-{dateTotal.toLocaleString()}</div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                        {/* 날짜 및 금액 */}
+                        <div className='week-dates'>
+                          {currentWeekDates.map((dateKey) => {
+                            const date = new Date(dateKey);
+                            const day = date.getDate();
+                            const items = itemsByDate[dateKey] || [];
+                            const dateTotal = getDateTotal(items);
+                            const isSelected = selectedDate === dateKey;
+                            const isToday = dateKey === new Date().toISOString().split('T')[0];
+                            
+                            return (
+                              <div 
+                                key={dateKey} 
+                                className={`week-date-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
+                                onClick={() => setSelectedDate(dateKey)}
+                              >
+                                <div className='week-date-number'>{day}</div>
+                                {dateTotal > 0 && (
+                                  <div className='week-date-amount'>-{dateTotal.toLocaleString()}</div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* 월간 캘린더 */}
+                      <div className='month-calendar'>
+                        {/* 요일 헤더 */}
+                        <div className='weekday-header'>
+                          {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
+                            <div key={index} className='weekday'>{day}</div>
+                          ))}
+                        </div>
+
+                        {/* 날짜 그리드 */}
+                        <div className='month-dates-grid'>
+                          {monthDates.map((dateKey) => {
+                            const date = new Date(dateKey);
+                            const day = date.getDate();
+                            const [year, month] = currentMonth.split('-');
+                            const isCurrentMonth = date.getFullYear() === parseInt(year) && 
+                                                   date.getMonth() + 1 === parseInt(month);
+                            const items = itemsByDate[dateKey] || [];
+                            const dateTotal = getDateTotal(items);
+                            const isSelected = selectedDate === dateKey;
+                            const isToday = dateKey === new Date().toISOString().split('T')[0];
+                            
+                            return (
+                              <div 
+                                key={dateKey} 
+                                className={`month-date-cell ${!isCurrentMonth ? 'other-month' : ''} ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
+                                onClick={() => {
+                                  setSelectedDate(dateKey);
+                                  if (isCurrentMonth) {
+                                    // 선택한 날짜가 현재 월이면 해당 주로 이동
+                                    const dayOfWeek = date.getDay();
+                                    const diff = date.getDate() - dayOfWeek;
+                                    const sunday = new Date(date);
+                                    sunday.setDate(diff);
+                                    setCurrentWeekStart(sunday.toISOString().split('T')[0]);
+                                  }
+                                }}
+                              >
+                                <div className='month-date-number'>{day}</div>
+                                {isCurrentMonth && dateTotal > 0 && (
+                                  <div className='month-date-amount'>-{dateTotal.toLocaleString()}</div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* 캘린더 바로 아래 - 주간/월간 전환 버튼 (길게) */}
+                  <button 
+                    className='view-toggle-button'
+                    onClick={() => setViewMode(viewMode === 'week' ? 'month' : 'week')}
+                    type='button'
+                  >
+                    {viewMode === 'week' ? '▼ 월간 보기로 확장' : '▲ 주간 보기로 접기'}
+                  </button>
 
                   {/* 선택된 날짜의 항목 리스트 */}
                   {selectedDateItems.length > 0 && (

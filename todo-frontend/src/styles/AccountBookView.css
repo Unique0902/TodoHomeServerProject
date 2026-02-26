@@ -518,6 +518,101 @@
     font-weight: 600;
 }
 
+/* 월간 캘린더 */
+.month-calendar {
+    margin-bottom: 20px;
+}
+
+.month-dates-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 0 4px;
+}
+
+.month-date-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 60px;
+    position: relative;
+}
+
+.month-date-cell:hover {
+    background-color: var(--bg-secondary);
+}
+
+.month-date-cell.other-month {
+    opacity: 0.3;
+}
+
+.month-date-cell.selected {
+    background-color: var(--bg-tertiary);
+    border: 2px solid var(--accent);
+}
+
+.month-date-cell.today:not(.selected) {
+    border: 1px solid var(--border-color);
+}
+
+.month-date-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    transition: color 0.3s ease;
+}
+
+.month-date-cell.selected .month-date-number {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.month-date-cell.other-month .month-date-number {
+    color: var(--text-tertiary);
+}
+
+.month-date-amount {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.month-date-cell.selected .month-date-amount {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* 뷰 전환 버튼 - 캘린더 바로 아래 길게 */
+.view-toggle-button {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    margin-top: 12px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.view-toggle-button:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 .selected-date-items {
     margin-top: 20px;
     padding-top: 20px;
