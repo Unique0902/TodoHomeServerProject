@@ -323,27 +323,148 @@ const AccountBookView = () => {
   const unpurchasedItems = accountBook?.wishItems?.filter((item) => !item.isPurchased) || [];
   const purchasedItems = accountBook?.wishItems?.filter((item) => item.isPurchased) || [];
 
-  // 구매 날짜/시간 포맷팅 헬퍼
-  const formatPurchaseDateTime = (dateString) => {
-    if (!dateString) return '';
+  // 모든 구매한 항목 수집 (wishItems + project items)
+  const allPurchasedItems = useMemo(() => {
+    const items = [];
     
+    // wishItems 중 구매한 항목
+    if (accountBook?.wishItems) {
+      accountBook.wishItems
+        .filter((item) => item.isPurchased)
+        .forEach((item) => {
+          items.push({
+            ...item,
+            type: 'wish',
+            projectTitle: null,
+          });
+        });
+    }
+    
+    // project items 중 구매한 항목
+    projects.forEach((project) => {
+      if (project.items) {
+        project.items
+          .filter((item) => item.isPurchased)
+          .forEach((item) => {
+            items.push({
+              ...item,
+              type: 'project',
+              projectTitle: project.title,
+              projectId: project._id,
+            });
+          });
+      }
+    });
+    
+    return items;
+  }, [accountBook, projects]);
+
+  // 구매날짜가 있는 항목과 없는 항목 분리
+  const purchasedItemsWithDate = useMemo(() => {
+    return allPurchasedItems.filter((item) => item.purchasedDate);
+  }, [allPurchasedItems]);
+
+  const purchasedItemsWithoutDate = useMemo(() => {
+    return allPurchasedItems.filter((item) => !item.purchasedDate);
+  }, [allPurchasedItems]);
+
+  // 날짜별로 그룹화
+  const itemsByDate = useMemo(() => {
+    const grouped = {};
+    
+    purchasedItemsWithDate.forEach((item) => {
+      const date = new Date(item.purchasedDate);
+      const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+      
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(item);
+    });
+    
+    // 날짜별로 정렬 (최신순)
+    return Object.keys(grouped)
+      .sort((a, b) => new Date(b) - new Date(a))
+      .reduce((acc, date) => {
+        acc[date] = grouped[date].sort((a, b) => new Date(b.purchasedDate) - new Date(a.purchasedDate));
+        return acc;
+      }, {});
+  }, [purchasedItemsWithDate]);
+
+  // 월별로 그룹화
+  const itemsByMonth = useMemo(() => {
+    const grouped = {};
+    
+    Object.keys(itemsByDate).forEach((dateKey) => {
+      const date = new Date(dateKey);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM 형식
+      
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = {};
+      }
+      grouped[monthKey][dateKey] = itemsByDate[dateKey];
+    });
+    
+    // 월별로 정렬 (최신순)
+    return Object.keys(grouped)
+      .sort((a, b) => new Date(b + '-01') - new Date(a + '-01'))
+      .reduce((acc, month) => {
+        acc[month] = grouped[month];
+        return acc;
+      }, {});
+  }, [itemsByDate]);
+
+  // 날짜 포맷팅 헬퍼
+  const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
-      const dateStr = date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
+      return date.toLocaleDateString('ko-KR', {
         month: 'long',
         day: 'numeric',
       });
-      const timeStr = date.toLocaleTimeString('ko-KR', {
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const formatMonth = (monthKey) => {
+    try {
+      const [year, month] = monthKey.split('-');
+      return `${parseInt(month)}월`;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const formatTime = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString('ko-KR', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,
       });
-      return `${dateStr} ${timeStr}`;
     } catch (e) {
-      console.error('구매 날짜 포맷 오류:', e);
       return '';
     }
+  };
+
+  const getDayOfWeek = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      return days[date.getDay()];
+    } catch (e) {
+      return '';
+    }
+  };
+
+  // 날짜별 총액 계산
+  const getDateTotal = (items) => {
+    return items.reduce((sum, item) => {
+      const price = item.price || 0;
+      return sum + price;
+    }, 0);
   };
 
   if (loading) return <div className='loading-state'>로딩 중...</div>;
@@ -594,8 +715,8 @@ const AccountBookView = () => {
         )}
       </section>
 
-      {/* 구매한 것 목록 */}
-      {purchasedItems.length > 0 && (
+      {/* 구매한 것 목록 - 캘린더 형태 */}
+      {allPurchasedItems.length > 0 && (
         <section className='purchased-items-section'>
           <div className='section-header' onClick={() => setIsPurchasedItemsExpanded(!isPurchasedItemsExpanded)}>
             <h2 className='section-title' style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>구매한 것</h2>
@@ -610,93 +731,173 @@ const AccountBookView = () => {
             </button>
           </div>
           {isPurchasedItemsExpanded && (
-            <div className='wish-items-list'>
-            {purchasedItems.map((item) => (
-              <div key={item._id} className='wish-item-row purchased'>
-                {editingItemId === item._id ? (
-                  // 수정 폼
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSaveEdit(item._id);
-                    }}
-                    className='item-edit-form'
-                    style={{ width: '100%', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}
-                  >
-                    <input
-                      type='text'
-                      value={editItemName}
-                      onChange={(e) => setEditItemName(e.target.value)}
-                      className='item-name-input'
-                      style={{ flex: 1, minWidth: '120px' }}
-                      autoFocus
-                    />
-                    <input
-                      type='number'
-                      value={editItemPrice}
-                      onChange={(e) => setEditItemPrice(e.target.value)}
-                      className='item-price-input'
-                      min='0'
-                      step='1'
-                      style={{ width: '100px' }}
-                      required
-                    />
-                    <button type='submit' className='item-edit-save-button' title='저장'>
-                      ✓
-                    </button>
-                    <button
-                      type='button'
-                      onClick={handleCancelEdit}
-                      className='item-edit-cancel-button'
-                      title='취소'
-                    >
-                      ✕
-                    </button>
-                  </form>
-                ) : (
-                  // 일반 표시
-                  <>
-                    <div className='item-checkbox' onClick={() => handleItemToggle(item)}>
-                      <input
-                        type='checkbox'
-                        checked={item.isPurchased}
-                        readOnly
-                        className='checkbox-input'
-                      />
+            <>
+              {/* 구매날짜가 있는 항목들 - 캘린더 형태 */}
+              {purchasedItemsWithDate.length > 0 && (
+                <div className='purchased-calendar'>
+                  {Object.keys(itemsByMonth).map((monthKey) => (
+                    <div key={monthKey} className='month-section'>
+                      <div className='month-header'>{formatMonth(monthKey)}</div>
+                      {Object.keys(itemsByMonth[monthKey]).map((dateKey) => {
+                        const items = itemsByMonth[monthKey][dateKey];
+                        const dateTotal = getDateTotal(items);
+                        const date = new Date(dateKey);
+                        const dayOfWeek = getDayOfWeek(dateKey);
+                        
+                        return (
+                          <div key={dateKey} className='date-card'>
+                            <div className='date-header'>
+                              <div className='date-info'>
+                                <span className='date-day'>{date.getDate()}</span>
+                                <span className='date-day-of-week'>{dayOfWeek}</span>
+                              </div>
+                              <div className='date-total'>
+                                {dateTotal > 0 ? `-${dateTotal.toLocaleString()}원` : ''}
+                              </div>
+                            </div>
+                            <div className='date-items'>
+                              {items.map((item) => (
+                                <div key={`${item.type}-${item._id}`} className='calendar-item'>
+                                  <div className='calendar-item-content'>
+                                    <div className='calendar-item-name'>
+                                      {item.name}
+                                      {item.type === 'project' && item.projectTitle && (
+                                        <span className='calendar-item-project'> · {item.projectTitle}</span>
+                                      )}
+                                    </div>
+                                    <div className='calendar-item-price'>
+                                      {item.price ? `-${item.price.toLocaleString()}원` : ''}
+                                    </div>
+                                  </div>
+                                  <div className='calendar-item-time'>{formatTime(item.purchasedDate)}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className='item-content'>
-                      <div className='item-name'>{item.name}</div>
-                      <div className='item-price'>{item.price.toLocaleString()}원</div>
-                    </div>
-                    {item.purchasedDate && (
-                      <div className='item-purchase-date'>
-                        {formatPurchaseDateTime(item.purchasedDate)}
+                  ))}
+                </div>
+              )}
+
+              {/* 구매날짜가 없는 항목들 */}
+              {purchasedItemsWithoutDate.length > 0 && (
+                <div className='purchased-items-no-date'>
+                  <div className='no-date-header'>구매날짜 없음</div>
+                  <div className='wish-items-list'>
+                    {purchasedItemsWithoutDate.map((item) => (
+                      <div key={`${item.type}-${item._id}`} className='wish-item-row purchased'>
+                        {editingItemId === item._id ? (
+                          // 수정 폼
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              if (item.type === 'wish') {
+                                handleSaveEdit(item._id);
+                              } else if (item.projectId) {
+                                handleSaveEditProjectItem(item.projectId, item._id);
+                              }
+                            }}
+                            className='item-edit-form'
+                            style={{ width: '100%', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}
+                          >
+                            <input
+                              type='text'
+                              value={editItemName}
+                              onChange={(e) => setEditItemName(e.target.value)}
+                              className='item-name-input'
+                              style={{ flex: 1, minWidth: '120px' }}
+                              autoFocus
+                            />
+                            <input
+                              type='number'
+                              value={editItemPrice}
+                              onChange={(e) => setEditItemPrice(e.target.value)}
+                              className='item-price-input'
+                              min='0'
+                              step='1'
+                              style={{ width: '100px' }}
+                              required={item.type === 'wish'}
+                            />
+                            <button type='submit' className='item-edit-save-button' title='저장'>
+                              ✓
+                            </button>
+                            <button
+                              type='button'
+                              onClick={handleCancelEdit}
+                              className='item-edit-cancel-button'
+                              title='취소'
+                            >
+                              ✕
+                            </button>
+                          </form>
+                        ) : (
+                          // 일반 표시
+                          <>
+                            <div 
+                              className='item-checkbox' 
+                              onClick={() => {
+                                if (item.type === 'wish') {
+                                  handleItemToggle(item);
+                                } else if (item.projectId) {
+                                  handleProjectItemToggle(item.projectId, item);
+                                }
+                              }}
+                            >
+                              <input
+                                type='checkbox'
+                                checked={item.isPurchased}
+                                readOnly
+                                className='checkbox-input'
+                              />
+                            </div>
+                            <div className='item-content'>
+                              <div className='item-name'>
+                                {item.name}
+                                {item.type === 'project' && item.projectTitle && (
+                                  <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginLeft: '8px' }}>
+                                    · {item.projectTitle}
+                                  </span>
+                                )}
+                              </div>
+                              {item.price && (
+                                <div className='item-price'>{item.price.toLocaleString()}원</div>
+                              )}
+                            </div>
+                            <button
+                              className='item-edit-button'
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (item.type === 'wish') {
+                                  handleStartEdit(item);
+                                } else if (item.projectId) {
+                                  handleStartEditProjectItem(item.projectId, item);
+                                }
+                              }}
+                              style={{ marginRight: '8px' }}
+                            >
+                              ✏️
+                            </button>
+                            {item.type === 'wish' && (
+                              <button
+                                className='item-delete-button'
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteItem(item._id, item.name);
+                                }}
+                              >
+                                🗑️
+                              </button>
+                            )}
+                          </>
+                        )}
                       </div>
-                    )}
-                    <button
-                      className='item-edit-button'
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartEdit(item);
-                      }}
-                      style={{ marginRight: '8px' }}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className='item-delete-button'
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteItem(item._id, item.name);
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </>
-                )}
-              </div>
-            ))}
-            </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </section>
       )}

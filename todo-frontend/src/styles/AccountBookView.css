@@ -390,6 +390,131 @@
     margin-top: 30px;
 }
 
+/* 캘린더 형태 스타일 */
+.purchased-calendar {
+    margin-top: 15px;
+}
+
+.month-section {
+    margin-bottom: 30px;
+}
+
+.month-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.date-card {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.date-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+.date-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-day {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.date-day-of-week {
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.date-total {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.date-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calendar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendar-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-item-name {
+    font-size: 15px;
+    color: var(--text-primary);
+    flex: 1;
+    transition: color 0.3s ease;
+}
+
+.calendar-item-project {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    transition: color 0.3s ease;
+}
+
+.calendar-item-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-left: 12px;
+    transition: color 0.3s ease;
+}
+
+.calendar-item-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    transition: color 0.3s ease;
+}
+
+/* 구매날짜 없는 항목들 */
+.purchased-items-no-date {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+.no-date-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+
 .empty-message {
     padding: 20px;
     text-align: center;
