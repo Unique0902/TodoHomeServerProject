@@ -467,6 +467,29 @@ const AccountBookView = () => {
     }, 0);
   };
 
+  // 구매 날짜/시간 포맷팅 헬퍼 (기존 호환성 유지)
+  const formatPurchaseDateTime = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      const dateStr = date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      const timeStr = date.toLocaleTimeString('ko-KR', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+      return `${dateStr} ${timeStr}`;
+    } catch (e) {
+      console.error('구매 날짜 포맷 오류:', e);
+      return '';
+    }
+  };
+
   if (loading) return <div className='loading-state'>로딩 중...</div>;
   if (error) return <div className='error-state'>{error}</div>;
   if (!accountBook) return <div className='empty-state'>가계부를 찾을 수 없습니다.</div>;
