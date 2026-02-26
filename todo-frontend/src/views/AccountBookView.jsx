@@ -33,6 +33,23 @@ const AccountBookView = () => {
   const [isPurchasedItemsExpanded, setIsPurchasedItemsExpanded] = useState(true);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
+  // 캘린더 관련 상태
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    return now.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+  });
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day; // 일요일로 맞춤
+    const sunday = new Date(now.setDate(diff));
+    return sunday.toISOString().split('T')[0];
+  });
+
   // 데이터 로드
   const fetchAccountBook = useCallback(async (showLoading = true) => {
     if (showLoading) {
@@ -467,6 +484,131 @@ const AccountBookView = () => {
     }, 0);
   };
 
+  // 월별 총액 계산
+  const getMonthTotal = (monthKey) => {
+    if (!itemsByMonth[monthKey]) return 0;
+    let total = 0;
+    Object.values(itemsByMonth[monthKey]).forEach((items) => {
+      total += getDateTotal(items);
+    });
+    return total;
+  };
+
+  // 현재 주의 날짜들 계산
+  const currentWeekDates = useMemo(() => {
+    const dates = [];
+    const startDate = new Date(currentWeekStart);
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      dates.push(date.toISOString().split('T')[0]);
+    }
+    return dates;
+  }, [currentWeekStart]);
+
+  // 주 변경 핸들러
+  const handleWeekChange = (direction) => {
+    const startDate = new Date(currentWeekStart);
+    startDate.setDate(startDate.getDate() + (direction * 7));
+    const newWeekStart = startDate.toISOString().split('T')[0];
+    setCurrentWeekStart(newWeekStart);
+    
+    // 주가 변경되면 해당 주의 월로 currentMonth 업데이트
+    const newMonth = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`;
+    setCurrentMonth(newMonth);
+  };
+
+  // 월 변경 핸들러
+  const handleMonthChange = (direction) => {
+    const [year, month] = currentMonth.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    date.setMonth(date.getMonth() + direction);
+    const newMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    setCurrentMonth(newMonth);
+    
+    // 해당 월의 첫 번째 주로 이동
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const day = firstDay.getDay();
+    const diff = firstDay.getDate() - day;
+    const sunday = new Date(firstDay.setDate(diff));
+    setCurrentWeekStart(sunday.toISOString().split('T')[0]);
+  };
+
+  // 선택된 날짜의 항목들
+  const selectedDateItems = useMemo(() => {
+    const dateKey = selectedDate;
+    if (itemsByDate[dateKey]) {
+      return itemsByDate[dateKey];
+    }
+    return [];
+  }, [selectedDate, itemsByDate]);
+
+  // 드래그 관련 상태
+  const [dragStart, setDragStart] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // 터치/드래그 핸들러
+  const handleTouchStart = (e) => {
+    setDragStart(e.touches[0].clientX);
+    setIsDragging(false);
+  };
+
+  const handleTouchMove = (e) => {
+    if (dragStart === null) return;
+    const diff = e.touches[0].clientX - dragStart;
+    if (Math.abs(diff) > 10) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (dragStart === null) return;
+    const diff = e.changedTouches[0].clientX - dragStart;
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // 오른쪽으로 드래그 (이전 주)
+        handleWeekChange(-1);
+      } else {
+        // 왼쪽으로 드래그 (다음 주)
+        handleWeekChange(1);
+      }
+    }
+    
+    setDragStart(null);
+    setIsDragging(false);
+  };
+
+  // 마우스 드래그 핸들러
+  const handleMouseDown = (e) => {
+    setDragStart(e.clientX);
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (dragStart === null) return;
+    const diff = e.clientX - dragStart;
+    if (Math.abs(diff) > 10) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseUp = (e) => {
+    if (dragStart === null) return;
+    const diff = e.clientX - dragStart;
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        handleWeekChange(-1);
+      } else {
+        handleWeekChange(1);
+      }
+    }
+    
+    setDragStart(null);
+    setIsDragging(false);
+  };
+
   // 구매 날짜/시간 포맷팅 헬퍼 (기존 호환성 유지)
   const formatPurchaseDateTime = (dateString) => {
     if (!dateString) return '';
@@ -755,52 +897,106 @@ const AccountBookView = () => {
           </div>
           {isPurchasedItemsExpanded && (
             <>
-              {/* 구매날짜가 있는 항목들 - 캘린더 형태 */}
+              {/* 구매날짜가 있는 항목들 - 토스 스타일 캘린더 */}
               {purchasedItemsWithDate.length > 0 && (
-                <div className='purchased-calendar'>
-                  {Object.keys(itemsByMonth).map((monthKey) => (
-                    <div key={monthKey} className='month-section'>
-                      <div className='month-header'>{formatMonth(monthKey)}</div>
-                      {Object.keys(itemsByMonth[monthKey]).map((dateKey) => {
-                        const items = itemsByMonth[monthKey][dateKey];
-                        const dateTotal = getDateTotal(items);
+                <div className='purchased-calendar-toss'>
+                  {/* 월 헤더 및 총액 */}
+                  <div className='calendar-month-header'>
+                    <button 
+                      className='month-nav-button' 
+                      onClick={() => handleMonthChange(-1)}
+                      type='button'
+                    >
+                      ←
+                    </button>
+                    <div className='month-title-group'>
+                      <div className='month-title'>{formatMonth(currentMonth)}</div>
+                      <div className='month-total'>
+                        {getMonthTotal(currentMonth).toLocaleString()}원
+                      </div>
+                    </div>
+                    <button 
+                      className='month-nav-button' 
+                      onClick={() => handleMonthChange(1)}
+                      type='button'
+                    >
+                      →
+                    </button>
+                  </div>
+
+                  {/* 주간 캘린더 */}
+                  <div 
+                    className='week-calendar'
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                  >
+                    {/* 요일 헤더 */}
+                    <div className='weekday-header'>
+                      {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
+                        <div key={index} className='weekday'>{day}</div>
+                      ))}
+                    </div>
+
+                    {/* 날짜 및 금액 */}
+                    <div className='week-dates'>
+                      {currentWeekDates.map((dateKey) => {
                         const date = new Date(dateKey);
-                        const dayOfWeek = getDayOfWeek(dateKey);
+                        const day = date.getDate();
+                        const items = itemsByDate[dateKey] || [];
+                        const dateTotal = getDateTotal(items);
+                        const isSelected = selectedDate === dateKey;
+                        const isToday = dateKey === new Date().toISOString().split('T')[0];
                         
                         return (
-                          <div key={dateKey} className='date-card'>
-                            <div className='date-header'>
-                              <div className='date-info'>
-                                <span className='date-day'>{date.getDate()}</span>
-                                <span className='date-day-of-week'>{dayOfWeek}</span>
-                              </div>
-                              <div className='date-total'>
-                                {dateTotal > 0 ? `-${dateTotal.toLocaleString()}원` : ''}
-                              </div>
-                            </div>
-                            <div className='date-items'>
-                              {items.map((item) => (
-                                <div key={`${item.type}-${item._id}`} className='calendar-item'>
-                                  <div className='calendar-item-content'>
-                                    <div className='calendar-item-name'>
-                                      {item.name}
-                                      {item.type === 'project' && item.projectTitle && (
-                                        <span className='calendar-item-project'> · {item.projectTitle}</span>
-                                      )}
-                                    </div>
-                                    <div className='calendar-item-price'>
-                                      {item.price ? `-${item.price.toLocaleString()}원` : ''}
-                                    </div>
-                                  </div>
-                                  <div className='calendar-item-time'>{formatTime(item.purchasedDate)}</div>
-                                </div>
-                              ))}
-                            </div>
+                          <div 
+                            key={dateKey} 
+                            className={`week-date-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
+                            onClick={() => setSelectedDate(dateKey)}
+                          >
+                            <div className='week-date-number'>{day}</div>
+                            {dateTotal > 0 && (
+                              <div className='week-date-amount'>-{dateTotal.toLocaleString()}</div>
+                            )}
                           </div>
                         );
                       })}
                     </div>
-                  ))}
+                  </div>
+
+                  {/* 선택된 날짜의 항목 리스트 */}
+                  {selectedDateItems.length > 0 && (
+                    <div className='selected-date-items'>
+                      <div className='selected-date-header'>
+                        {new Date(selectedDate).toLocaleDateString('ko-KR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </div>
+                      {selectedDateItems.map((item) => (
+                        <div key={`${item.type}-${item._id}`} className='calendar-item'>
+                          <div className='calendar-item-content'>
+                            <div className='calendar-item-name'>
+                              {item.name}
+                              {item.type === 'project' && item.projectTitle && (
+                                <span className='calendar-item-project'> · {item.projectTitle}</span>
+                              )}
+                            </div>
+                            <div className='calendar-item-price'>
+                              {item.price ? `-${item.price.toLocaleString()}원` : ''}
+                            </div>
+                          </div>
+                          <div className='calendar-item-time'>{formatTime(item.purchasedDate)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

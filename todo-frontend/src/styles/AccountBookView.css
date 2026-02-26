@@ -390,7 +390,150 @@
     margin-top: 30px;
 }
 
-/* 캘린더 형태 스타일 */
+/* 토스 스타일 캘린더 */
+.purchased-calendar-toss {
+    margin-top: 15px;
+}
+
+.calendar-month-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.month-nav-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.3s ease;
+}
+
+.month-nav-button:hover {
+    background-color: var(--bg-secondary);
+}
+
+.month-title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.month-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.month-total {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.week-calendar {
+    margin-bottom: 20px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.weekday-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+    padding: 0 4px;
+}
+
+.weekday {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    padding: 8px 0;
+    transition: color 0.3s ease;
+}
+
+.week-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 0 4px;
+}
+
+.week-date-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 70px;
+}
+
+.week-date-cell:hover {
+    background-color: var(--bg-secondary);
+}
+
+.week-date-cell.selected {
+    background-color: var(--bg-tertiary);
+    border: 2px solid var(--accent);
+}
+
+.week-date-cell.today:not(.selected) {
+    border: 1px solid var(--border-color);
+}
+
+.week-date-number {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+.week-date-cell.selected .week-date-number {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.week-date-amount {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.week-date-cell.selected .week-date-amount {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.selected-date-items {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+.selected-date-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+
+/* 캘린더 형태 스타일 (기존 - 호환성 유지) */
 .purchased-calendar {
     margin-top: 15px;
 }
